@@ -4,7 +4,7 @@ Simple, minimum, yet configurable photo viewer/slideshow/digital signage softwar
 Feature: normal view, windowless view with slideshow, fullscreen view with slideshow. Keyboard and mouse playback control. 
 Configurable with GUI and command line options.
 
-For those who dont't want annoying "Print This" or "Add to gallery" menus, automatic resizing, unnecessary animation menu effects. 
+For those who dont't want annoying "Print This" or "Add to gallery" menus, automatic resizing, and unnecessary animation menu effects. 
 
 
 Normal View
