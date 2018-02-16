@@ -20,13 +20,13 @@ TODO:
   interval check
   filter check
 
+ Command line options.
  GUI settings.
  stop using config xml use ini.
  file drop handling.
- Command line options.
  PreLoading image for slideshow.
- playlist.
- power save aware.
+ load playlist.
+ OS-power-save event aware.
  i18n
   http://wiki.lazarus.freepascal.org/Step-by-step_instructions_for_creating_multi-language_applications
   http://wiki.lazarus.freepascal.org/Translations_/_i18n_/_localizations_for_programs
@@ -123,7 +123,7 @@ type
     FOptFit:boolean;
     FOptExpand:boolean;
     FOptIntervalIntSeconds:integer;
-    FOptMinimulFileSizeKiloByte:integer;
+    FOptMinimulFileSizeKiloByte:integer; //be carefull when setting this
 
     FOptRepeat:boolean;
     FOptRandom:boolean;
@@ -183,8 +183,8 @@ type
     property OptSlideshowAutoStart:boolean read FOptSlideshowAutoStart;
     property IsSingleFileSelected: boolean read FisSingleFileSelected;
     property IsManualTransition: boolean read FisManualTransition;
-    procedure DoneInFrame(iCurr:integer);
-    procedure DoneFullscreen(iCurr:integer);
+    procedure DoneInFrame(strCurr:string);
+    procedure DoneFullscreen(strCurr:string);
     procedure SetCaption(strCaption:string);
 
   end;
@@ -203,7 +203,7 @@ uses UFullscreen;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
-  i,j:integer;
+  i,j,f:integer;
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
@@ -229,7 +229,7 @@ begin
   FOptFit:=true;
   FOptIntMoniter:=0;
   FOptIntervalIntSeconds:=4;
-  FOptMinimulFileSizeKiloByte:=1;
+  FOptMinimulFileSizeKiloByte:=1;//don't change
 
   FOptRandom:=true;
   FOptRepeat:=true;
@@ -279,7 +279,11 @@ begin
         //is picture file
         if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
         begin
-          FstFileList.Add(ParamStr(I));
+          f:= FileSize(ParamStr(I));
+          if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+          begin
+            FstFileList.Add(ParamStr(I));
+          end;
         end;
       end else if (FstPlaylistExtList.IndexOf(LowerCase(ExtractFileExt(ParamStr(I)))) >= 0) then
       begin
@@ -322,7 +326,11 @@ begin
         begin
           if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
           begin
-            FstFileList.Add(folderfiles[j]);
+            f:= FileSize(folderfiles[j]);
+            if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+            begin
+              FstFileList.Add(folderfiles[j]);
+            end;
           end;
         end;
       finally
@@ -357,7 +365,11 @@ begin
         begin
           if not (AnsiStartsStr('.',ExtractFilename(OpenPictureDialog1.Files[i]))) then
           begin
-            FstFileList.Add(OpenPictureDialog1.Files[i]);
+            f:= FileSize(OpenPictureDialog1.Files[i]);
+            if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+            begin
+              FstFileList.Add(OpenPictureDialog1.Files[i]);
+            end;
           end;
         end else if (FstPlaylistExtList.IndexOf(LowerCase(ExtractFileExt(OpenPictureDialog1.Files[i]))) >= 0) then
         begin
@@ -395,7 +407,11 @@ begin
           //ignore first selected image.
           if (folderfiles[j] <> FstFileList[0]) then
           begin
-            FstFileList.Add(folderfiles[j]);
+            f:= FileSize(folderfiles[j]);
+            if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+            begin
+              FstFileList.Add(folderfiles[j]);
+            end;
           end;
         end;
       end;
@@ -839,7 +855,7 @@ begin
      FiCurrentFileIndex:=FiCurrentFileIndex+1;
      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
      screen.Cursor:=crDefault;
-     Handled:=true;
+     //Handled:=true;
     end;
   end;
 end;
@@ -856,7 +872,7 @@ begin
      FiCurrentFileIndex:=FiCurrentFileIndex-1;
      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
      screen.Cursor:=crDefault;
-     Handled:=true;
+     //Handled:=true;
     end;
   end;
 end;
@@ -888,22 +904,32 @@ begin
 end;
 
 
-procedure TfrmMain.DoneFullscreen(iCurr:integer);
+procedure TfrmMain.DoneFullscreen(strCurr:string);
+var
+  i:integer;
 begin
   if FIsStartNormal then
   begin
     if FileList.Count <= 1 then exit;  //must be here. one pic fullscreen hangs
 
+    if strCurr <> '' then
+    begin
+      i:=FileList.IndexOf(strCurr);
+      if (i > -1) then
+      begin
+        FiCurrentFileIndex:=i;
+        LoadImage();
+      end;
+    end;
 
-    FiCurrentFileIndex:=iCurr;
-    LoadImage();
+
     {
-    Image1.Visible:=true;
-    Image1.Repaint;
-    Image1.Refresh;
-    Image1.BringToFront;
+    if iCurr > -1 then
+    begin
+      FiCurrentFileIndex:=iCurr;
+      LoadImage();
+    end;
     }
-
     Screen.Cursor:=crDefault; //again
 
   end;
@@ -964,7 +990,9 @@ begin
   end;
 end;
 
-procedure TfrmMain.DoneInFrame(iCurr:integer);
+procedure TfrmMain.DoneInFrame(strCurr :string);
+var
+  i:integer;
 begin
 
   FisInFrame:=false;
@@ -984,9 +1012,20 @@ begin
 
   if FileList.Count <= 1 then exit;
 
+  if strCurr <> '' then
+  begin
+    i:=FileList.IndexOf(strCurr);
+    if (i > -1) then
+    begin
+      FiCurrentFileIndex:=i;
+      LoadImage();
+    end;
+  end;
+
+  {
   FiCurrentFileIndex:=iCurr;
   LoadImage();
-
+  }
 
   Image1.Repaint;
   Image1.Refresh;

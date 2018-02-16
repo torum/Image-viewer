@@ -1,7 +1,7 @@
 object frmFullscreen: TfrmFullscreen
-  Left = 1551
+  Left = 1554
   Height = 301
-  Top = 402
+  Top = 404
   Width = 400
   AlphaBlend = True
   BorderStyle = bsNone
@@ -10,7 +10,6 @@ object frmFullscreen: TfrmFullscreen
   ClientWidth = 400
   Color = clBlack
   DesignTimePPI = 120
-  OnActivate = FormActivate
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -19,7 +18,6 @@ object frmFullscreen: TfrmFullscreen
   OnMouseMove = FormMouseMove
   OnMouseWheelDown = FormMouseWheelDown
   OnMouseWheelUp = FormMouseWheelUp
-  OnPaint = FormPaint
   OnResize = FormResize
   OnShow = FormShow
   PopupMenu = PopupMenu1

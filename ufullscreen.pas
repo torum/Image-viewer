@@ -2,7 +2,7 @@ unit UFullscreen;
 
 {$mode objfpc}{$H+}
 
-{$DEFINE Mydebug}
+{$DEFINE MyDebug}
 
 interface
 
@@ -45,9 +45,7 @@ type
 
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
-    procedure FormActivate(Sender: TObject);
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
-    procedure FormPaint(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -89,6 +87,7 @@ type
     FFileListRemaining:TStringList;
     //FFileListIgnore:TStringList;
     FiCurr:integer;
+    FstrCurr:string;
     FInterval:integer;
     FStretch:boolean;
     FExpand:boolean;
@@ -346,9 +345,7 @@ begin
 
 end;
 
-procedure TfrmFullscreen.FormActivate(Sender: TObject);
-begin
-end;
+
 
 procedure TfrmFullscreen.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
@@ -359,6 +356,8 @@ begin
     TimerFadeIn.Enabled:=false;
     //frmMain.DoneInFrame();
   end;
+
+  CanClose:=true;
 end;
 
 procedure TfrmFullscreen.FormClose(Sender: TObject;
@@ -375,9 +374,9 @@ begin
 
   if FisInFrame then
   begin
-    frmMain.DoneInFrame(FiCurr);
+    frmMain.DoneInFrame(FstrCurr);
   end else begin
-    frmMain.DoneFullscreen(FiCurr);
+    frmMain.DoneFullscreen(FstrCurr);
   end;
 end;
 
@@ -445,7 +444,7 @@ begin
 
   //TODO if preLoad,
 
-  TimerInterval.Enabled:=false;
+  TimerInterval.Enabled:=false; //just in case.
 
   {$ifdef Mydebug}
   OutputDebugString(PChar(TrimRight( 'PlaybackPlay:id '+ intToStr(TimerInterval.Tag) )));
@@ -454,19 +453,35 @@ begin
   i:=TimerInterval.Tag;
   if ValidateFileIndex(i) then
   begin
+
+
     //display image
     FiCurr:=DisplayImage(i);
+    FstrCurr:=FFileList[FiCurr];
 
-    if FisInFrame then
+
+    if FiCurr < 0 then
     begin
-      if (FFileList.Count = 1) then
+      //skipping or error
+      DisplayError(i,'file skipping error   .'+intToStr(i));
+
+      //TODO if you set Repeat and FileSize Filter.
+      // It triggers infinite loop.
+
+    end else
+    begin
+      if FisInFrame then
       begin
-        frmMain.SetCaption('InFrame Slideshow - ' + FFileList[FiCurr]);
-      end else
-      begin
-        frmMain.SetCaption('InFrame Slideshow: '+'['+intToStr(FiCurr+1)+'/'+ intToStr(FFileList.Count) +'] - ' + FFileList[FiCurr]);
+        if (FFileList.Count = 1) then
+        begin
+          frmMain.SetCaption('InFrame Slideshow - ' + FFileList[FiCurr]);
+        end else
+        begin
+          frmMain.SetCaption('InFrame Slideshow: '+'['+intToStr(FiCurr+1)+'/'+ intToStr(FFileList.Count) +'] - ' + FFileList[FiCurr]);
+        end;
       end;
     end;
+
   end else begin
     DisplayError(i,'Display file index out of rainge.'+intToStr(i));
     {$ifdef Mydebug}
@@ -478,12 +493,14 @@ begin
   //next cycle.
   if FFileList.Count > 0 then
   begin
+
     //tell Timer what to play.
     if FRandom then begin
       iNext:=GetNextRandomImageIndex();
     end else begin
       iNext:=GetNextImageIndex(Current);
     end;
+
     if (iNext > -1) then
     begin
       {$ifdef Mydebug}
@@ -499,7 +516,8 @@ begin
         TimerInterval.Enabled:=true;
       end;
 
-    end else begin
+    end else
+    begin
       //next is the end of list.
       {$ifdef Mydebug}
       OutputDebugString(PChar(TrimRight( 'PlaybackPlay: ->PlaybackRepeatStart')));
@@ -545,11 +563,8 @@ begin
     {$endif}
 
     //start timer
-    if FEffect then begin
-      TimerInterval.Enabled:=true;
-    end else begin
-      TimerInterval.Enabled:=true;
-    end;
+    TimerInterval.Enabled:=true;
+
   end else begin
     //TODO
     //self terminate?
@@ -613,20 +628,37 @@ end;
 procedure TfrmFullscreen.PlaybackNext(Sender: TObject);
 begin
   if FFileList.Count > 1 then begin
+
+    TimerInterval.Enabled:=false;
+
     if FEffect then begin
+      {
+      TimerFadeIn.Enabled:=false;
+      TimerFadeOut.Enabled:=false;
+      alphablendvalue:=255;
+      PlaybackPlay(false);
+      }
+
+
       if TimerFadeIn.Enabled then
       begin
-        //fading in but let's just go next.
-        TimerFadeIn.Enabled:=false;
-        //alphablendvalue:=2;
-        PlaybackPlay(false);
+        //fading IN. so just speed up.
+        self.AlphaBlendValue:=255;
+
+        //don't do this. getRandomImageIndex(stringlist remaining) gets messed up.
+        //TimerFadeIn.Enabled:=false;
+        //PlaybackPlay(false);
       end else if TimerFadeOut.Enabled then
       begin
-        TimerFadeOut.Enabled:=false;
-        //alphablendvalue:=2;
-        PlaybackPlay(false);
+        //fading OUT. so let's just speed up.
+        self.AlphaBlendValue:=2;
+
+        //don't do this. getRandomImageIndex(stringlist remaining) gets messed up.
+        //TimerFadeOut.Enabled:=false;
+        //PlaybackPlay(false);
       end else
       begin
+        self.AlphaBlendValue:=255;//just in case;
         PlaybackPlay(false);
       end;
 
@@ -653,7 +685,7 @@ begin
         if TimerFadeIn.Enabled then
         begin
           TimerFadeIn.Enabled:=false;
-          alphablendvalue:=2;
+          alphablendvalue:=255;
           TimerInterval.Enabled:=false;
           TimerInterval.Tag := iPrev;
           PlaybackPlay(false);
@@ -674,6 +706,9 @@ begin
         begin
           TimerInterval.Enabled:=false;
           TimerInterval.Tag := iPrev;
+          alphablendvalue:=255;
+          TimerFadeOut.Enabled:=false;
+          TimerInterval.Enabled:=false;
           PlaybackPlay(false);
         end;
 
@@ -777,6 +812,7 @@ begin
         {$endif}
         Image1.Picture.Clear;
         DisplayError(id,'DisplayImage@LoadFromFile - '+E.Message);
+        result:=-1;
       end;
     end;
   end else
@@ -784,6 +820,7 @@ begin
     //file does not exists.
     if (f < 0) then begin
       Image1.Picture.Clear;
+      self.AlphaBlendValue:=255;
       with image1.Canvas do
         begin
           Brush.Style := bsClear;
@@ -796,9 +833,21 @@ begin
       OutputDebugString(PChar(TrimRight( 'DisplayImage FileNotFound:id '+ intToStr(id) )));
       {$endif}
     end else begin
-      //file size just too small. skipping.
+      //file size just too small. file size became smaller during the slideshow.
+      //TODO test this.
+      self.AlphaBlendValue:=255;
+      Image1.Picture.Clear;
+      with image1.Canvas do
+        begin
+          Brush.Style := bsClear;
+          Font.Color := clWhite;
+          TextOut(24,24, 'File size is wrong: '+FFileList[id]);
+      end;
+      Image1.Update;
+      result:=id;
+
       //TODO getNext and continue?
-      result:=-1;
+      //result:=-1;
     end;
   end;
 
@@ -880,23 +929,26 @@ begin
       end;
     end;
   end else begin
+
     TimerFadeIn.Enabled:=false;
+
     {$ifdef Mydebug}
     OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer' )));
     {$endif}
+
     //start timer or repeat check.
     if FRandom then begin
       iNext:=GetNextRandomImageIndex();
     end else begin
       iNext:=GetNextImageIndex(Current);
     end;
+
     if (iNext > -1) then begin
       //start interval timer
       {$ifdef Mydebug}
       OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer: ->Next:' + intToStr(iNext) )));
       {$endif}
       TimerInterval.Enabled:=true;
-
       //TODO preLoading.
 
     end else begin
@@ -941,7 +993,7 @@ begin
     exit;
   end;
 
-  TimerInterval.Enabled:=false;;
+  TimerInterval.Enabled:=false;
 
   if self.AlphaBlendValue > 12 then
   begin
@@ -965,6 +1017,7 @@ begin
     {$ifdef Mydebug}
     OutputDebugString(PChar(TrimRight( 'TimerFadeOutTimer: ->(PlaybackPlay)TimerFadeIn' )));
     {$endif}
+
   end;
 end;
 
@@ -1018,7 +1071,7 @@ begin
   begin
     if FFileListHistory.Count > 0 then begin
 
-      //TODO when you go back, put current to remaining,
+      //TODO check. when you go back, put current to remaining,
 
 
       //saving for the "next"
@@ -1168,16 +1221,7 @@ end;
 
 procedure TfrmFullscreen.MenuItemQuitClick(Sender: TObject);
 begin
-  if FisInFrame then
-  begin
-    //TODO NOT WORKING
-    TimerInterval.Enabled:=false;
-    TimerFadeOut.Enabled:=false;
-    TimerFadeIn.Enabled:=false;
-    IdleTimerMouseHide.Enabled:=false;
-    //frmMain.DoneInFrame();
 
-  end;
   close;
 end;
 
@@ -1244,8 +1288,34 @@ begin
 end;
 
 procedure TfrmFullscreen.PopupMenu1Popup(Sender: TObject);
+var
+  i:integer;
 begin
   FisPopupMenuShowing:=true;
+
+  for i:=0 to MenuItemInterval.Count-1 do
+  begin
+    if (MenuItemInterval.Items[i].Tag * 1000) = FInterval then
+    begin
+      MenuItemInterval.Items[i].Checked:=true;
+    end else
+    begin
+      MenuItemInterval.Items[i].Checked:=false;
+    end;
+  end;
+
+  for i:=0 to MenuItemFilterFileSize.Count-1 do
+  begin
+    if MenuItemFilterFileSize.Items[i].Tag = FMinimulFileSizeKiloByte then
+    begin
+      MenuItemFilterFileSize.Items[i].Checked:=true;
+    end else
+    begin
+      MenuItemFilterFileSize.Items[i].Checked:=false;
+    end;
+  end;
+
+
 
   if FStretch then
   begin
@@ -1298,12 +1368,33 @@ begin
   if screen.MonitorCount <= 1 then
   begin
     MenuItemMoniters.Visible:=false;
+  end else
+  begin
+    if FFileList.Count >= 1 then
+    begin
+      MenuItemMoniters.Visible:=true;
+      for i:=0 to MenuItemMoniters.Count-1 do
+      begin
+        if MenuItemMoniters.Items[i].Tag=FoptIntMoniter then
+        begin
+          MenuItemMoniters.Items[i].Checked:=true;
+        end else
+        begin
+          MenuItemMoniters.Items[i].Checked:=false;
+        end;
+      end;
+    end else
+    begin
+      MenuItemMoniters.Visible:=false;
+    end;
   end;
 
   if FisInFrame then
   begin
     MenuItemMoniters.Visible:=false;
   end;
+
+
 
   if FisInFrame then
   begin
@@ -1345,11 +1436,8 @@ begin
         MenuItemQuit.Caption:='&Close';
       end;
     end;
-  end else
-  begin
-    //
   end;
-  //MenuItemQuit.Caption:='&Quit';
+
 
   //
   if FisInFrame then
@@ -1382,16 +1470,6 @@ begin
     MenuItemPause.Checked:=true;
   end;
 
-  {
-  if FManualTransition then
-  begin
-    MenuItemStart.Visible:=true;
-  end else
-  begin
-    MenuItemStart.Visible:=false;
-  end;
-  }
-
 
   if FFileList.Count > 1 then
   begin
@@ -1400,14 +1478,22 @@ begin
     MenuItemRepeat.Visible:=true;
     MenuItemEffect.Visible:=true;
     MenuItemInterval.Visible:=true;
-    MenuItemFilter.Visible:=true;
+    //MenuItemFilter.Visible:=true;
   end else begin
     MenuItemPlayback.Visible:=false;
     MenuItemRandom.Visible:=false;
     MenuItemRepeat.Visible:=false;
     MenuItemEffect.Visible:=false;
     MenuItemInterval.Visible:=false;
-    MenuItemFilter.Visible:=false;
+    //MenuItemFilter.Visible:=false;
+  end;
+
+  if FFileList.Count <= 0 then
+  begin
+    MenuItemStretch.Visible:=false;
+  end else
+  begin
+    MenuItemStretch.Visible:=true;
   end;
 
 end;
@@ -1438,30 +1524,112 @@ begin
 end;
 
 procedure TfrmFullscreen.ChangeMinFileSizeClicked(Sender: TObject);
+var
+  i:integer;
 begin
   FMinimulFileSizeKiloByte := TMenuItem(Sender).Tag;
-  {
+
   TimerFadeIn.Enabled:=false;
   TimerFadeOut.Enabled:=false;
   TimerInterval.Enabled:=false;
 
-  FMinimulFileSizeKiloByte := TMenuItem(Sender).Tag;
-  FFilelist.Clear;
-  FFilelist.Assign(frmMain.FileList);
+  //rebuild filelist index.
 
-  if FEffect then
+  FFilelist.Clear;
+  //FFilelist.Assign(frmMain.FileList);
+  //loop & delete
+  for i:=0 to frmMain.FileList.Count-1 do
   begin
-    TimerFadeOut.Enabled:=true;
+    if FileSize(frmMain.FileList[i]) >= (FMinimulFileSizeKiloByte * 1024) then
+    begin
+      FFilelist.Add(frmMain.FileList[i]);
+    end else
+    begin
+      // remove it from history and remainings.
+      if FFileListRemaining.IndexOf(frmMain.FileList[i]) > -1 then
+      begin
+        FFileListRemaining.Delete(FFileListRemaining.IndexOf(frmMain.FileList[i]));
+      end;
+      if FFileListHistory.IndexOf(frmMain.FileList[i]) > -1 then
+      begin
+        FFileListHistory.Delete(FFileListHistory.IndexOf(frmMain.FileList[i]));
+      end;
+    end;
+  end;
+
+  if FFilelist.Count <= 0 then
+  begin
+    //display error
+    self.AlphaBlendValue:=255;
+    Image1.Picture.Clear;
+    with image1.Canvas do
+      begin
+        Brush.Style := bsClear;
+        Font.Color := clWhite;
+        TextOut(24,24, 'File size filter: File size too small.');
+    end;
+    Image1.Update;
+    TimerInterval.Enabled:=false;
+    TimerFadeOut.Enabled:=false;
+    TimerFadeIn.Enabled:=false;
   end else
   begin
-    TimerInterval.Enabled:=true;
-  end;}
+
+    //set next index correctly.
+    if FRandom then begin
+      FiCurr:=-1;
+      i:=GetNextRandomImageIndex();
+      if (i > -1) then
+      begin
+        //FiCurr:=i;
+        TimerInterval.tag:=i;
+      end else
+      begin
+        FFileListRemaining.Assign(FFileList);
+        FiCurr:=-1;
+        i:=GetNextRandomImageIndex();
+        TimerInterval.tag:=i;
+      end;
+    end else
+    begin
+      FiCurr:=0;
+      TimerInterval.tag:=0;
+    end;
+
+    //start
+    if FManualTransition then
+    begin
+      //reload previously showing image.  note "FstrCurr" old index was rebuilt.
+      i:= FFilelist.IndexOf(FstrCurr);
+      if (i > -1) and (FstrCurr <> '') then
+      begin
+        FiCurr:=-1;
+        TimerInterval.tag:=i;
+
+        PlaybackPlay(false);
+      end;
+    end else
+    begin
+
+      if FEffect then
+      begin
+        TimerFadeOut.Enabled:=true;
+      end else
+      begin
+        //TimerInterval.Enabled:=true;
+        TimerIntervalTimer(nil);
+      end;
+
+    end;
+  end;
+
+
 end;
 
 procedure TfrmFullscreen.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F')) then  //or (Chr(Key) = 'F') or (Chr(Key) = 'S')
+  if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F')) then
   begin
     close;
   end;
@@ -1507,19 +1675,19 @@ end;
 procedure TfrmFullscreen.FormMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-  //if FManualTransition then begin
-     PlaybackNext(sender);
-     Handled:=true;
-  //end;
+
+  PlaybackNext(sender);
+  //Handled:=true;
+
 end;
 
 procedure TfrmFullscreen.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-  //if FManualTransition then begin
-     PlaybackBack(sender);
-     Handled:=true;
-  //end;
+
+  PlaybackBack(sender);
+  //Handled:=true;
+
 end;
 
 procedure TfrmFullscreen.IdleTimerMouseHideTimer(Sender: TObject);
@@ -1527,15 +1695,7 @@ begin
   if not FisPopupMenuShowing then
   begin
     Screen.Cursor:= crNone;
-  end;
-end;
 
-procedure TfrmFullscreen.FormPaint(Sender: TObject);
-begin
-  if FisFullscreen then
-  begin
-    //self.Cursor:=crNone;
-    //Screen.Cursor:=crNone;
   end;
 end;
 
