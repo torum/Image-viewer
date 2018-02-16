@@ -2,12 +2,59 @@ unit UMain;
 
 {$mode objfpc}{$H+}
 
+{
+Source:
+ https://github.com/torumyax/Image-viewer
+
+No extra components required.
+
+Tested on
+ Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
+ Ubuntu 17.10: Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
+ MacOS 10.03.2 High Sierra on iMac(21.5 Inch, Late 2012 - Intel Core i5, 8GB memory).
+               Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
+ Ubuntu 16.04 LTS
+
+TODO:
+ Popup
+  interval check
+  filter check
+
+ GUI settings.
+ stop using config xml use ini.
+ file drop handling.
+ Command line options.
+ PreLoading image for slideshow.
+ playlist.
+ power save aware.
+ i18n
+  http://wiki.lazarus.freepascal.org/Step-by-step_instructions_for_creating_multi-language_applications
+  http://wiki.lazarus.freepascal.org/Translations_/_i18n_/_localizations_for_programs
+
+
+Known issue and bugs:
+ On Windows, PNG (depth 24) antialising isn't working when stretch.
+  https://forum.lazarus.freepascal.org/index.php?topic=24408.0
+  http://forum.lazarus.freepascal.org/index.php?topic=19542.0
+
+ On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
+ On Ubuntu 16.04 with unity won't show fullscreen.
+ On Ubuntu, (full) "screen" size is wrong.(top margine, probably title bar hight?)
+ On Ubuntu, OpenPictureDialog won't show thumbnails.
+
+ On MacOS, show fullscreen won't work. Modal window is hidden behind?
+ On MacOS, bsNone won't work. titlebar/border won't hide.
+ On MacOS, inFrame transit effect won't work?
+}
+
+
+
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
-  XMLPropStorage, strutils, Types, XMLConf;
+  strutils, Types, XMLConf{$ifdef windows}, Windows{$endif};
 
 type
 
@@ -16,28 +63,49 @@ type
   TfrmMain = class(TForm)
     ApplicationProperties1: TApplicationProperties;
     Image1: TImage;
+    MenuItem1: TMenuItem;
+    MenuItemStretchIn: TMenuItem;
+    MenuItemStretchOut: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItemNext: TMenuItem;
+    MenuItemBack: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    MenuItemStayOnTop: TMenuItem;
+    MenuItemSlideshow: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItemSlideshowInFrame: TMenuItem;
     MenuItemQuit: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
-    PopupMenu1: TPopupMenu;
+    PanelInframe: TPanel;
+    PopupMenuSystem: TPopupMenu;
+    PopupMenuMain: TPopupMenu;
     TimerEffectStart: TTimer;
     TrayIcon1: TTrayIcon;
     XMLConfig: TXMLConfig;
-    XMLPropStorage: TXMLPropStorage;
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
-    procedure ApplicationProperties1Restore(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure FormPaint(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
     procedure Image1MouseWheelDown(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
     procedure Image1MouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
+    procedure Image1Resize(Sender: TObject);
+    procedure MenuItemNextClick(Sender: TObject);
+    procedure MenuItemBackClick(Sender: TObject);
+    procedure MenuItemSlideshowClick(Sender: TObject);
+    procedure MenuItemSlideshowInFrameClick(Sender: TObject);
     procedure MenuItemQuitClick(Sender: TObject);
+    procedure MenuItemStayOnTopClick(Sender: TObject);
+    procedure MenuItemStretchInClick(Sender: TObject);
+    procedure MenuItemStretchOutClick(Sender: TObject);
+    procedure PopupMenuMainPopup(Sender: TObject);
     procedure TimerEffectStartTimer(Sender: TObject);
 
   private
@@ -45,14 +113,9 @@ type
     FstDirectoryList:TStringList;
     FstPlaylistList:TStringList;
     FstMoniterList:TStringList;
-
-    FOptIntMoniter:integer;//todo multiple moniters
-
-    FOptFileExts:string;
     FstFileExtList:TStringList;
-    FOptPlaylistExts:string;
     FstPlaylistExtList:TStringList;
-
+    //opts
     FOptFullscreen:boolean;
     FOptTransitEffect:boolean;
     FOptStretch:boolean;
@@ -60,25 +123,48 @@ type
     FOptExpand:boolean;
     FOptIntervalIntSeconds:integer;
     FOptMinimulFileSizeKiloByte:integer;
-    FOptManualTransition:boolean;
+
     FOptRepeat:boolean;
     FOptRandom:boolean;
+    FoptStayOnTopInframe:boolean;
 
+    FOptFileExts:string;
+    FOptPlaylistExts:string;
+
+    FOptIncludeSubFolders:boolean;
+    FOptSlideshowAutoStart:boolean;
+
+    FoptFrameSkinWidth:integer; //not using for now
+
+    //app status
     FisFullScreen: boolean;
+    FisStartNormal: boolean;
+    FisSingleFileSelected: boolean;
+    FisManualTransition:boolean;
+    FOptIntMoniter:integer;
+    FisInFrame:boolean;
+    FCurrentMonitor:TMonitor;
+
     FOrigBounds: TRect;
     FOrigWndState: TWindowState;
 
-    FCurrentFileIndex:integer;
+    FiCurrentFileIndex:integer;
 
-    procedure ShowFullScreen(AValue: boolean);
-    procedure SetFullScreen_Universal(AValue: boolean);
-    procedure SetFullScreen_Win32(AValue: boolean);
+    procedure ShowFullScreen(blnOn: boolean);
+    procedure SetFullScreen_Universal(blnOn: boolean);
+    procedure SetFullScreen_Win32(blnOn: boolean);
     procedure SetMoniter(intMoniter:integer);
+    procedure SetStayOnTop(bln:boolean);
+    function GetCurrentMonitor():TMonitor;
+    function GetCurrentMonitorIndex():integer;
     procedure RestoreFormState;
     procedure StoreFormState;
+    procedure LoadImage;
+
   public
     property FileList: TStringList read FstFileList;
     property OptIntMoniter: integer read FOptIntMoniter write SetMoniter;
+    //property IsCustumScreen: boolean read FisCustumScreen;
     property MoniterList: TStringList read FstMoniterList;
     property OptTransitEffect: boolean read FoptTransitEffect;
     property OptFit: boolean read FOptFit;
@@ -86,9 +172,19 @@ type
     property OptStretch: boolean read FOptStretch;
     property OptIntervalIntSeconds: integer read FOptIntervalIntSeconds;
     property OptMinimulFileSizeKiloByte: integer read FOptMinimulFileSizeKiloByte;
-    property OptManualTransition: boolean read FOptManualTransition;
+
     property OptRandom: boolean read FOptRandom;
     property OptRepeat: boolean read FOptRepeat;
+    property CurrentMonitor:TMonitor read GetCurrentMonitor;
+    property IsInFrame:boolean read FisInFrame;
+    property IsStartNormal:boolean read FisStartNormal;
+    property OptStayOnTopInframe:boolean read FoptStayOnTopInframe write SetStayOnTop;
+    property OptSlideshowAutoStart:boolean read FOptSlideshowAutoStart;
+    property IsSingleFileSelected: boolean read FisSingleFileSelected;
+    property IsManualTransition: boolean read FisManualTransition;
+    procedure DoneInFrame(iCurr:integer);
+    procedure DoneFullscreen(iCurr:integer);
+    procedure SetCaption(strCaption:string);
 
   end;
 
@@ -103,12 +199,14 @@ uses UFullscreen;
 
 { TfrmMain }
 
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
   i,j:integer;
   folderfiles:TStringlist;
-  fileSearchMask:string;
+  fileSearchMask,fileFolder:string;
 begin
+
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
 
@@ -120,14 +218,10 @@ begin
   FstFileList:=TStringList.create;
   FstDirectoryList:=TStringList.create;
   FstPlaylistList:=TstringList.Create;
-
   FstMoniterList:=TStringList.Create;
-  FstMoniterList.Duplicates := dupIgnore;
-  FstMoniterList.Sorted := true;
-
 
   //set defaults
-  FOptFullscreen:=true;
+  FOptFullscreen:=false;
   FOptTransitEffect:=true;
   FOptStretch:=false;
   FOptExpand:=false;
@@ -135,16 +229,22 @@ begin
   FOptIntMoniter:=0;
   FOptIntervalIntSeconds:=4;
   FOptMinimulFileSizeKiloByte:=1;
-  fOptManualTransition:=true;
+
   FOptRandom:=true;
   FOptRepeat:=true;
 
   FOptFileExts:='.jpg;.jpeg;*.jpe;.png;.gif';
+  FOptPlaylistExts:='.m3u;.xspf';
+
+  FOptIncludeSubFolders:=true;
+  FOptSlideshowAutoStart:=true;
+
+  FoptFrameSkinWidth:=0;
+
   FstFileExtList := TStringList.Create;
   FstFileExtList.Delimiter:=';';
   FstFileExtList.DelimitedText:=FOptFileExts;
 
-  FOptPlaylistExts:='.imagelist';
   FstPlaylistExtList:= TStringList.Create;
   FstPlaylistExtList.Delimiter:=';';
   FstPlaylistExtList.DelimitedText:=FOptPlaylistExts;
@@ -157,8 +257,22 @@ begin
     begin
       //options
 
-    end else if (FileExists(ParamStr(I))) then begin
+    end else if (FileExists(ParamStr(I))) then
+    begin
       //found a file
+      {$ifdef windows}
+      {$else}
+      //on unix, directory is also file.
+      if (DirectoryExists(ParamStr(I))) then begin
+        //found a folder
+        if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
+        begin
+          FstDirectoryList.Add(ParamStr(I));
+        end;
+        Continue;
+      end;
+      {$endif}
+
       if (FstFileExtList.IndexOf(LowerCase(ExtractFileExt(ParamStr(I)))) >= 0) then
       begin
         //is picture file
@@ -171,13 +285,18 @@ begin
         //found a playlist
         FstPlaylistList.Add(ParamStr(I));
       end;
-    end else if (DirectoryExists(ParamStr(I))) then begin
+
+    {$ifdef windows}
+    end else if (DirectoryExists(ParamStr(I))) then
+    begin
       //found a folder
       if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
       begin
         FstDirectoryList.Add(ParamStr(I));
-      end
+      end;
+    {$endif}
     end;
+
   end;
 
   //search inside folder(s)
@@ -197,7 +316,7 @@ begin
       try
         //Application.ProcessMessages;
         //recursively search files
-        folderfiles := FindAllFiles(FstDirectoryList[i], fileSearchMask, true); //'*.jpg;*.jpeg;*.png;'
+        folderfiles := FindAllFiles(FstDirectoryList[i], fileSearchMask, FOptIncludeSubFolders); //'*.jpg;*.jpeg;*.png;'
         for j:=0 to folderfiles.Count - 1 do
         begin
           if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
@@ -213,15 +332,18 @@ begin
 
   //TODO playlist
   //open ploylist files and add them to the filelist.
-
-
-  //TODO trayicon
-  TrayIcon1.Hint:=self.Caption; //+ moniter[1]    etc
-  //ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
+  //when only if no other files are specified.
+  //FstPlaylistList.Count
+  //.m3u;.xspf
 
 
 
-  if (FstFileList.Count < 1) or Application.HasOption('h', 'help') then begin
+  if Application.HasOption('h', 'help') then
+  begin
+    //todo
+  end;
+
+  if (FstFileList.Count < 1) then begin
     //No files are provided in the parameter string, so open "file open" dialog.
     //TODO modal dialog with options and playlist edit tab (drag & drop files) and "About" tab.
 
@@ -230,7 +352,6 @@ begin
     begin
       for i:=0 to OpenPictureDialog1.Files.Count -1 do
       begin
-        //Application.ProcessMessages;
         if (FstFileExtList.IndexOf(LowerCase(ExtractFileExt(OpenPictureDialog1.Files[i]))) >= 0) then
         begin
           if not (AnsiStartsStr('.',ExtractFilename(OpenPictureDialog1.Files[i]))) then
@@ -250,24 +371,60 @@ begin
 
   end;
 
-
-  //clean up
-  {
-  j:=FstFileList.Count-1;
-  for i:=j downto 0 do
+  //if only one image was selected, add all siblings automatically.
+  //since "send to" command-line parameters don't accept more than 255.
+  if FstFileList.Count = 1 then
   begin
-    if (AnsiStartsStr('.',ExtractFilename(FstFileList[i]))) then
+    fileFolder:=ReplaceStr(FstFileList[0],ExtractFileName(FstFileList[0]),'');
+    //create search mask
+    fileSearchMask:='';
+    for i:=0 to FstFileExtList.Count-1 do
     begin
-      FstFileList.Delete(i);
+      if trim(FstFileExtList[i]) <> '' then begin
+         fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
+      end;
     end;
+    try
+      //find siblings.
+      folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
+      for j:=0 to folderfiles.Count - 1 do
+      begin
+        if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
+        begin
+          //ignore first selected image.
+          if (folderfiles[j] <> FstFileList[0]) then
+          begin
+            FstFileList.Add(folderfiles[j]);
+          end;
+        end;
+      end;
+    finally
+      folderfiles.Free;
+    end;
+    //Since automatically added, do not start slideshow at fullscreen.
+    //FOptSlideshowAutoStart:=false;
+    FisSingleFileSelected:=true;
   end;
-  }
 
+
+
+  //We tried. But there is nothing to do, so self terminate.
   if (FstFileList.Count < 1) then begin
-    //We tried. But there is nothing to do, so self terminate.
     Application.Terminate;
     exit;
   end;
+
+  if Screen.MonitorCount > 1 then
+  begin
+    for i:=0 to Screen.MonitorCount-1 do
+    begin
+      FstMoniterList.Add(intToStr(i));
+    end;
+  end else
+  begin
+    FOptIntMoniter:=0; //let's make sure.
+  end;
+
 
 
   //TODO opts-> (i)interval(3) (e)repeat (r)random (f)fullscreen (t)effect (m)moniter(1)
@@ -284,47 +441,68 @@ begin
   //start-at filename-sorting show-filename show-on-multiple-displays random-background
   //show-fullpath show-filename
 
-  if Screen.MonitorCount > 1 then
-  begin
-    for i:=0 to Screen.MonitorCount-1 do
-    begin
-      FstMoniterList.Add(intToStr(i));
-    end;
-  end;
 
 
-  //TODO i18n
-  //http://wiki.lazarus.freepascal.org/Step-by-step_instructions_for_creating_multi-language_applications
-  //http://wiki.lazarus.freepascal.org/Translations_/_i18n_/_localizations_for_programs
 
-  //TODO change wallpaper
-  //for unity and gnome3(gnome shell)
-  // $ gsettings get org.gnome.desktop.background picture-uri
-  // $ gsettings set org.gnome.desktop.background picture-uri "file:///home/user/background.jpg"
-  // $ gnome-session --version
-  //https://askubuntu.com/questions/66914/how-to-change-desktop-background-from-command-line-in-unity
+
+
+  //System TrayIcon
+  TrayIcon1.Hint:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
+  //TODO + moniter[1]    etc
+
 
 
   //load ini settings
-  //TODO.
-  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.xml');
+  // since linux don't have ext(.exe or any ext), so... replace and append ext.
+  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.xml';
 
 
   if FOptFullscreen then
   begin
+    //start fullscreen.
+
+    //main form become just background.
     self.ShowInTaskBar:=stNever;
     self.Image1.Visible:=false;
 
     self.WindowState:=wsFullScreen;
     self.AlphaBlend:=true;
     self.AlphaBlendValue:=1;
+
+    FisStartNormal:=false;
     self.Show;
     self.BringToFront;
+
   end else
   begin
-    //TODO
+
+    //main form is the viewer.
+    self.ShowInTaskBar:=stDefault;
+
+    self.Position:=poDefault;
+    self.WindowState:=wsNormal;
+
+    //just in case set default;
+    self.Top:=120;
+    self.Left:=120;
+    self.Width:=480;
+    self.Height:=480;
+
+    //this won't work here. do it at FormShow.
+    //if fileexists(XMLConfig.FileName) then begin
+    //   RestoreFormState;
+    //end;
+    self.AlphaBlend:=true;
+    self.AlphaBlendValue:=255;
+    self.Image1.Visible:=true;
+
+    FiCurrentFileIndex:=0;
+
+    FisStartNormal := true;
     self.Show;
+
     self.BringToFront;
+    SetForegroundWindow(self.Handle);
   end;
 
 end;
@@ -334,57 +512,115 @@ begin
 
   if Application.Terminated then exit;
 
-  if FOptFullscreen then
+  //if FOptFullscreen then
+  if (FOptFullscreen and (not FisFullscreen) and (not FisStartNormal)) then
   begin
-    Screen.Cursor:=crNone;
-    Screen.UpdateScreen;
-
-    {$ifdef windows}
-    //self.BringToFront;
-    //SetForegroundWindow(self.Handle);
-    {$else}
-    //does it need or work on linux?
-    {$endif}
-    ShowFullScreen(true);
+    //Screen.Cursor:=crNone;
+    //Screen.UpdateScreen;
 
     if FOptTransitEffect then
     begin
       self.AlphaBlendValue:=1;
+      ShowFullScreen(true);
       //start transition timer, and timer creates fullscreen
       TimerEffectStart.Enabled:=true;
     end else
     begin
-      self.AlphaBlendValue := 255;
       //Create fullscreen form at "FormActivate"
+      self.AlphaBlendValue := 255;
+      ShowFullScreen(true);
+      self.BringToFront;
+      //SetForegroundWindow(self.Handle);
     end;
-  end else begin
-    self.Position:=poDefault;//poScreenCenter;
-    self.WindowState:=wsNormal;
-
-    self.Top:=120;
-    self.Left:=120;
-    self.Width:=480;
-    self.Height:=480;
+  end else if FIsInFrame then begin
+    //?
+  end else
+  begin
+    //it seems, it must be in "FormShow"
     if fileexists(XMLConfig.FileName) then begin
        RestoreFormState;
     end;
 
-    self.AlphaBlend:=true;
-    self.AlphaBlendValue:=255;
-    self.Image1.Visible:=true;
+    LoadImage;
 
-    FCurrentFileIndex:=0;
+  end;
 
-    if FileList.Count > 0 then begin
-      Image1.Picture.LoadFromFile(FileList[FCurrentFileIndex]);
+  //just in case
+  if FisFullscreen then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      frmFullscreen.BringToFront;
+      SetForegroundWindow(frmFullscreen.Handle);
+    end else begin
+      //something went wrong....
+      FisFullscreen:=false;
     end;
+  end;
 
-    SetForegroundWindow(self.Handle);
+end;
+
+procedure TfrmMain.FormActivate(Sender: TObject);
+begin
+  if Application.Terminated then exit;
+
+  if (FOptFullscreen and (not FisStartNormal)) then
+  begin
+    if not FOptTransitEffect then
+    begin
+
+      frmFullscreen := TfrmFullscreen.create(self);
+      frmFullScreen.WindowState:=wsFullScreen;
+      frmFullscreen.ShowModal;
+
+      close; //when returned (frmFullscreen is closed), self close.
+    end;
+  end;
+
+  //just in case
+  if FisFullscreen then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      frmFullscreen.BringToFront;
+      SetForegroundWindow(frmFullscreen.Handle);
+    end else begin
+      //something went wrong....
+      FisFullscreen:=false;
+    end;
+  end;
+
+end;
+
+procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  if FOptFullscreen or FisFullscreen then
+  begin
+    //todo fullscreen options
+  end else begin
+    //saves normal form size and pos.
+    StoreFormState;
   end;
 end;
 
-procedure TfrmMain.TimerEffectStartTimer(Sender: TObject);
+procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  FstFileExtList.Free;
+  FstPlaylistExtList.Free;
+  FstFileList.Free;
+  FstDirectoryList.Free;
+  FstPlaylistList.Free;
+end;
+
+procedure TfrmMain.TimerEffectStartTimer(Sender: TObject);
+var
+  i:integer;
+begin
+
+  //while doing this. user might click the main form ....
+  //if done so, and popup won't work on fullscreen..
+  //->don't set popup menu in main form.
+
   if self.AlphaBlendValue < 255 then
   begin
     if (self.AlphaBlendValue < 100 ) then begin
@@ -399,103 +635,381 @@ begin
     end;
   end else begin
     TimerEffectStart.Enabled:=false;
+
+    {test if start fullscreen at secondry moniter}
+    {
+    Screen.UpdateMonitors;
+    Screen.UpdateScreen;
+
+    if Screen.MonitorCount > 1 then
+    begin
+      for i:=0 to Screen.MonitorCount-1 do
+      begin
+        if (Monitor = Screen.Monitors[i]) then
+        begin
+          if (i > 0) then
+          begin
+            FisCustumScreen:=true;
+            FOptIntMoniter:=i;
+            showmessage('second');
+            break;
+
+          end;
+        end;
+      end;
+    end;
+    }
+    {test end}
+
     frmFullscreen := TfrmFullscreen.create(self);
+
     frmFullScreen.WindowState:=wsFullScreen;
+    frmFullScreen.StartWith:=FiCurrentFileIndex;
     frmFullscreen.ShowModal;
-    close; //when returned (frmFullscreen is closed), self close.
+
+    //returned from fullscreen
+    if FisStartNormal then
+    begin
+      //TODO, if start with normal then, do not close.
+      //TODO needs test.
+
+      //TODO loadimage the last image fullscreen showed.
+
+      Screen.Cursor:=crDefault;
+      Screen.UpdateScreen;
+      Image1.Visible:=true;
+      ShowFullScreen(false);
+      //we are back normal;
+      FOptFullscreen:=false;
+      //close;
+    end else
+    begin
+      //start fullscreen so close after fullscreen.
+      close; //when returned (frmFullscreen is closed), self close.
+    end;
+
   end;
+end;
+
+procedure TfrmMain.LoadImage;
+begin
+  if FileList.Count > 0 then begin
+    if (FileList.Count = 1) then
+    begin
+      Self.Caption:=FileList[FiCurrentFileIndex];
+    end else
+    begin
+      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+    end;
+    Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex]);
+    Image1Resize(nil);
+  end;
+end;
+
+procedure TfrmMain.Image1Resize(Sender: TObject);
+var
+  curWidth,curHeight:integer;
+begin
+  if not Assigned(Image1.Picture) then exit;
+
+  //TODO:
+  Image1.Stretch:=false;
+  Image1.StretchInEnabled:=false;
+  curWidth := self.ClientWidth; //.Width;
+  curHeight:= self.ClientHeight; //.Height;
+  //if FOptStretch then begin
+  //   Image1.Stretch:=true;
+  //end else begin
+    if FOptFit then begin
+      if ((Image1.Picture.Width > curWidth) or
+              (Image1.Picture.height > curHeight)) then begin
+        Image1.Stretch:=true;
+        Image1.StretchInEnabled:=true;
+        //Image1.StretchOutEnabled:=false;
+        Image1.AntialiasingMode:=amOn;
+        //fit only when larger than screen size.
+      end else begin
+        Image1.Stretch:=false;
+        Image1.StretchInEnabled:=false;
+        Image1.AntialiasingMode:=amOff;
+      end;
+    end else begin
+      Image1.Stretch:=false;
+    end;
+
+    if FOptExpand then begin
+      Image1.Stretch:=true;
+      Image1.StretchOutEnabled:=true;
+      Image1.AntialiasingMode:=amOn;
+    end;
+  //end;
+  //Image1.Refresh;
+  //Image1.Repaint;
 end;
 
 procedure TfrmMain.Image1DblClick(Sender: TObject);
 begin
+  if FisInFrame then begin
+    //this shuldn't be happening.
+  end else
+  begin
+    if not FisFullscreen then
+    begin
+      MenuItemSlideshowClick(nil);
+    end else
+    begin
+      //this shuldn't be happening.
+    end;
+  end;
+
+end;
+
+procedure TfrmMain.MenuItemSlideshowClick(Sender: TObject);
+begin
+  {
   if self.WindowState = wsNormal then begin
     self.WindowState:=wsMaximized;
   end else if self.WindowState = wsMaximized then begin
     self.WindowState:=wsNormal;
+  end;
+  }
+  //start fullscreen
+  if (not FisFullscreen) and (not FisInFrame) then
+  begin
+    //TODO, do not change option value...
+    FOptFullscreen:=true;
+    FisStartNormal:=true;//so tell TimerEffectStart to go back to normal when done.
+
+    Image1.Visible:=false;
+
+    //sets current screen of the form.
+    FCurrentMonitor:=Screen.MonitorFromWindow(handle);
+    FOptIntMoniter:=getCurrentMonitorIndex();
+
+
+    if FOptTransitEffect then
+    begin
+      self.AlphaBlendValue:=1; //TODO form dissapears at once. maybe fadeout timer?
+      ShowFullScreen(true);
+      //start transition timer, and timer creates fullscreen
+      TimerEffectStart.Enabled:=true;
+    end else
+    begin
+      ShowFullScreen(true);
+
+      frmFullscreen := TfrmFullscreen.create(self);
+      frmFullScreen.WindowState:=wsFullScreen;
+      frmFullScreen.StartWith:=FiCurrentFileIndex;
+      frmFullscreen.ShowModal;
+
+      //DoneFullscreen will be called
+
+      Image1.Visible:=true;
+      ShowFullScreen(false);
+
+      Screen.Cursor:=crDefault;
+    end;
+
   end;
 end;
 
 procedure TfrmMain.Image1MouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-
-    if FCurrentFileIndex < FileList.Count -1 then begin
-     Image1.Picture.LoadFromFile(FileList[FCurrentFileIndex+1]);
-     FCurrentFileIndex:=FCurrentFileIndex+1;
+  if (not FisFullscreen) and (not FisInFrame) then
+  begin
+    if FiCurrentFileIndex < FileList.Count -1 then begin
+     screen.Cursor:=crHourGlass;
+     Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+     FiCurrentFileIndex:=FiCurrentFileIndex+1;
+     Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+     screen.Cursor:=crDefault;
      Handled:=true;
     end;
+  end;
 end;
 
 procedure TfrmMain.Image1MouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-
-    if FCurrentFileIndex > 0 then begin
-     Image1.Picture.LoadFromFile(FileList[FCurrentFileIndex-1]);
-     FCurrentFileIndex:=FCurrentFileIndex-1;
+  if (not FisFullscreen) and (not FisInFrame) then
+  begin
+    if FiCurrentFileIndex > 0 then begin
+     screen.Cursor:=crHourGlass;
+     Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+     FiCurrentFileIndex:=FiCurrentFileIndex-1;
+     Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+     screen.Cursor:=crDefault;
      Handled:=true;
     end;
+  end;
+end;
+
+procedure TfrmMain.MenuItemNextClick(Sender: TObject);
+begin
+  {
+  if FiCurrentFileIndex < FileList.Count -1 then begin
+   screen.Cursor:=crHourGlass;
+   Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+   FiCurrentFileIndex:=FiCurrentFileIndex+1;
+   Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+   screen.Cursor:=crDefault;
+  end;
+  }
+end;
+
+procedure TfrmMain.MenuItemBackClick(Sender: TObject);
+begin
+  {
+  if FiCurrentFileIndex > 0 then begin
+   screen.Cursor:=crHourGlass;
+   Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+   FiCurrentFileIndex:=FiCurrentFileIndex-1;
+   Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+   screen.Cursor:=crDefault;
+  end;
+  }
 end;
 
 
-procedure TfrmMain.FormActivate(Sender: TObject);
+procedure TfrmMain.DoneFullscreen(iCurr:integer);
 begin
-  if Application.Terminated then exit;
-
-  if FOptFullscreen then
+  if FIsStartNormal then
   begin
-    Screen.Cursor:=crNone;
-    Screen.UpdateScreen;
+    if FileList.Count <= 1 then exit;  //must be here. one pic fullscreen hangs
 
-    if not FOptTransitEffect then
-    begin
-      frmFullscreen := TfrmFullscreen.create(self);
-      frmFullScreen.WindowState:=wsFullScreen;
-      frmFullscreen.ShowModal;
-      close; //when returned (frmFullscreen is closed), self close.
-    end;
-  end else begin
-    //TODO
+
+    FiCurrentFileIndex:=iCurr;
+    LoadImage();
     {
-    frmFullscreen := TfrmFullscreen.create(self);
-    frmFullscreen.Position:=poOwnerFormCenter;
-    frmFullScreen.Top:=self.Top;
-    frmFullScreen.left:=self.left;
-    frmFullScreen.width:=self.width;
-    frmFullScreen.height:=self.height;
-    frmFullScreen.WindowState:=wsNormal;
-
-    frmFullscreen.ShowModal;
-    close;
+    Image1.Visible:=true;
+    Image1.Repaint;
+    Image1.Refresh;
+    Image1.BringToFront;
     }
+
+    Screen.Cursor:=crDefault; //again
+
   end;
 end;
 
-procedure TfrmMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
 begin
-  if FOptFullscreen then
-  begin
-    //todo fullscreen options
-  end else begin
-    //saves normal form size and pos.
-    StoreFormState;
-  end;
+  if Fisfullscreen then exit;
+  //if FileList.Count <= 1 then exit;
 
+  if FisInFrame then
+  begin
+    //close it
+    if Assigned(frmFullscreen) then
+    begin
+      if frmFullscreen.Visible then
+      begin
+        frmFullscreen.Close;
+        //todo do I need to do something?? need to check.
+      end;
+    end;
+  end else
+  begin
+    {$ifdef windows}
+    FOrigBounds:= BoundsRect;
+    self.BorderStyle:=bsNone;
+    BoundsRect := FOrigBounds;
+    {$else}
+      //TODO. don't know how to hide titlebar in linux.
+    {$endif}
+
+    FisInFrame:=true;
+
+    self.Caption:='InFrame Slideshow';
+
+    Image1.Visible:=false;
+
+    frmFullscreen := TfrmFullscreen.create(self);
+    frmFullScreen.WindowState:=wsNormal;
+    frmFullScreen.StartWith:=FiCurrentFileIndex;
+
+    //frmFullscreen.Parent := self;
+    //frame skin test
+    PanelInframe.Top:=FoptFrameSkinWidth;
+    PanelInframe.left:=FoptFrameSkinWidth;
+    PanelInframe.Height:=self.ClientHeight-(PanelInframe.Top*2);
+    PanelInframe.Width:=self.ClientWidth-(PanelInframe.left*2);
+    PanelInframe.Visible:=true;
+    PanelInframe.BringToFront;
+    frmFullscreen.Parent := PanelInframe;
+
+    frmFullscreen.Visible:=true;
+    frmFullscreen.Show;
+
+    //inFrame you have to
+    //call frmFullscreen.FormResize(self);   when resize
+    //call DoneInFrame(); from frmFullscreen when close fullscreen.
+  end;
 end;
 
-procedure TfrmMain.FormPaint(Sender: TObject);
+procedure TfrmMain.DoneInFrame(iCurr:integer);
 begin
-  if FOptFullscreen then
-  begin
-    Screen.UpdateScreen;
-    self.Cursor:=crNone;
-    Screen.Cursor:=crNone;
-    Screen.UpdateScreen;
+
+  FisInFrame:=false;
+
+  BoundsRect:= FOrigBounds;
+  self.BorderStyle:=bsSizeable;
+  BoundsRect:=FOrigBounds;
+
+
+  //self.BoundsRect := frmFullscreen.BoundsRect;
+
+  //test end
+  PanelInframe.Visible:=false;
+
+  Image1.BringToFront;
+  Image1.Visible:=true;
+
+  if FileList.Count <= 1 then exit;
+
+  FiCurrentFileIndex:=iCurr;
+  LoadImage();
+
+
+  Image1.Repaint;
+  Image1.Refresh;
+  Image1.BringToFront;
+
+  screen.Cursor:=crDefault;
+end;
+
+procedure TfrmMain.FormResize(Sender: TObject);
+begin
+  if FisInFrame then begin
+    if assigned(frmFullscreen) and frmFullscreen.Visible then
+    begin
+      frmFullscreen.FormResize(self);
+    end;
   end;
 end;
 
-procedure TfrmMain.ApplicationProperties1Exception(Sender: TObject; E: Exception
-  );
+procedure TfrmMain.SetCaption(strCaption:string);
+begin
+  Self.Caption:= strCaption;
+end;
+
+procedure TfrmMain.SetStayOnTop(bln:Boolean);
+begin
+  //if (self.FormStyle = fsSystemStayOnTop) then
+  if bln then
+  begin
+    self.FormStyle:=fsSystemStayOnTop;
+    MenuItemStayOnTop.Checked:=true;
+  end else
+  begin
+    self.FormStyle:=fsNormal;
+    MenuItemStayOnTop.Checked:=false;
+  end;
+  self.FoptStayOnTopInframe:=bln;
+end;
+
+procedure TfrmMain.ApplicationProperties1Exception(Sender: TObject; E: Exception);
 begin
   //TODO oops
   //We don't want to show dialog while showing fullscreen with Modal window.
@@ -509,35 +1023,124 @@ begin
   // http://lists.elists.org/pipermail/delphi/2000-September/010939.html
 end;
 
-procedure TfrmMain.ApplicationProperties1Restore(Sender: TObject);
-begin
-
-end;
 
 procedure TfrmMain.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if FOptFullscreen and FisFullscreen then
+  if FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      if frmFullscreen.Visible then
+      begin
+
+        //pass it to fullscreen.
+        if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F') or (Chr(Key) = 'S')) then
+        begin
+          //close;
+          frmFullscreen.Close;
+        end;
+        if (Key = VK_RIGHT) then begin
+          frmFullscreen.PlaybackNext(sender);
+        end;
+        //back
+        if (Key = VK_LEFT) or (Key = VK_BACK) then begin
+          frmFullscreen.PlaybackBack(sender);
+        end;
+        //pause/start
+        if (Key = VK_PAUSE) or (Key = VK_SPACE) then
+        begin
+          frmFullscreen.PlaybackPause(sender);
+        end;
+        //TODO inFrame: frmMain steals fullscreen's shortcut keys. so.
+        if (Chr(Key) = 'I') then
+        begin
+          //stretch in
+          frmFullscreen.MenuItemFitClick(sender);
+        end;
+        if (Chr(Key) = 'O') then
+        begin
+          //stretch out
+          frmFullscreen.MenuItemExpandClick(sender);
+        end;
+        if (Chr(Key) = 'E') then
+        begin
+          //effect
+          frmFullscreen.MenuItemEffectClick(sender);
+        end;
+        if (Chr(Key) = 'N') then
+        begin
+          //random
+          frmFullscreen.MenuItemRandomClick(sender);
+        end;
+        if (Chr(Key) = 'R') then
+        begin
+          //repeat
+          frmFullscreen.MenuItemRepeatClick(sender);
+        end;
+      {
+
+        if ((Key = VK_RMENU) or (Key = VK_LMENU)) then
+
+      }
+
+      end;
+
+    end;
+  end else if FOptFullscreen and FisFullscreen then
   begin
     if ((Key = VK_F11) or (Key = VK_ESCAPE)) then
     begin
       close;
     end;
   end else begin
+    // normal image view.
+
+    //Since form steals Image menu...
+
+    //fullscreen slideshow
+    if ((Key = VK_F11) or (Chr(Key) = 'F')) then
+    begin
+     MenuItemSlideshowClick(nil);
+    end;
+
+
+    //InFrame slideshow
+    if (Chr(Key) = 'S') then
+    begin
+     MenuItemSlideshowInFrameClick(nil);
+    end;
+
+
     //next
     if (Key = VK_RIGHT) then begin
-      if FCurrentFileIndex < FileList.Count -1 then begin
-       Image1.Picture.LoadFromFile(FileList[FCurrentFileIndex+1]);
-       FCurrentFileIndex:=FCurrentFileIndex+1;
+      if FiCurrentFileIndex < FileList.Count -1 then begin
+       screen.Cursor:=crHourGlass;
+       Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+       FiCurrentFileIndex:=FiCurrentFileIndex+1;
+       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+       screen.Cursor:=crDefault;
       end;
     end;
     //back
     if (Key = VK_LEFT) or (Key = VK_BACK) then begin
-      if FCurrentFileIndex > 0 then begin
-       Image1.Picture.LoadFromFile(FileList[FCurrentFileIndex-1]);
-       FCurrentFileIndex:=FCurrentFileIndex-1;
+      if FiCurrentFileIndex > 0 then begin
+       screen.Cursor:=crHourGlass;
+       Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+       FiCurrentFileIndex:=FiCurrentFileIndex-1;
+       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+       screen.Cursor:=crDefault;
       end;
     end;
+    //stretch in
+    if (Chr(Key) = 'I') then begin
+      MenuItemStretchInClick(nil);
+    end;
+    //stretch out
+    if (Chr(Key) = 'O') then begin
+      MenuItemStretchOutClick(nil);
+    end;
+
   end;
 end;
 
@@ -546,52 +1149,63 @@ begin
   close;
 end;
 
-procedure TfrmMain.FormDestroy(Sender: TObject);
+procedure TfrmMain.MenuItemStayOnTopClick(Sender: TObject);
 begin
-  FstFileExtList.Free;
-  FstPlaylistExtList.Free;
-  FstFileList.Free;
-  FstDirectoryList.Free;
-  FstPlaylistList.Free;
-  //if Assigned(frmFullscreen) then frmFullscreen.Free;
-end;
-
-procedure TfrmMain.ShowFullScreen(AValue: boolean);
-begin
-  {$ifdef windows}
-  SetFullScreen_Win32(AValue);
-  {$else}
-  SetFullScreen_Universal(AValue);
-  {$endif}
-  FisFullscreen:=AValue;
-end;
-
-procedure TfrmMain.SetFullScreen_Universal(AValue: boolean);
-begin
-  if AValue then
-    ShowWindow(Handle, SW_SHOWFULLSCREEN)
-  else
-    ShowWindow(Handle, SW_SHOWNORMAL);
-end;
-
-procedure TfrmMain.SetFullScreen_Win32(AValue: boolean);
-begin
-  if AValue then
+  if (self.FormStyle = fsSystemStayOnTop) then
   begin
-    FOrigWndState:= WindowState;
-    FOrigBounds:= BoundsRect;
-    BorderStyle:= bsNone;
-    BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect; //Monitor.BoundsRect;
-
-  end
-  else
+    SetStayOnTop(false);
+  end else
   begin
-    WindowState:= FOrigWndState;
-    BoundsRect:= FOrigBounds;
-    BorderStyle:= bsSizeable;
-    BoundsRect:= FOrigBounds; //again
+    SetStayOnTop(true);
   end;
 end;
+
+procedure TfrmMain.MenuItemStretchInClick(Sender: TObject);
+begin
+  if FOptFit then FOptFit:=false else FOptFit:=true;
+  Image1Resize(self);
+end;
+
+procedure TfrmMain.MenuItemStretchOutClick(Sender: TObject);
+begin
+  if FOptExpand then FOptExpand:=false else FOptExpand:=true;
+  Image1Resize(self);
+end;
+
+procedure TfrmMain.PopupMenuMainPopup(Sender: TObject);
+begin
+
+  if (FstFileList.Count > 1) then
+  begin
+    //MenuItemSlideshowInFrame.Visible:=true;
+
+    //if FisManualTransition then
+    if FisSingleFileSelected then
+    begin
+      MenuItemSlideshowInFrame.Caption:='View in &InFrame';
+      MenuItemSlideshow.Caption:='View in &Fullscreen';
+    end else
+    begin
+      MenuItemSlideshowInFrame.Caption:='Start &InFrame Slideshow';
+      MenuItemSlideshow.Caption:='Start &Fullscreen Slideshow';
+    end;
+  end else
+  begin
+    //MenuItemSlideshowInFrame.Visible:=false;
+    MenuItemSlideshowInFrame.Caption:='&InFrame View';
+    MenuItemSlideshow.Caption:='&Fullscreen View';
+
+    MenuItemNext.enabled:=false; //visible or enabled:=false;
+    MenuItemBack.enabled:=false;
+  end;
+
+  if FOptFit then MenuItemStretchIn.Checked:=true else MenuItemStretchIn.Checked:=false;
+  if FOptExpand then MenuItemStretchOut.Checked:=true else MenuItemStretchOut.Checked:=false;
+
+
+end;
+
+
 
 procedure TfrmMain.SetMoniter(intMoniter:integer);
 begin
@@ -600,14 +1214,88 @@ begin
 
   if FOptFullscreen and FisFullScreen and Assigned(frmFullscreen) then
   begin
-       ShowFullScreen(true);
+      ShowFullScreen(true);
   end else
   begin
-    //TODO non fullscreen form.
+    //non fullscreen.
   end;
-
 end;
 
+function TfrmMain.GetCurrentMonitor():TMonitor;
+begin
+  if not Assigned(FCurrentMonitor) then
+  begin
+    FCurrentMonitor := Screen.MonitorFromWindow(Handle);
+    result:=FCurrentMonitor;
+  end else
+  begin
+    result:=FCurrentMonitor;
+  end;
+end;
+
+function TfrmMain.GetCurrentMonitorIndex():integer;
+var
+  i:integer;
+begin
+  result:=0;
+  for i:=0 to Screen.MonitorCount-1 do
+  begin
+    if CurrentMonitor = Screen.Monitors[i] then
+    begin
+      result:=i;
+      break;
+    end;
+  end;
+end;
+
+procedure TfrmMain.ShowFullScreen(blnOn: boolean);
+begin
+  {$ifdef windows}
+  SetFullScreen_Win32(blnOn);
+  {$else}
+  SetFullScreen_Universal(blnOn);
+  {$endif}
+  FisFullscreen:=blnOn;
+end;
+
+procedure TfrmMain.SetFullScreen_Universal(blnOn: boolean);
+begin
+  if blnOn then
+    ShowWindow(Handle, SW_SHOWFULLSCREEN)
+  else
+    ShowWindow(Handle, SW_SHOWNORMAL);
+end;
+
+procedure TfrmMain.SetFullScreen_Win32(blnOn: boolean);
+begin
+  if blnOn then
+  begin
+    if not FisFullScreen then
+    begin
+      FOrigWndState:= WindowState;
+      FOrigBounds:= BoundsRect;
+      BorderStyle:= bsNone;
+    end;
+
+    if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
+    begin
+    //if FisCustumScreen then begin
+      BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect; //Monitor.BoundsRect;
+    end else
+    begin
+      //BoundsRect:= Monitor.BoundsRect;
+      //BoundsRect:= Screen.MonitorFromWindow(Handle).BoundsRect;
+      BoundsRect:= CurrentMonitor.BoundsRect;
+    end;
+
+  end else
+  begin
+    WindowState:= FOrigWndState;
+    BoundsRect:= FOrigBounds;
+    BorderStyle:= bsSizeable;
+    BoundsRect:= FOrigBounds; //again
+  end;
+end;
 
 
 

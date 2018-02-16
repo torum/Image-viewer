@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1359
+  Left = 1390
   Height = 301
-  Top = 784
+  Top = 795
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -11,16 +11,27 @@ object frmMain: TfrmMain
   Color = clBlack
   DesignTimePPI = 120
   OnActivate = FormActivate
-  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
-  OnPaint = FormPaint
+  OnResize = FormResize
   OnShow = FormShow
-  Position = poDefault
-  SessionProperties = 'Left;Width;Top;Height'
+  Position = poScreenCenter
   LCLVersion = '1.8.0.6'
-  WindowState = wsFullScreen
+  object PanelInframe: TPanel
+    Left = 24
+    Height = 248
+    Top = 24
+    Width = 352
+    Align = alCustom
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BevelOuter = bvNone
+    Color = clBlack
+    ParentColor = False
+    TabOrder = 0
+    Visible = False
+  end
   object Image1: TImage
     Left = 0
     Height = 301
@@ -32,9 +43,11 @@ object frmMain: TfrmMain
     OnDblClick = Image1DblClick
     OnMouseWheelDown = Image1MouseWheelDown
     OnMouseWheelUp = Image1MouseWheelUp
+    OnResize = Image1Resize
+    PopupMenu = PopupMenuMain
     Proportional = True
+    Stretch = True
     StretchOutEnabled = False
-    StretchInEnabled = False
     Transparent = True
   end
   object TimerEffectStart: TTimer
@@ -45,7 +58,7 @@ object frmMain: TfrmMain
     top = 128
   end
   object TrayIcon1: TTrayIcon
-    PopUpMenu = PopupMenu1
+    PopUpMenu = PopupMenuSystem
     Icon.Data = {
       1CEE040000000100090010100000010020006804000096000000181800000100
       200088090000FE0400002020000001002000A8100000860E0000303000000100
@@ -10149,9 +10162,56 @@ object frmMain: TfrmMain
     left = 352
     top = 248
   end
-  object PopupMenu1: TPopupMenu
-    left = 304
-    top = 248
+  object PopupMenuMain: TPopupMenu
+    OnPopup = PopupMenuMainPopup
+    left = 296
+    top = 128
+    object MenuItemNext: TMenuItem
+      Caption = 'Next'
+      ShortCut = 39
+      OnClick = MenuItemNextClick
+    end
+    object MenuItemBack: TMenuItem
+      Caption = 'Previous'
+      ShortCut = 37
+      OnClick = MenuItemBackClick
+    end
+    object MenuItem6: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem7: TMenuItem
+      Caption = 'Stretch'
+      object MenuItemStretchIn: TMenuItem
+        Caption = 'In'
+        ShortCut = 73
+        OnClick = MenuItemStretchInClick
+      end
+      object MenuItemStretchOut: TMenuItem
+        Caption = 'Out'
+        ShortCut = 79
+        OnClick = MenuItemStretchOutClick
+      end
+    end
+    object MenuItem3: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemStayOnTop: TMenuItem
+      Caption = 'Stay on top'
+      OnClick = MenuItemStayOnTopClick
+    end
+    object MenuItemSlideshowInFrame: TMenuItem
+      Caption = 'Start InFrame Slideshow'
+      ShortCut = 83
+      OnClick = MenuItemSlideshowInFrameClick
+    end
+    object MenuItemSlideshow: TMenuItem
+      Caption = 'Fullscreen Slideshow'
+      ShortCut = 70
+      OnClick = MenuItemSlideshowClick
+    end
+    object MenuItem2: TMenuItem
+      Caption = '-'
+    end
     object MenuItemQuit: TMenuItem
       Caption = '&Quit'
       OnClick = MenuItemQuitClick
@@ -10159,8 +10219,8 @@ object frmMain: TfrmMain
   end
   object ApplicationProperties1: TApplicationProperties
     ExceptionDialog = aedOkMessageBox
+    ShowMainForm = False
     OnException = ApplicationProperties1Exception
-    OnRestore = ApplicationProperties1Restore
     left = 352
     top = 16
   end
@@ -10171,16 +10231,19 @@ object frmMain: TfrmMain
     left = 64
     top = 24
   end
-  object XMLPropStorage: TXMLPropStorage
-    StoredValues = <>
-    left = 106
-    top = 132
-  end
   object XMLConfig: TXMLConfig
     StartEmpty = False
     RootName = 'CONFIG'
     ReadOnly = False
     left = 105
     top = 208
+  end
+  object PopupMenuSystem: TPopupMenu
+    left = 288
+    top = 248
+    object MenuItem1: TMenuItem
+      Caption = 'Quit'
+      OnClick = MenuItemQuitClick
+    end
   end
 end

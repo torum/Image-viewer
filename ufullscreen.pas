@@ -8,17 +8,21 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus, strutils, Types, Dos {$ifdef Mydebug},Windows{$endif};
+  LclType, LclProc, LclIntf, Menus, strutils, Types, Dos {$ifdef windows},Windows{$endif}
+  ;
 
 type
 
   { TfrmFullscreen }
 
   TfrmFullscreen = class(TForm)
+    IdleTimerMouseHide: TIdleTimer;
     Image1: TImage;
-    MenuItem1: TMenuItem;
-    MenuItemRandom: TMenuItem;
+    MenuItemBorderForSOT: TMenuItem;
+    MenuItemStart: TMenuItem;
+    MenuItemStayOnTop: TMenuItem;
     MenuItemRepeat: TMenuItem;
+    MenuItemRandom: TMenuItem;
     MenuItemFit: TMenuItem;
     MenuItemExpand: TMenuItem;
     MenuItemStretchBoth: TMenuItem;
@@ -39,9 +43,12 @@ type
     TimerFadeIn: TTimer;
     TimerFadeOut: TTimer;
 
+    procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure FormPaint(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormDestroy(Sender: TObject);
@@ -50,9 +57,16 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
+    procedure IdleTimerMouseHideTimer(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
+    procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure Image1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
+      );
     procedure Image1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
+    procedure MenuItemStartClick(Sender: TObject);
+    procedure MenuItemStayOnTopClick(Sender: TObject);
     procedure MenuItemExpandClick(Sender: TObject);
     procedure MenuItemFitClick(Sender: TObject);
     procedure MenuItemQuitClick(Sender: TObject);
@@ -63,6 +77,7 @@ type
     procedure MenuItemRandomClick(Sender: TObject);
     procedure MenuItemRepeatClick(Sender: TObject);
     procedure MenuItemStretchBothClick(Sender: TObject);
+    procedure PopupMenu1Close(Sender: TObject);
     procedure PopupMenu1Popup(Sender: TObject);
     procedure TimerFadeInTimer(Sender: TObject);
     procedure TimerFadeOutTimer(Sender: TObject);
@@ -87,10 +102,22 @@ type
     FIsSlideshowPlaying:boolean;//TODO this actually doing nothing.Reconsider.
     FOrigBounds: TRect;
     FOrigWndState: TWindowState;
+
+    FiStartWith:integer;
+
+    FOptIntMoniter:integer;
+    //FisCustumScreen: boolean;
+    FisInFrame :boolean;
+    FisStartNormal:boolean;
+
+    FXPos, FYPos: Integer;
+    FisMoving: Boolean;
+    FisPopupMenuShowing:boolean;
+
     procedure ShowFullScreen(AValue: boolean);
     procedure SetFullScreen_Universal(AValue: boolean);
     procedure SetFullScreen_Win32(AValue: boolean);
-    procedure StartSlideshow();
+    procedure StartSlideshow(startIndex:integer);
       {Starts slideshow begining of specified "starts" index.
       }
     function DisplayImage(id:integer):integer;
@@ -130,14 +157,20 @@ type
     procedure ChangeIntervalClicked(Sender: TObject);
     procedure ChangeMinFileSizeClicked(Sender: TObject);
 
+    procedure PlaybackRepeatStart();
+
+  //TODO test this. does this work on linux?
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+
+  public
     procedure PlaybackNext(Sender: TObject);
     procedure PlaybackBack(Sender: TObject);
     procedure PlaybackPause(Sender: TObject);
     procedure PlaybackPlay(preLoad:boolean);
-    procedure PlaybackRepeatStart();
 
-  public
     property Current: integer read FiCurr;
+    property StartWith: integer write FiStartWith;
   end;
 
 var
@@ -149,14 +182,30 @@ uses UMain;
 
 {$R *.lfm}
 
+//TODO test this. does this work on linux?
+//I don't think I need this.
+
+procedure TfrmFullscreen.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  Params.Style := Params.Style or WS_BORDER or WS_THICKFRAME;
+
+end;
+
 procedure TfrmFullscreen.FormCreate(Sender: TObject);
 var
   i:integer;
   childItem: TMenuItem;
 begin
+
   FiCurr:=-1;
+  {$ifdef windows}
   TimerFadeIn.Interval:=1;
   TimerFadeOut.Interval:=2;
+  {$else}
+  TimerFadeIn.Interval:=10;
+  TimerFadeOut.Interval:=12;
+  {$endif}
 
   FFileList:=TStringlist.Create;
   FFileList.Assign(frmMain.FileList);
@@ -173,9 +222,15 @@ begin
   FExpand:=frmMain.OptExpand;
   FEffect:=frmMain.OptTransitEffect;
   FMinimulFileSizeKiloByte:=frmMain.OptMinimulFileSizeKiloByte;
-  FManualTransition:=frmMain.OptManualTransition;
+  FManualTransition:=frmMain.IsManualTransition;
   FRandom:= frmMain.OptRandom;
   FRepeat:= frmMain.OptRepeat;
+
+  FOptIntMoniter:=frmMain.OptIntMoniter;
+  FisInFrame:=frmMain.IsInFrame;
+  FisStartNormal:=frmMain.IsStartNormal;
+
+  FiStartWith:=0;
 
   Image1.Stretch:=false;
   if FStretch or FFit then begin
@@ -199,22 +254,22 @@ begin
     MenuItemInterval.Add(childItem);
   end;
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[One] &minute';
+  childItem.Caption := '[&One] minute';
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=60;
   MenuItemInterval.Add(childItem);
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[Five] &minute';
+  childItem.Caption := '[&Five] minute';
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=300;
   MenuItemInterval.Add(childItem);
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[Ten] &minute';
+  childItem.Caption := '[&Ten] minute';
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=600;
   MenuItemInterval.Add(childItem);
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[Fifteen] &minute';
+  childItem.Caption := '[&Fifteen] minute';
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=900;
   MenuItemInterval.Add(childItem);
@@ -251,9 +306,79 @@ begin
   self.ShowInTaskBar:=stNever;
 
   self.AlphaBlend:=true;
-  self.AlphaBlendValue := 255; // do NOT ever set it to 0.
+  if FEffect then
+  begin
+    self.AlphaBlendValue := 1; // do NOT ever set it to 0.
+  end else
+  begin
+    self.AlphaBlendValue := 255;
+  end;
 
   Randomize;//important
+end;
+
+procedure TfrmFullscreen.FormShow(Sender: TObject);
+begin
+  //changing moniter (show) cause slideshow to star over....
+  if FIsSlideshowPlaying then exit;
+
+  if (FFileList.Count > 0) then
+  begin
+    //Sets fullscreen and show.
+    if FisInFrame then
+    begin
+      //TODO check
+      //self.BoundsRect := self.Parent.ClientRect;
+      self.BoundsRect := frmMain.ClientRect;
+      StartSlideshow(FiStartWith);
+    end else
+    begin
+      ShowFullScreen(true);
+      StartSlideshow(FiStartWith);
+    end;
+
+  end else begin
+    //no files are selected or to open. List empty.
+    //this should not happen.
+
+  end;
+
+
+end;
+
+procedure TfrmFullscreen.FormActivate(Sender: TObject);
+begin
+end;
+
+procedure TfrmFullscreen.FormCloseQuery(Sender: TObject; var CanClose: boolean);
+begin
+  if FisInFrame then
+  begin
+    TimerInterval.Enabled:=false;
+    TimerFadeOut.Enabled:=false;
+    TimerFadeIn.Enabled:=false;
+    //frmMain.DoneInFrame();
+  end;
+end;
+
+procedure TfrmFullscreen.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  CloseAction:= caFree;
+
+  TimerInterval.Enabled := false;
+  TimerFadeIn.Enabled := false;
+  TimerFadeOut.Enabled := false;
+
+  IdleTimerMouseHide.Enabled:=false;
+  Screen.Cursor:=crDefault;
+
+  if FisInFrame then
+  begin
+    frmMain.DoneInFrame(FiCurr);
+  end else begin
+    frmMain.DoneFullscreen(FiCurr);
+  end;
 end;
 
 procedure TfrmFullscreen.FormDestroy(Sender: TObject);
@@ -263,53 +388,54 @@ begin
   FFileListRemaining.Free;
 end;
 
-procedure TfrmFullscreen.FormShow(Sender: TObject);
-begin
-  self.Cursor:=crNone;
-  Screen.Cursor:=crNone;
-  Screen.UpdateScreen;
 
-  if (FFileList.Count > 0) then
-  begin
-    //Sets fullscreen and show.
-    ShowFullScreen(true);
-  end else begin
-    //no files are selected or to open. List empty.
-    //this should not happen.
-  end;
-  StartSlideshow();
-end;
-
-procedure TfrmFullscreen.FormActivate(Sender: TObject);
-begin
-  //StartSlideshow();
-end;
-
-procedure TfrmFullscreen.StartSlideshow();
+procedure TfrmFullscreen.StartSlideshow(startIndex:integer);
 begin
   //reset
   FFileListHistory.Clear;
   FFileListRemaining.Clear;
   FFileListRemaining.Assign(FFileList);
 
+  FIsSlideshowPlaying:=true;
+
   //specify index to display.
   if FRandom then begin
-    TimerInterval.tag:= GetNextRandomImageIndex();
+    if startIndex > -1 then
+    begin
+      TimerInterval.tag:= startIndex;
+    end else
+    begin
+      TimerInterval.tag:=GetNextRandomImageIndex();
+    end;
   end else
   begin
-    TimerInterval.tag:=0;
+    TimerInterval.tag:=startIndex;
   end;
 
   //Start slideshow.
   if FEffect then begin
-    self.AlphaBlendValue := 1;
+    //did not add files manually. started as single file.so,
+    if (Not frmMain.OptSlideshowAutoStart) or frmMain.IsSingleFileSelected then
+    begin
+      FManualTransition:=true;
+      //PlaybackPause(self);
+    end;
     PlaybackPlay(false);
   end else begin
     PlaybackPlay(false);
-    TimerInterval.Enabled:=true;
+
+    //did not add files manually. started as single file.so,
+    if (Not frmMain.OptSlideshowAutoStart) or frmMain.IsSingleFileSelected then
+    begin
+      FManualTransition:=true;
+      //PlaybackPause(self);
+    end else
+    begin
+      FManualTransition:=false;
+      TimerInterval.Enabled:=true;
+    end;
   end;
 
-  FIsSlideshowPlaying:=true;
 end;
 
 procedure TfrmFullscreen.PlaybackPlay(preLoad:boolean);
@@ -328,9 +454,19 @@ begin
   i:=TimerInterval.Tag;
   if ValidateFileIndex(i) then
   begin
-
     //display image
     FiCurr:=DisplayImage(i);
+
+    if FisInFrame then
+    begin
+      if (FFileList.Count = 1) then
+      begin
+        frmMain.SetCaption('InFrame Slideshow - ' + FFileList[FiCurr]);
+      end else
+      begin
+        frmMain.SetCaption('InFrame Slideshow: '+'['+intToStr(FiCurr+1)+'/'+ intToStr(FFileList.Count) +'] - ' + FFileList[FiCurr]);
+      end;
+    end;
   end else begin
     DisplayError(i,'Display file index out of rainge.'+intToStr(i));
     {$ifdef Mydebug}
@@ -372,6 +508,7 @@ begin
         //it's the last but you need to fade in.
         // TimerFadeIn checks repeat option
         TimerFadeIn.Enabled:=true;
+
       end else begin
         //checking repeat option
         PlaybackRepeatStart();
@@ -396,6 +533,7 @@ begin
 
     //reset next
     if FRandom then begin
+      FiCurr:=-1;
       TimerInterval.tag:=GetNextRandomImageIndex();
     end else begin
       FiCurr:=0;
@@ -425,6 +563,29 @@ procedure TfrmFullscreen.PlaybackPause(Sender: TObject);
 begin
   //toggle playback pause/start
   if FIsSlideshowPlaying then begin
+
+    if FManualTransition then
+    begin
+      FManualTransition:=false;
+
+      if FEffect then begin
+        //TimerFadeOut.Enabled:=true;
+        TimerIntervalTimer(self);
+      end else begin
+        PlaybackPlay(false);
+      end;
+
+    end else
+    begin
+      FManualTransition:=true;
+
+      TimerInterval.Enabled:=false;
+      TimerFadeIn.Enabled:=false;
+      TimerFadeOut.Enabled:=false;
+
+      self.AlphaBlendValue:=255;
+    end;
+    {
     if TimerInterval.Enabled or TimerFadeIn.Enabled or TimerFadeOut.Enabled then
     begin
       TimerInterval.Enabled:=false;
@@ -445,17 +606,34 @@ begin
         PlaybackPlay(false);
       end;
     end;
+    }
   end;
 end;
 
 procedure TfrmFullscreen.PlaybackNext(Sender: TObject);
 begin
-  if FEffect then begin
-    TimerFadeIn.Enabled:=false;
-    TimerFadeOut.Enabled:=false;
-    TimerFadeOut.Enabled:=true;
-  end else begin
-    PlaybackPlay(false);
+  if FFileList.Count > 1 then begin
+    if FEffect then begin
+      if TimerFadeIn.Enabled then
+      begin
+        //fading in but let's just go next.
+        TimerFadeIn.Enabled:=false;
+        //alphablendvalue:=2;
+        PlaybackPlay(false);
+      end else if TimerFadeOut.Enabled then
+      begin
+        TimerFadeOut.Enabled:=false;
+        //alphablendvalue:=2;
+        PlaybackPlay(false);
+      end else
+      begin
+        PlaybackPlay(false);
+      end;
+
+    end else begin
+      PlaybackPlay(false);
+    end;
+
   end;
 end;
 
@@ -463,21 +641,49 @@ procedure TfrmFullscreen.PlaybackBack(Sender: TObject);
 var
   iPrev:integer;
 begin
-  //OutputDebugString(PChar(TrimRight('PlaybackBack:(Current):'+intToStr(Current))));
-  iPrev:=GetPreviousImageIndex(Current);
-  //OutputDebugString(PChar(TrimRight('PlaybackBack:(iPrev):'+intToStr(iPrev))));
-  if (iPrev > -1) then
-  begin
-    if FEffect then begin
-      TimerFadeIn.Enabled:=false;
-      TimerInterval.Enabled:=false;
-      TimerInterval.Tag := iPrev;
-      TimerFadeOut.Enabled:=true;
-    end else begin
-      TimerInterval.Enabled:=false;
-      TimerInterval.Tag := iPrev;
-      PlaybackPlay(false);
+  if FFileList.Count > 1 then begin
+    //TODO when you go back, put current to remaining,
+
+    //OutputDebugString(PChar(TrimRight('PlaybackBack:(Current):'+intToStr(Current))));
+    iPrev:=GetPreviousImageIndex(Current);
+    //OutputDebugString(PChar(TrimRight('PlaybackBack:(iPrev):'+intToStr(iPrev))));
+    if (iPrev > -1) then
+    begin
+      if FEffect then begin
+        if TimerFadeIn.Enabled then
+        begin
+          TimerFadeIn.Enabled:=false;
+          alphablendvalue:=2;
+          TimerInterval.Enabled:=false;
+          TimerInterval.Tag := iPrev;
+          PlaybackPlay(false);
+        end else if TimerFadeOut.Enabled then
+        begin
+          //let's just go back to the picture we are watching.
+          TimerFadeOut.Enabled:=false;
+          TimerInterval.Enabled:=false;
+          alphablendvalue:=255;
+          TimerInterval.Enabled:=true;
+          {
+          TimerInterval.Enabled:=false;
+          TimerInterval.Tag := iPrev;
+          //setting 1 shuld stop timer and going next
+          alphablendvalue:=1;
+          }
+        end else
+        begin
+          TimerInterval.Enabled:=false;
+          TimerInterval.Tag := iPrev;
+          PlaybackPlay(false);
+        end;
+
+      end else begin
+        TimerInterval.Enabled:=false;
+        TimerInterval.Tag := iPrev;
+        PlaybackPlay(false);
+      end;
     end;
+
   end;
 end;
 
@@ -500,13 +706,40 @@ end;
 
 function TfrmFullscreen.DisplayImage(id:integer):integer;
 var
-  f:integer;
+  f,curWidth,curHeight:integer;
 begin
   f:= ValideteFile(id);
   if f >= (FMinimulFileSizeKiloByte * 1024) then
   begin
     Image1.Picture.Clear;
     Image1.Stretch:=false;
+    Image1.StretchInEnabled:=false;
+
+    if FisInFrame then
+    begin
+      curWidth := self.Parent.ClientWidth;
+      curHeight:= self.Parent.ClientHeight;
+    end else
+    begin
+      ////todo currentMonitor?
+      ////frmMain.CurrentMonitor.
+      curWidth := screen.Monitors[FOptIntMoniter].Width;
+      curHeight:= screen.Monitors[FOptIntMoniter].Height;
+
+      //if FisCustumScreen then
+      //begin
+      //  curWidth := screen.Monitors[FOptIntMoniter].Width;
+      //  curHeight:= screen.Monitors[FOptIntMoniter].Height;
+      //end else
+      //begin
+        ////curWidth := screen.Width;
+        ////curHeight:= screen.Height;
+        //curWidth := Monitor.Width;
+        //curHeight:= Monitor.Height;
+      //end;
+
+    end;
+
     try
       Image1.Picture.LoadFromFile(FFileList[id]);
 
@@ -514,13 +747,17 @@ begin
          Image1.Stretch:=true;
       end else begin
         if FFit then begin
-          if ((Image1.Picture.Width > screen.Monitors[frmMain.OptIntMoniter].Width) or
-                  (Image1.Picture.height > screen.Monitors[frmMain.OptIntMoniter].Height)) then begin
+          if ((Image1.Picture.Width > curWidth) or
+                  (Image1.Picture.height > curHeight)) then begin
             Image1.Stretch:=true;
+            Image1.StretchInEnabled:=true;
             //fit only when larger than screen size.
           end else begin
             Image1.Stretch:=false;
+            Image1.StretchInEnabled:=false;
           end;
+        end else begin
+          Image1.Stretch:=false;
         end;
         if FExpand then begin
           Image1.Stretch:=true;
@@ -533,14 +770,13 @@ begin
       {$ifdef Mydebug}
       OutputDebugString(PChar(TrimRight( 'DisplayImage:id '+ intToStr(id) )));
       {$endif}
-
     except
       On E :Exception do begin
         {$ifdef Mydebug}
         OutputDebugString(PChar(TrimRight( 'Exception@DisplayImage_LoadFromFile:id '+ intToStr(id)+':'+E.Message )));
         {$endif}
         Image1.Picture.Clear;
-        DisplayError(id,E.Message);
+        DisplayError(id,'DisplayImage@LoadFromFile - '+E.Message);
       end;
     end;
   end else
@@ -571,23 +807,12 @@ begin
   end;
 end;
 
-Function L0(w:word):string;
-var
-  s : string;
-begin
-  Str(w,s);
-  if w<10 then
-   L0:='0'+s
-  else
-   L0:=s;
-end;
 
 procedure TfrmFullscreen.DisplayError(id:integer;message:string);
 var
-  Hour,Min,Sec,HSec : word;
   strFilePath:string;
-  esl:TStringlist;
-  logFile:string;
+  {$ifdef MyDebug} esl:TStringlist;
+  logFile:string; {$endif}
 begin
   if ValidateFileIndex(id) then
   begin
@@ -604,6 +829,7 @@ begin
   end;
   Image1.Update;
 
+  {$ifdef MyDebug}
   try
     esl:=TStringlist.Create;
     try
@@ -612,8 +838,8 @@ begin
     begin
       esl.LoadFromFile(logFile);
     end;
-    GetTime(Hour,Min,Sec,HSec);
-    esl.Add(L0(Hour)+':'+L0(Min)+':'+L0(Sec));
+
+    esl.Add(DateTimeToStr(Now));
     esl.Add('DisplayError: '+message);
     esl.Add('FileIndex: '+intToStr(id));
     esl.Add('File: '+strFilePath);
@@ -623,8 +849,10 @@ begin
       esl.Free;
     end;
   except
-    //shee
+    //
   end;
+  {$endif}
+
 end;
 
 procedure TfrmFullscreen.TimerFadeInTimer(Sender: TObject);
@@ -672,7 +900,7 @@ begin
       //TODO preLoading.
 
     end else begin
-        //todo debug this.
+      //todo debug this.
       {$ifdef Mydebug}
       OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer: ->PlaybackRepeatStart')));
       {$endif}
@@ -684,12 +912,19 @@ end;
 
 procedure TfrmFullscreen.TimerIntervalTimer(Sender: TObject);
 begin
+  if FManualTransition then
+  begin
+    TimerInterval.Enabled:=false;
+    exit;
+  end;
+
   if FEffect then begin
     TimerFadeOut.Enabled:=true;
   end else begin
     PlaybackPlay(false);
   end;
 end;
+
 
 procedure TfrmFullscreen.TimerFadeOutTimer(Sender: TObject);
 begin
@@ -728,9 +963,8 @@ begin
     {$endif}
     PlaybackPlay(false);
     {$ifdef Mydebug}
-    //OutputDebugString(PChar(TrimRight( 'TimerFadeOutTimer: ->(PlaybackPlay)TimerFadeIn' )));
+    OutputDebugString(PChar(TrimRight( 'TimerFadeOutTimer: ->(PlaybackPlay)TimerFadeIn' )));
     {$endif}
-    //TimerFadeIn.Enabled:=true;
   end;
 end;
 
@@ -784,6 +1018,9 @@ begin
   begin
     if FFileListHistory.Count > 0 then begin
 
+      //TODO when you go back, put current to remaining,
+
+
       //saving for the "next"
       FFileListRemaining.Insert(0,FFileListHistory[FFileListHistory.Count-1]);
       //delete current?
@@ -823,15 +1060,60 @@ end;
 procedure TfrmFullscreen.Image1DblClick(Sender: TObject);
 begin
   close;
-  //TODO or...
+end;
+
+procedure TfrmFullscreen.Image1MouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if (Button = mbLeft) and FisInFrame then
+  begin
+    FXPos:=X;
+    FYPos:=Y;
+    FisMoving:=True;
+  end;
+end;
+
+procedure TfrmFullscreen.Image1MouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
+begin
+  Screen.Cursor:= crDefault;
+  if FisInFrame then
+  begin
+    If FisMoving then frmMain.Left:=frmMain.Left+X-FXPos;
+    If FisMoving then frmMain.Top:=frmMain.Top+Y-FYPos;
+  end;
 end;
 
 procedure TfrmFullscreen.Image1MouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+  if (Button = mbLeft) and FisInFrame then
+  begin
+    FisMoving:=False;
+  end;
   if (Button = mbRight) then
   begin
-    PopupMenu1.PopUp;
+    //PopupMenu1.PopUp; //don't
+  end;
+end;
+
+procedure TfrmFullscreen.MenuItemStartClick(Sender: TObject);
+begin
+  FManualTransition:=false;
+  TimerInterval.Enabled:=true;
+end;
+
+procedure TfrmFullscreen.MenuItemStayOnTopClick(Sender: TObject);
+begin
+  if FisInFrame then
+  begin
+    //
+    if frmMain.OptStayOnTopInframe then
+    begin
+      frmMain.OptStayOnTopInframe:=false;
+    end else begin
+      frmMain.OptStayOnTopInframe:=true;
+    end;
   end;
 end;
 
@@ -879,8 +1161,23 @@ begin
   Image1.Refresh;
 end;
 
+procedure TfrmFullscreen.PopupMenu1Close(Sender: TObject);
+begin
+  FisPopupMenuShowing:=false;
+end;
+
 procedure TfrmFullscreen.MenuItemQuitClick(Sender: TObject);
 begin
+  if FisInFrame then
+  begin
+    //TODO NOT WORKING
+    TimerInterval.Enabled:=false;
+    TimerFadeOut.Enabled:=false;
+    TimerFadeIn.Enabled:=false;
+    IdleTimerMouseHide.Enabled:=false;
+    //frmMain.DoneInFrame();
+
+  end;
   close;
 end;
 
@@ -948,6 +1245,8 @@ end;
 
 procedure TfrmFullscreen.PopupMenu1Popup(Sender: TObject);
 begin
+  FisPopupMenuShowing:=true;
+
   if FStretch then
   begin
     MenuItemStretchBoth.checked:=true;
@@ -996,15 +1295,139 @@ begin
     MenuItemRandom.Checked:=false;
   end;
 
-  if screen.MonitorCount <= 1 then begin
+  if screen.MonitorCount <= 1 then
+  begin
     MenuItemMoniters.Visible:=false;
+  end;
+
+  if FisInFrame then
+  begin
+    MenuItemMoniters.Visible:=false;
+  end;
+
+  if FisInFrame then
+  begin
+    if FFileList.Count > 1 then
+    begin
+      if FManualTransition then
+      begin
+        MenuItemQuit.Caption:='&Leave InFrame';
+      end else
+      begin
+        MenuItemQuit.Caption:='&Stop InFrame Slideshow';
+      end;
+    end else
+    begin
+      MenuItemQuit.Caption:='&Leave InFrame';
+    end;
+  end else if FisFullscreen then
+  begin
+    if FFileList.Count > 1 then
+    begin
+      if FisStartNormal then
+      begin
+        if FManualTransition then
+        begin
+          MenuItemQuit.Caption:='&Leave Fullscreen';
+        end else
+        begin
+          MenuItemQuit.Caption:='&Stop Fullscreen Slideshow';
+        end;
+      end else begin
+        MenuItemQuit.Caption:='&Quit';
+      end;
+    end else
+    begin
+      if FisStartNormal then
+      begin
+        MenuItemQuit.Caption:='&Close Fullscreen';
+      end else begin
+        MenuItemQuit.Caption:='&Close';
+      end;
+    end;
+  end else
+  begin
+    //
+  end;
+  //MenuItemQuit.Caption:='&Quit';
+
+  //
+  if FisInFrame then
+  begin
+    MenuItemBorderForSOT.Visible:=true;
+    MenuItemStayOnTop.Visible:=true;
+    if frmMain.OptStayOnTopInframe then
+    begin
+      MenuItemStayOnTop.Checked:=true;
+    end else
+    begin
+      MenuItemStayOnTop.Checked:=false;
+    end;
+  end else
+  begin
+    MenuItemBorderForSOT.Visible:=false;
+    MenuItemStayOnTop.Visible:=false;
+  end;
+
+
+  if (TimerInterval.Enabled or TimerFadeIn.Enabled or TimerFadeOut.Enabled) then
+  begin
+    MenuItemPause.Checked:=false;
+  end else
+  begin
+    MenuItemPause.Checked:=true;
+  end;
+  if FManualTransition then
+  begin
+    MenuItemPause.Checked:=true;
+  end;
+
+  {
+  if FManualTransition then
+  begin
+    MenuItemStart.Visible:=true;
+  end else
+  begin
+    MenuItemStart.Visible:=false;
+  end;
+  }
+
+
+  if FFileList.Count > 1 then
+  begin
+    MenuItemPlayback.Visible:=true;
+    MenuItemRandom.Visible:=true;
+    MenuItemRepeat.Visible:=true;
+    MenuItemEffect.Visible:=true;
+    MenuItemInterval.Visible:=true;
+    MenuItemFilter.Visible:=true;
+  end else begin
+    MenuItemPlayback.Visible:=false;
+    MenuItemRandom.Visible:=false;
+    MenuItemRepeat.Visible:=false;
+    MenuItemEffect.Visible:=false;
+    MenuItemInterval.Visible:=false;
+    MenuItemFilter.Visible:=false;
   end;
 
 end;
 
 procedure TfrmFullscreen.ChangeMoniterClicked(Sender: TObject);
 begin
+  //todo check
+  if (Monitor = Screen.Monitors[TMenuItem(Sender).Tag]) then
+  begin
+    //FisCustumScreen:=false;
+  end else
+  begin
+    //FisCustumScreen:=true;
+  end;
+  FOptIntMoniter:= TMenuItem(Sender).Tag;
+
+  //self.Visible:=false;//test
   frmMain.OptIntMoniter:= TMenuItem(Sender).Tag;
+
+  //self.Visible:=true;//test
   ShowFullScreen(FisFullScreen);
 end;
 
@@ -1038,15 +1461,21 @@ end;
 procedure TfrmFullscreen.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if ((Key = VK_F11) or (Key = VK_ESCAPE)) then
+  if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F')) then  //or (Chr(Key) = 'F') or (Chr(Key) = 'S')
   begin
     close;
   end;
 
-  //TODO pop up?
-  //VK_RMENU
-  //VK_LMENU
 
+  if ((Key = VK_RMENU) or (Key = VK_LMENU)) then
+  begin
+    //self.Image1.PopupMenu.PopUp(0,0);
+    self.PopupMenu1.PopUp(0,0);
+  end;
+
+
+  //assigned in popupmenu shortcuts
+  {
   if FManualTransition then begin
 
     //next
@@ -1062,33 +1491,60 @@ begin
     begin
       PlaybackPause(sender);
     end;
+
   end;
+  }
+end;
+
+
+procedure TfrmFullscreen.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  Screen.Cursor:= crDefault;
+  //do the same at Image1.
 end;
 
 procedure TfrmFullscreen.FormMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-  if FManualTransition then begin
+  //if FManualTransition then begin
      PlaybackNext(sender);
      Handled:=true;
-  end;
+  //end;
 end;
 
 procedure TfrmFullscreen.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-  if FManualTransition then begin
+  //if FManualTransition then begin
      PlaybackBack(sender);
      Handled:=true;
+  //end;
+end;
+
+procedure TfrmFullscreen.IdleTimerMouseHideTimer(Sender: TObject);
+begin
+  if not FisPopupMenuShowing then
+  begin
+    Screen.Cursor:= crNone;
   end;
 end;
 
 procedure TfrmFullscreen.FormPaint(Sender: TObject);
 begin
-  Screen.UpdateScreen;
-  self.Cursor:=crNone;
-  Screen.Cursor:=crNone;
-  Screen.UpdateScreen;
+  if FisFullscreen then
+  begin
+    //self.Cursor:=crNone;
+    //Screen.Cursor:=crNone;
+  end;
+end;
+
+procedure TfrmFullscreen.FormResize(Sender: TObject);
+begin
+  if FisInFrame then
+  begin
+    self.BoundsRect := self.Parent.ClientRect;
+  end;
 end;
 
 procedure TfrmFullscreen.ShowFullScreen(AValue: boolean);
@@ -1101,6 +1557,12 @@ begin
   {$endif}
   FisFullscreen:=AValue;
 
+  //no effect?
+  if AValue then
+  begin
+    self.BringToFront;
+    SetForegroundWindow(self.Handle);
+  end;
 end;
 
 procedure TfrmFullscreen.SetFullScreen_Universal(AValue: boolean);
@@ -1128,8 +1590,22 @@ begin
     FOrigWndState:= WindowState;
     FOrigBounds:= BoundsRect;
     BorderStyle:= bsNone;
-    WindowState:=wsFullScreen;
-    BoundsRect:= Screen.Monitors[frmMain.OptIntMoniter].BoundsRect;
+    //WindowState:=wsFullScreen;  // not good when changing moniter at fullscreen form.
+
+    if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
+    begin
+
+      BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
+
+    end else
+    begin
+      //BoundsRect:= self.Monitor.BoundsRect;
+      //BoundsRect:= frmMain.BoundsRect;
+
+      //BoundsRect:= frmMain.Monitor.BoundsRect;
+      BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
+      //ShowWindow(Handle, SW_SHOWFULLSCREEN)
+    end;
   end
   else
   begin
@@ -1138,12 +1614,6 @@ begin
     BorderStyle:= bsSizeable;
     BoundsRect:= FOrigBounds; //again
   end;
-end;
-
-procedure TfrmFullscreen.FormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
-begin
-  CloseAction:= caFree;
 end;
 
 

@@ -1,7 +1,7 @@
 object frmFullscreen: TfrmFullscreen
-  Left = 1521
+  Left = 1551
   Height = 301
-  Top = 392
+  Top = 402
   Width = 400
   AlphaBlend = True
   BorderStyle = bsNone
@@ -12,24 +12,34 @@ object frmFullscreen: TfrmFullscreen
   DesignTimePPI = 120
   OnActivate = FormActivate
   OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnMouseMove = FormMouseMove
   OnMouseWheelDown = FormMouseWheelDown
   OnMouseWheelUp = FormMouseWheelUp
   OnPaint = FormPaint
+  OnResize = FormResize
   OnShow = FormShow
+  PopupMenu = PopupMenu1
   Position = poOwnerFormCenter
   LCLVersion = '1.8.0.6'
-  WindowState = wsFullScreen
   object Image1: TImage
     Left = 0
     Height = 301
     Top = 0
     Width = 400
+    AntialiasingMode = amOn
     Align = alClient
+    AutoSize = True
+    Center = True
     OnDblClick = Image1DblClick
+    OnMouseDown = Image1MouseDown
+    OnMouseMove = Image1MouseMove
     OnMouseUp = Image1MouseUp
+    PopupMenu = PopupMenu1
+    Proportional = True
     StretchOutEnabled = False
     StretchInEnabled = False
     Transparent = True
@@ -38,33 +48,23 @@ object frmFullscreen: TfrmFullscreen
     Enabled = False
     Interval = 1
     OnTimer = TimerFadeOutTimer
-    left = 288
-    top = 128
+    left = 336
+    top = 16
   end
   object TimerFadeIn: TTimer
     Enabled = False
     Interval = 1
     OnTimer = TimerFadeInTimer
-    left = 64
-    top = 128
+    left = 280
+    top = 16
   end
   object PopupMenu1: TPopupMenu
     OnPopup = PopupMenu1Popup
-    left = 177
-    top = 202
+    OnClose = PopupMenu1Close
+    left = 176
+    top = 136
     object MenuItemPlayback: TMenuItem
       Caption = '&Playback'
-      object MenuItemRandom: TMenuItem
-        Caption = 'Random'
-        OnClick = MenuItemRandomClick
-      end
-      object MenuItemRepeat: TMenuItem
-        Caption = 'Repeat'
-        OnClick = MenuItemRepeatClick
-      end
-      object MenuItem1: TMenuItem
-        Caption = '-'
-      end
       object MenuItemNext: TMenuItem
         Caption = '&Next'
         ShortCut = 39
@@ -80,26 +80,44 @@ object frmFullscreen: TfrmFullscreen
         ShortCut = 32
         OnClick = MenuItemPauseClick
       end
+      object MenuItemStart: TMenuItem
+        Caption = 'Start'
+        Visible = False
+        OnClick = MenuItemStartClick
+      end
     end
     object MenuItemInterval: TMenuItem
       Caption = '&Interval'
     end
+    object MenuItemRandom: TMenuItem
+      Caption = 'Random'
+      ShortCut = 78
+      OnClick = MenuItemRandomClick
+    end
+    object MenuItemRepeat: TMenuItem
+      Caption = 'Repeat'
+      ShortCut = 82
+      OnClick = MenuItemRepeatClick
+    end
     object MenuItemEffect: TMenuItem
       Caption = '&Effect'
+      ShortCut = 69
       OnClick = MenuItemEffectClick
     end
     object MenuItemStretch: TMenuItem
       Caption = '&Stretch'
       object MenuItemFit: TMenuItem
-        Caption = 'Stretch In (big->screen)'
+        Caption = 'In (big->screen)'
+        ShortCut = 73
         OnClick = MenuItemFitClick
       end
       object MenuItemExpand: TMenuItem
-        Caption = 'Stretch Out (small->screen)'
+        Caption = 'Out (small->screen)'
+        ShortCut = 79
         OnClick = MenuItemExpandClick
       end
       object MenuItemStretchBoth: TMenuItem
-        Caption = 'Stretch In && Out'
+        Caption = 'In&&Out (fit to screen)'
         Visible = False
         OnClick = MenuItemStretchBothClick
       end
@@ -112,6 +130,13 @@ object frmFullscreen: TfrmFullscreen
     end
     object MenuItemMoniters: TMenuItem
       Caption = '&Moniters'
+    end
+    object MenuItemBorderForSOT: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemStayOnTop: TMenuItem
+      Caption = 'Stay on top'
+      OnClick = MenuItemStayOnTopClick
     end
     object MenuItem5: TMenuItem
       Caption = '-'
@@ -126,7 +151,13 @@ object frmFullscreen: TfrmFullscreen
     Enabled = False
     Interval = 3000
     OnTimer = TimerIntervalTimer
-    left = 176
-    top = 30
+    left = 16
+    top = 16
+  end
+  object IdleTimerMouseHide: TIdleTimer
+    AutoEnabled = True
+    OnTimer = IdleTimerMouseHideTimer
+    left = 23
+    top = 255
   end
 end
