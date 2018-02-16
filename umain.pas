@@ -30,6 +30,7 @@ TODO:
  i18n
   http://wiki.lazarus.freepascal.org/Step-by-step_instructions_for_creating_multi-language_applications
   http://wiki.lazarus.freepascal.org/Translations_/_i18n_/_localizations_for_programs
+ UWP packaging and release.
 
 
 Known issue and bugs:
@@ -712,35 +713,48 @@ var
 begin
   if not Assigned(Image1.Picture) then exit;
 
-  //TODO:
+  //TODO: don't
   Image1.Stretch:=false;
-  Image1.StretchInEnabled:=false;
+  //Image1.StretchInEnabled:=false;
+  //Image1.StretchOutEnabled:=false;
+
   curWidth := self.ClientWidth; //.Width;
   curHeight:= self.ClientHeight; //.Height;
   //if FOptStretch then begin
   //   Image1.Stretch:=true;
   //end else begin
     if FOptFit then begin
+      //fit only when larger than screen size.
+
       if ((Image1.Picture.Width > curWidth) or
               (Image1.Picture.height > curHeight)) then begin
         Image1.Stretch:=true;
         Image1.StretchInEnabled:=true;
-        //Image1.StretchOutEnabled:=false;
+        Image1.StretchOutEnabled:=true;
         Image1.AntialiasingMode:=amOn;
-        //fit only when larger than screen size.
+
       end else begin
         Image1.Stretch:=false;
         Image1.StretchInEnabled:=false;
+        Image1.StretchOutEnabled:=false;
         Image1.AntialiasingMode:=amOff;
       end;
     end else begin
       Image1.Stretch:=false;
+      Image1.StretchInEnabled:=false;
+      Image1.StretchOutEnabled:=false;
+      Image1.AntialiasingMode:=amOff;
     end;
 
     if FOptExpand then begin
+      if ((Image1.Picture.Width < curWidth) and
+              (Image1.Picture.height < curHeight)) then begin
       Image1.Stretch:=true;
       Image1.StretchOutEnabled:=true;
+      Image1.StretchInEnabled:=true;
       Image1.AntialiasingMode:=amOn;
+
+      end;
     end;
   //end;
   //Image1.Refresh;
@@ -821,6 +835,7 @@ begin
     if FiCurrentFileIndex < FileList.Count -1 then begin
      screen.Cursor:=crHourGlass;
      Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+     Image1Resize(self);
      FiCurrentFileIndex:=FiCurrentFileIndex+1;
      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
      screen.Cursor:=crDefault;
@@ -837,6 +852,7 @@ begin
     if FiCurrentFileIndex > 0 then begin
      screen.Cursor:=crHourGlass;
      Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+     Image1Resize(self);
      FiCurrentFileIndex:=FiCurrentFileIndex-1;
      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
      screen.Cursor:=crDefault;
@@ -1117,6 +1133,7 @@ begin
       if FiCurrentFileIndex < FileList.Count -1 then begin
        screen.Cursor:=crHourGlass;
        Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+       Image1Resize(self);
        FiCurrentFileIndex:=FiCurrentFileIndex+1;
        Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
        screen.Cursor:=crDefault;
@@ -1127,6 +1144,7 @@ begin
       if FiCurrentFileIndex > 0 then begin
        screen.Cursor:=crHourGlass;
        Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+       Image1Resize(self);
        FiCurrentFileIndex:=FiCurrentFileIndex-1;
        Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
        screen.Cursor:=crDefault;
