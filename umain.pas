@@ -3,6 +3,12 @@ unit UMain;
 {$mode objfpc}{$H+}
 
 {
+Memo:
+ Right now, the code is a mess. Once I finish implementing all the
+ basic functionality, I have to clean this up.
+}
+
+{
 Source:
  https://github.com/torumyax/Image-viewer
 
@@ -40,8 +46,8 @@ Known issue and bugs:
 
  On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
  On Ubuntu 16.04 with unity won't show fullscreen.
- On Ubuntu, (full) "screen" size is wrong.(top margine, probably title bar hight?)
- On Ubuntu, OpenPictureDialog won't show thumbnails.
+ On Ubuntu, (full) "screen" size is wrong.(top bar and dock size should be considered)
+ On Ubuntu, OpenPictureDialog won't show thumbnails?
 
  On MacOS, show fullscreen won't work. Modal window is hidden behind?
  On MacOS, bsNone won't work. titlebar/border won't hide.
@@ -997,9 +1003,13 @@ begin
 
   FisInFrame:=false;
 
+  {$ifdef windows}
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
+  {$else}
+    //TODO. don't work on Ubuntu.
+  {$endif}
 
 
   //self.BoundsRect := frmFullscreen.BoundsRect;
@@ -1150,6 +1160,10 @@ begin
     end;
   end else begin
     // normal image view.
+
+    if (Chr(Key) = 'Q') then begin
+      close;
+    end;
 
     //Since form steals Image menu...
 
@@ -1318,9 +1332,19 @@ end;
 procedure TfrmMain.SetFullScreen_Universal(blnOn: boolean);
 begin
   if blnOn then
-    ShowWindow(Handle, SW_SHOWFULLSCREEN)
-  else
+  begin
+    if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
+    begin
+      BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
+    end else
+    begin
+      BoundsRect:= CurrentMonitor.BoundsRect;
+    end;
+    ShowWindow(Handle, SW_SHOWFULLSCREEN);
+  end else
+  begin
     ShowWindow(Handle, SW_SHOWNORMAL);
+  end;
 end;
 
 procedure TfrmMain.SetFullScreen_Win32(blnOn: boolean);
@@ -1340,8 +1364,6 @@ begin
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect; //Monitor.BoundsRect;
     end else
     begin
-      //BoundsRect:= Monitor.BoundsRect;
-      //BoundsRect:= Screen.MonitorFromWindow(Handle).BoundsRect;
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
 

@@ -1,9 +1,12 @@
 object frmFullscreen: TfrmFullscreen
-  Left = 1554
+  Left = 1562
   Height = 301
-  Top = 404
+  Top = 406
   Width = 400
+  Align = alClient
   AlphaBlend = True
+  AutoSize = True
+  BorderIcons = []
   BorderStyle = bsNone
   Caption = 'Fullscreen'
   ClientHeight = 301

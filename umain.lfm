@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1393
+  Left = 1401
   Height = 301
-  Top = 796
+  Top = 798
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -10214,6 +10214,7 @@ object frmMain: TfrmMain
     end
     object MenuItemQuit: TMenuItem
       Caption = '&Quit'
+      ShortCut = 81
       OnClick = MenuItemQuitClick
     end
   end

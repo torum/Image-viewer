@@ -2,7 +2,13 @@ unit UFullscreen;
 
 {$mode objfpc}{$H+}
 
-{$DEFINE MyDebug}
+{
+Memo:
+ Right now, the code is a mess. Once I finish implementing all the
+ basic functionality, I have to clean this up.
+
+ {$DEFINE MyDebug}
+}
 
 interface
 
@@ -761,6 +767,8 @@ begin
       curWidth := screen.Monitors[FOptIntMoniter].Width;
       curHeight:= screen.Monitors[FOptIntMoniter].Height;
 
+
+      {
       //if FisCustumScreen then
       //begin
       //  curWidth := screen.Monitors[FOptIntMoniter].Width;
@@ -772,6 +780,7 @@ begin
         //curWidth := Monitor.Width;
         //curHeight:= Monitor.Height;
       //end;
+      }
 
     end;
 
@@ -995,14 +1004,14 @@ begin
 
   TimerInterval.Enabled:=false;
 
-  if self.AlphaBlendValue > 12 then
+  if self.AlphaBlendValue > 1 then
   begin
     if (self.AlphaBlendValue > 128 ) then begin
       self.AlphaBlendValue := self.AlphaBlendValue - 4;
     end else
     begin
-      if (self.AlphaBlendValue  < 20) then begin
-        self.AlphaBlendValue := 10;
+      if (self.AlphaBlendValue  < 17) then begin
+        self.AlphaBlendValue := 1;
       end else begin
         self.AlphaBlendValue := self.AlphaBlendValue - 15;
       end;
@@ -1731,14 +1740,22 @@ begin
   if AValue then
   begin
     FOrigWndState:= WindowState;
-    BorderStyle:= bsNone;
+    //BorderStyle:= bsNone;  //don't do this on linux
+    //TODO: on ubuntu, can't to stretch over the top bar or dock.
     WindowState:=wsFullScreen;
+    if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
+    begin
+      BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
+    end else
+    begin
+      BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
+    end;
     ShowWindow(Handle, SW_SHOWFULLSCREEN)
   end else
   begin
     ShowWindow(Handle, SW_SHOWNORMAL);
     WindowState:= FOrigWndState;
-    BorderStyle:= bsSizeable;
+    //BorderStyle:= bsSizeable;
   end;
 
 end;
@@ -1754,14 +1771,11 @@ begin
 
     if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
-
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
-
     end else
     begin
       //BoundsRect:= self.Monitor.BoundsRect;
       //BoundsRect:= frmMain.BoundsRect;
-
       //BoundsRect:= frmMain.Monitor.BoundsRect;
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
       //ShowWindow(Handle, SW_SHOWFULLSCREEN)
