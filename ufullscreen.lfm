@@ -1,17 +1,16 @@
 object frmFullscreen: TfrmFullscreen
-  Left = 1569
-  Height = 301
-  Top = 409
-  Width = 400
+  Left = 1565
+  Height = 241
+  Top = 408
+  Width = 320
   Align = alClient
   AlphaBlend = True
   BorderIcons = []
   BorderStyle = bsNone
   Caption = 'Fullscreen'
-  ClientHeight = 301
-  ClientWidth = 400
+  ClientHeight = 241
+  ClientWidth = 320
   Color = clBlack
-  DesignTimePPI = 120
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -24,12 +23,12 @@ object frmFullscreen: TfrmFullscreen
   OnShow = FormShow
   PopupMenu = PopupMenu1
   Position = poOwnerFormCenter
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '1.8.0.4'
   object Image1: TImage
     Left = 0
-    Height = 301
+    Height = 241
     Top = 0
-    Width = 400
+    Width = 320
     AntialiasingMode = amOn
     Align = alClient
     AutoSize = True
@@ -48,21 +47,21 @@ object frmFullscreen: TfrmFullscreen
     Enabled = False
     Interval = 1
     OnTimer = TimerFadeOutTimer
-    left = 336
-    top = 16
+    left = 269
+    top = 13
   end
   object TimerFadeIn: TTimer
     Enabled = False
     Interval = 1
     OnTimer = TimerFadeInTimer
-    left = 280
-    top = 16
+    left = 224
+    top = 13
   end
   object PopupMenu1: TPopupMenu
     OnPopup = PopupMenu1Popup
     OnClose = PopupMenu1Close
-    left = 176
-    top = 136
+    left = 141
+    top = 109
     object MenuItemPlayback: TMenuItem
       Caption = '&Playback'
       object MenuItemNext: TMenuItem
@@ -151,13 +150,13 @@ object frmFullscreen: TfrmFullscreen
     Enabled = False
     Interval = 3000
     OnTimer = TimerIntervalTimer
-    left = 16
-    top = 16
+    left = 13
+    top = 13
   end
   object IdleTimerMouseHide: TIdleTimer
     AutoEnabled = True
     OnTimer = IdleTimerMouseHideTimer
-    left = 23
-    top = 255
+    left = 18
+    top = 204
   end
 end

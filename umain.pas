@@ -1307,14 +1307,14 @@ begin
     begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
-    //ShowWindow(Handle, SW_SHOWFULLSCREEN);
+    ShowWindow(Handle, SW_SHOWFULLSCREEN);
   end else
   begin
     WindowState:= FOrigWndState;
     {$ifdef windows}
     BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
     {$endif}
-    //ShowWindow(Handle, SW_SHOWNORMAL);
+    ShowWindow(Handle, SW_SHOWNORMAL);
     BoundsRect:= FOrigBounds;
   end;
 end;

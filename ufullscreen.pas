@@ -385,7 +385,7 @@ begin
     frmMain.DoneFullscreen(FstrCurr);
   end;
 
-  ShowFullScreen(false);
+  //ShowFullScreen(false);
 end;
 
 procedure TfrmFullscreen.FormDestroy(Sender: TObject);
@@ -1124,7 +1124,7 @@ end;
 
 procedure TfrmFullscreen.Image1DblClick(Sender: TObject);
 begin
-  ShowFullScreen(false);
+  //ShowFullScreen(false);
   close;
 end;
 
@@ -1234,7 +1234,7 @@ end;
 
 procedure TfrmFullscreen.MenuItemQuitClick(Sender: TObject);
 begin
-  ShowFullScreen(false);
+  //ShowFullScreen(false);
   close;
 end;
 
@@ -1636,7 +1636,7 @@ procedure TfrmFullscreen.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F')) then
   begin
-    ShowFullScreen(false);
+    //ShowFullScreen(false);
     close;
   end;
 
@@ -1749,12 +1749,12 @@ begin
     ShowWindow(Handle, SW_SHOWFULLSCREEN)
   end else
   begin
-    WindowState:= FOrigWndState;
+    //WindowState:= FOrigWndState;
     {$ifdef windows}
     BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
     {$endif}
     ShowWindow(Handle, SW_SHOWNORMAL);
-    BoundsRect:= FOrigBounds;
+    //BoundsRect:= FOrigBounds;
   end;
 
 end;
