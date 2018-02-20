@@ -1,8 +1,8 @@
 # Image viewer/slideshow (Windows/Linux/Mac)
-Simple, minimum, yet configurable photo viewer/slideshow/digital signage software. (Windows/Linux)
+Simple, minimum, yet configurable photo viewer/slideshow/digital signage software. (Windows/Linux/macOS)
 
 Feature: normal view, windowless view with slideshow, fullscreen view with slideshow. Keyboard and mouse playback control. 
-Configurable with GUI and command line options.
+Configurable options with GUI and command line.
 
 For those who dont't want annoying "Print This" or "Add to gallery" menus, automatic resizing, and unnecessary animation menu effects. 
 
