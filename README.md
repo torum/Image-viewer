@@ -10,6 +10,9 @@ For those who dont't want annoying "Print This" or "Add to gallery" menus, autom
 Normal View (on Windows)
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/ImageViewerScreenshot1.png?raw=true)
 
+Normal View (on Ubuntu)
+![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/Screenshot%20from%202018-02-20%2021-19-26.jpg?raw=true)
+
 Normal View (on macOS)
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/Mac%202018-02-20%2018.34.57.png?raw=true)
 
