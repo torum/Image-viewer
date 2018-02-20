@@ -16,7 +16,7 @@ Normal View (on Ubuntu)
 Normal View (on macOS)
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/Mac%202018-02-20%2018.34.57.png?raw=true)
 
-Windowless View (Windows only)
+Windowless View (with slideshow)
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3.png?raw=true)
 
 
