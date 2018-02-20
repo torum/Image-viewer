@@ -42,6 +42,7 @@ Known issue and bugs:
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
 
  On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
+  https://forum.lazarus.freepascal.org/index.php?topic=38675.0
  Fixed->On Ubuntu 16.04 with unity won't show fullscreen.
  Fixed->On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
   https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
@@ -899,6 +900,8 @@ begin
 end;
 
 procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
+{$ifdef windows}{$else}var
+  Form: TForm;{$endif}
 begin
   if Fisfullscreen then exit;
   //if FileList.Count <= 1 then exit;
@@ -921,7 +924,15 @@ begin
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
     {$else}
-      //TODO. don't know how to hide titlebar in linux.
+      // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+      self.BorderStyle:=bsNone;
+      Form := TForm.Create(nil);
+      try
+        Parent := Form;
+        Parent := nil;
+      finally
+        Form.Free;
+      end;
     {$endif}
 
     FisInFrame:=true;
@@ -954,7 +965,8 @@ begin
 end;
 
 procedure TfrmMain.DoneInFrame(strCurr :string);
-var
+var{$ifdef windows}{$else}
+  Form: TForm;{$endif}
   i:integer;
 begin
 
@@ -965,7 +977,15 @@ begin
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
   {$else}
-    //TODO. don't work on Ubuntu.
+    // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+    self.BorderStyle:=bsSizeable;
+    Form := TForm.Create(nil);
+    try
+      Parent := Form;
+      Parent := nil;
+    finally
+      Form.Free;
+    end;
   {$endif}
 
 
