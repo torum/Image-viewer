@@ -22,10 +22,7 @@ Tested on
  Ubuntu 16.04 LTS
 
 TODO:
- Popup
-  interval check
-  filter check
-
+ Save and load options.
  Command line options.
  GUI settings.
  stop using config xml use ini.
@@ -46,7 +43,8 @@ Known issue and bugs:
 
  On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
  On Ubuntu 16.04 with unity won't show fullscreen.
- On Ubuntu, (full) "screen" size is wrong.(top bar and dock size should be considered)
+ On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
+  https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
  On Ubuntu, OpenPictureDialog won't show thumbnails?
 
  On MacOS, show fullscreen won't work. Modal window is hidden behind?
@@ -488,7 +486,7 @@ begin
     self.ShowInTaskBar:=stNever;
     self.Image1.Visible:=false;
 
-    self.WindowState:=wsFullScreen;
+    //self.WindowState:=wsFullScreen;
     self.AlphaBlend:=true;
     self.AlphaBlendValue:=1;
 
@@ -593,8 +591,14 @@ begin
     begin
 
       frmFullscreen := TfrmFullscreen.create(self);
-      frmFullScreen.WindowState:=wsFullScreen;
+      //frmFullScreen.WindowState:=wsFullScreen;
+
+      {$ifdef windows}
       frmFullscreen.ShowModal;
+      {$else}
+      frmFullscreen.FormStyle := fsSystemStayOnTop;
+      frmFullscreen.ShowModal; //todo
+      {$endif}
 
       close; //when returned (frmFullscreen is closed), self close.
     end;
@@ -686,9 +690,15 @@ begin
 
     frmFullscreen := TfrmFullscreen.create(self);
 
-    frmFullScreen.WindowState:=wsFullScreen;
+    //frmFullScreen.WindowState:=wsFullScreen;
     frmFullScreen.StartWith:=FiCurrentFileIndex;
+
+    {$ifdef windows}
     frmFullscreen.ShowModal;
+    {$else}
+    frmFullscreen.FormStyle := fsSystemStayOnTop;
+    frmFullscreen.ShowModal;
+    {$endif}
 
     //returned from fullscreen
     if FisStartNormal then
@@ -834,9 +844,14 @@ begin
       ShowFullScreen(true);
 
       frmFullscreen := TfrmFullscreen.create(self);
-      frmFullScreen.WindowState:=wsFullScreen;
+      //frmFullScreen.WindowState:=wsFullScreen;
       frmFullScreen.StartWith:=FiCurrentFileIndex;
+      {$ifdef windows}
       frmFullscreen.ShowModal;
+      {$else}
+      frmFullscreen.FormStyle := fsSystemStayOnTop;
+      frmFullscreen.ShowModal; //todo
+      {$endif}
 
       //DoneFullscreen will be called
 
@@ -974,7 +989,7 @@ begin
     Image1.Visible:=false;
 
     frmFullscreen := TfrmFullscreen.create(self);
-    frmFullScreen.WindowState:=wsNormal;
+    //frmFullScreen.WindowState:=wsNormal;
     frmFullScreen.StartWith:=FiCurrentFileIndex;
 
     //frmFullscreen.Parent := self;

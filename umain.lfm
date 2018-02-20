@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1401
+  Left = 1404
   Height = 301
-  Top = 798
+  Top = 800
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0

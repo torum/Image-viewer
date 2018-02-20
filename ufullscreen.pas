@@ -14,8 +14,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus, strutils, Types, Dos {$ifdef windows},Windows{$endif}
-  ;
+  LclType, LclProc, LclIntf, Menus, strutils, Types, Dos{$ifdef windows}, Windows{$endif};
 
 type
 
@@ -1608,7 +1607,7 @@ begin
     //start
     if FManualTransition then
     begin
-      //reload previously showing image.  note "FstrCurr" old index was rebuilt.
+      //reload previously showing image.  note:old index "FstrCurr" has been rebuilt.
       i:= FFilelist.IndexOf(FstrCurr);
       if (i > -1) and (FstrCurr <> '') then
       begin
@@ -1742,7 +1741,7 @@ begin
     FOrigWndState:= WindowState;
     //BorderStyle:= bsNone;  //don't do this on linux
     //TODO: on ubuntu, can't to stretch over the top bar or dock.
-    WindowState:=wsFullScreen;
+    //WindowState:=wsFullScreen; //don't use this for modal window.
     if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
