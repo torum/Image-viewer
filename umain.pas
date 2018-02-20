@@ -41,15 +41,15 @@ Known issue and bugs:
   https://forum.lazarus.freepascal.org/index.php?topic=24408.0
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
 
- On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
+ Fixed->On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
   https://forum.lazarus.freepascal.org/index.php?topic=38675.0
  Fixed->On Ubuntu 16.04 with unity won't show fullscreen.
  Fixed->On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
   https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
  On Ubuntu, OpenPictureDialog won't show thumbnails?
 
- On macOS, fullscreen won't hide top bar and dock. But my sample works fine....
- On macOS, bsNone won't work. titlebar/border won't hide.
+ Fixed->On macOS, fullscreen won't hide top bar and dock. But my sample works fine....
+ Fixed->On macOS, bsNone won't work. titlebar/border won't hide.
  On macOS, inFrame transit effect won't work?
  On macOS, trayicon won't show correctly. Black filled.->disabled
 }
@@ -1316,7 +1316,7 @@ begin
       FOrigWndState:= WindowState;
       FOrigBounds := BoundsRect;
     end;
-    //WindowState:=wsFullScreen; //don't do this if the form is modal on linux.
+    //WindowState:=wsFullScreen; //don't do this if the form is modal on linux.And it won't work with multi moniters.
     {$ifdef windows}
     BorderStyle:= bsNone;  //don't do this at runtime on linux!
     {$endif}
@@ -1327,14 +1327,18 @@ begin
     begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
+    {$IFDEF MACOS}{$ELSE}
     ShowWindow(Handle, SW_SHOWFULLSCREEN);
+    {$ENDIF}
   end else
   begin
     WindowState:= FOrigWndState;
     {$ifdef windows}
     BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
     {$endif}
+    {$IFDEF MACOS}{$ELSE}
     ShowWindow(Handle, SW_SHOWNORMAL);
+    {$ENDIF}
     BoundsRect:= FOrigBounds;
   end;
 end;
