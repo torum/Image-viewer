@@ -1,4 +1,4 @@
-# Image viewer/slideshow (Windows/Linux)
+# Image viewer/slideshow (Windows/Linux/Mac)
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software. (Windows/Linux)
 
 Feature: normal view, windowless view with slideshow, fullscreen view with slideshow. Keyboard and mouse playback control. 
