@@ -21,4 +21,4 @@ Windowless View (Windows only)
 Tested on 
 Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
 and Ubuntu 17.10: Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
-and macOS 10.03.2 High Sierra Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
+and macOS 10.03.2 High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
