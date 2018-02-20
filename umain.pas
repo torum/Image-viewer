@@ -47,9 +47,11 @@ Known issue and bugs:
  Fixed->On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
   https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
  On Ubuntu, OpenPictureDialog won't show thumbnails?
+ On Ubuntu, inFrame transit effect won't work?
 
  Fixed->On macOS, fullscreen won't hide top bar and dock. But my sample works fine....
  Fixed->On macOS, bsNone won't work. titlebar/border won't hide.
+ On macOS, window pos, size aren't saved. It always shows up at design time pos.
  On macOS, inFrame transit effect won't work?
  On macOS, trayicon won't show correctly. Black filled.->disabled
 }
@@ -1307,6 +1309,8 @@ begin
 end;
 
 procedure TfrmMain.SetFullScreen_Universal(blnOn: boolean);
+{$IFDEF DARWIN} var
+  Form: TForm;{$ENDIF}
 begin
   if blnOn then
   begin
@@ -1320,6 +1324,20 @@ begin
     {$ifdef windows}
     BorderStyle:= bsNone;  //don't do this at runtime on linux!
     {$endif}
+
+    {$IFDEF DARWIN}
+    //hide title bar
+    // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+    self.BorderStyle:=bsNone;
+    Form := TForm.Create(nil);
+    try
+      Parent := Form;
+      Parent := nil;
+    finally
+      Form.Free;
+    end;
+    {$ENDIF}
+
     if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
@@ -1327,7 +1345,7 @@ begin
     begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
-    {$IFDEF MACOS}{$ELSE}
+    {$IFDEF DARWIN}{$ELSE}
     ShowWindow(Handle, SW_SHOWFULLSCREEN);
     {$ENDIF}
   end else
@@ -1336,7 +1354,21 @@ begin
     {$ifdef windows}
     BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
     {$endif}
-    {$IFDEF MACOS}{$ELSE}
+
+    {$IFDEF DARWIN}
+    //un-hide title bar
+    // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+    self.BorderStyle:=bsSizeable;
+    Form := TForm.Create(nil);
+    try
+      Parent := Form;
+      Parent := nil;
+    finally
+      Form.Free;
+    end;
+    {$endif}
+
+    {$IFDEF DARWIN}{$ELSE}
     ShowWindow(Handle, SW_SHOWNORMAL);
     {$ENDIF}
     BoundsRect:= FOrigBounds;
