@@ -118,9 +118,9 @@ type
     FisMoving: Boolean;
     FisPopupMenuShowing:boolean;
 
-    procedure ShowFullScreen(AValue: boolean);
-    procedure SetFullScreen_Universal(AValue: boolean);
-    procedure SetFullScreen_Win32(AValue: boolean);
+    procedure ShowFullScreen(blnOn: boolean);
+    procedure SetFullScreen_Universal(blnOn: boolean);
+    procedure SetFullScreen_Win32(blnOn: boolean);
     procedure StartSlideshow(startIndex:integer);
       {Starts slideshow begining of specified "starts" index.
       }
@@ -186,13 +186,13 @@ uses UMain;
 
 {$R *.lfm}
 
-//TODO test this. does this work on linux?
+
 //I don't think I need this.
 
 procedure TfrmFullscreen.CreateParams(var Params: TCreateParams);
 begin
   inherited;
-  Params.Style := Params.Style or WS_BORDER or WS_THICKFRAME;
+  //Params.Style := Params.Style or WS_BORDER or WS_THICKFRAME;
 
 end;
 
@@ -1523,6 +1523,8 @@ begin
 
   //self.Visible:=true;//test
   ShowFullScreen(FisFullScreen);
+
+  self.Resize;
 end;
 
 procedure TfrmFullscreen.ChangeIntervalClicked(Sender: TObject);
@@ -1715,28 +1717,27 @@ begin
   end;
 end;
 
-procedure TfrmFullscreen.ShowFullScreen(AValue: boolean);
+procedure TfrmFullscreen.ShowFullScreen(blnOn: boolean);
 begin
 
   {$ifdef windows}
-  SetFullScreen_Win32(AValue);
+  SetFullScreen_Win32(blnOn);
   {$else}
-  SetFullScreen_Universal(AValue);
+  SetFullScreen_Universal(blnOn);
   {$endif}
-  FisFullscreen:=AValue;
+  FisFullscreen:=blnOn;
 
   //no effect?
-  if AValue then
+  if blnOn then
   begin
     self.BringToFront;
     SetForegroundWindow(self.Handle);
   end;
 end;
 
-procedure TfrmFullscreen.SetFullScreen_Universal(AValue: boolean);
+procedure TfrmFullscreen.SetFullScreen_Universal(blnOn: boolean);
 begin
-
-  if AValue then
+  if blnOn then
   begin
     FOrigWndState:= WindowState;
     //BorderStyle:= bsNone;  //don't do this on linux
@@ -1754,14 +1755,18 @@ begin
   begin
     ShowWindow(Handle, SW_SHOWNORMAL);
     WindowState:= FOrigWndState;
-    //BorderStyle:= bsSizeable;
+    {$ifdef windows}
+    BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
+    {$endif}
+    ShowWindow(Handle, SW_SHOWNORMAL);
+    //BoundsRect:= FOrigBounds;
   end;
 
 end;
 
-procedure TfrmFullscreen.SetFullScreen_Win32(AValue: boolean);
+procedure TfrmFullscreen.SetFullScreen_Win32(blnOn: boolean);
 begin
-  if AValue then
+  if blnOn then
   begin
     FOrigWndState:= WindowState;
     FOrigBounds:= BoundsRect;
@@ -1779,12 +1784,15 @@ begin
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
       //ShowWindow(Handle, SW_SHOWFULLSCREEN)
     end;
+
+    //ShowWindow(Handle, SW_SHOWFULLSCREEN)
   end
   else
   begin
     WindowState:= FOrigWndState;
     BoundsRect:= FOrigBounds;
     BorderStyle:= bsSizeable;
+    //ShowWindow(Handle, SW_SHOWNORMAL);
     BoundsRect:= FOrigBounds; //again
   end;
 end;

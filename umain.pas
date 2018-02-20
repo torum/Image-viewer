@@ -42,8 +42,8 @@ Known issue and bugs:
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
 
  On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
- On Ubuntu 16.04 with unity won't show fullscreen.
- On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
+ Fixed->On Ubuntu 16.04 with unity won't show fullscreen.
+ Fixed->On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
   https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
  On Ubuntu, OpenPictureDialog won't show thumbnails?
 
@@ -640,13 +640,11 @@ begin
 end;
 
 procedure TfrmMain.TimerEffectStartTimer(Sender: TObject);
-var
-  i:integer;
 begin
 
   //while doing this. user might click the main form ....
   //if done so, and popup won't work on fullscreen..
-  //->don't set popup menu in main form.
+  //-> don't set popup menu in main form.
 
   if self.AlphaBlendValue < 255 then
   begin
@@ -663,36 +661,8 @@ begin
   end else begin
     TimerEffectStart.Enabled:=false;
 
-    {test if start fullscreen at secondry moniter}
-    {
-    Screen.UpdateMonitors;
-    Screen.UpdateScreen;
-
-    if Screen.MonitorCount > 1 then
-    begin
-      for i:=0 to Screen.MonitorCount-1 do
-      begin
-        if (Monitor = Screen.Monitors[i]) then
-        begin
-          if (i > 0) then
-          begin
-            FisCustumScreen:=true;
-            FOptIntMoniter:=i;
-            showmessage('second');
-            break;
-
-          end;
-        end;
-      end;
-    end;
-    }
-    {test end}
-
     frmFullscreen := TfrmFullscreen.create(self);
-
-    //frmFullScreen.WindowState:=wsFullScreen;
     frmFullScreen.StartWith:=FiCurrentFileIndex;
-
     {$ifdef windows}
     frmFullscreen.ShowModal;
     {$else}
@@ -807,23 +777,17 @@ begin
       //this shuldn't be happening.
     end;
   end;
-
 end;
 
 procedure TfrmMain.MenuItemSlideshowClick(Sender: TObject);
 begin
-  {
-  if self.WindowState = wsNormal then begin
-    self.WindowState:=wsMaximized;
-  end else if self.WindowState = wsMaximized then begin
-    self.WindowState:=wsNormal;
-  end;
-  }
+
   //start fullscreen
   if (not FisFullscreen) and (not FisInFrame) then
   begin
     //TODO, do not change option value...
     FOptFullscreen:=true;
+
     FisStartNormal:=true;//so tell TimerEffectStart to go back to normal when done.
 
     Image1.Visible:=false;
@@ -832,11 +796,11 @@ begin
     FCurrentMonitor:=Screen.MonitorFromWindow(handle);
     FOptIntMoniter:=getCurrentMonitorIndex();
 
-
     if FOptTransitEffect then
     begin
       self.AlphaBlendValue:=1; //TODO form dissapears at once. maybe fadeout timer?
       ShowFullScreen(true);
+
       //start transition timer, and timer creates fullscreen
       TimerEffectStart.Enabled:=true;
     end else
@@ -844,20 +808,13 @@ begin
       ShowFullScreen(true);
 
       frmFullscreen := TfrmFullscreen.create(self);
-      //frmFullScreen.WindowState:=wsFullScreen;
       frmFullScreen.StartWith:=FiCurrentFileIndex;
-      {$ifdef windows}
       frmFullscreen.ShowModal;
-      {$else}
-      frmFullscreen.FormStyle := fsSystemStayOnTop;
-      frmFullscreen.ShowModal; //todo
-      {$endif}
 
       //DoneFullscreen will be called
 
       Image1.Visible:=true;
       ShowFullScreen(false);
-
       Screen.Cursor:=crDefault;
     end;
 
@@ -943,14 +900,6 @@ begin
       end;
     end;
 
-
-    {
-    if iCurr > -1 then
-    begin
-      FiCurrentFileIndex:=iCurr;
-      LoadImage();
-    end;
-    }
     Screen.Cursor:=crDefault; //again
 
   end;
@@ -1348,6 +1297,16 @@ procedure TfrmMain.SetFullScreen_Universal(blnOn: boolean);
 begin
   if blnOn then
   begin
+    if not FisFullScreen then
+    begin
+      //save original windowstate
+      FOrigWndState:= WindowState;
+      FOrigBounds := BoundsRect;
+    end;
+    //WindowState:=wsFullScreen; //don't do this if the form is modal on linux.
+    {$ifdef windows}
+    BorderStyle:= bsNone;  //don't do this at runtime on linux!
+    {$endif}
     if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
@@ -1358,7 +1317,12 @@ begin
     ShowWindow(Handle, SW_SHOWFULLSCREEN);
   end else
   begin
+    WindowState:= FOrigWndState;
+    {$ifdef windows}
+    BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
+    {$endif}
     ShowWindow(Handle, SW_SHOWNORMAL);
+    BoundsRect:= FOrigBounds;
   end;
 end;
 
@@ -1375,18 +1339,19 @@ begin
 
     if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
-    //if FisCustumScreen then begin
-      BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect; //Monitor.BoundsRect;
+      BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
     end else
     begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
 
+    //ShowWindow(Handle, SW_SHOWFULLSCREEN);
   end else
   begin
     WindowState:= FOrigWndState;
     BoundsRect:= FOrigBounds;
     BorderStyle:= bsSizeable;
+    //ShowWindow(Handle, SW_SHOWNORMAL);
     BoundsRect:= FOrigBounds; //again
   end;
 end;
