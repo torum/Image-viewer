@@ -1,14 +1,15 @@
 object frmMain: TfrmMain
   Left = 1404
-  Height = 241
+  Height = 301
   Top = 800
-  Width = 320
+  Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
   Caption = 'Image Viewer Main'
-  ClientHeight = 241
-  ClientWidth = 320
+  ClientHeight = 301
+  ClientWidth = 400
   Color = clBlack
+  DesignTimePPI = 120
   OnActivate = FormActivate
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -17,12 +18,12 @@ object frmMain: TfrmMain
   OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.4'
+  LCLVersion = '1.8.0.6'
   object PanelInframe: TPanel
     Left = 24
-    Height = 188
+    Height = 248
     Top = 24
-    Width = 272
+    Width = 352
     Align = alCustom
     Anchors = [akTop, akLeft, akRight, akBottom]
     BevelOuter = bvNone
@@ -33,9 +34,9 @@ object frmMain: TfrmMain
   end
   object Image1: TImage
     Left = 0
-    Height = 241
+    Height = 301
     Top = 0
-    Width = 320
+    Width = 400
     Align = alClient
     AutoSize = True
     Center = True
@@ -47,14 +48,13 @@ object frmMain: TfrmMain
     Proportional = True
     Stretch = True
     StretchOutEnabled = False
-    Transparent = True
   end
   object TimerEffectStart: TTimer
     Enabled = False
     Interval = 1
     OnTimer = TimerEffectStartTimer
-    left = 141
-    top = 102
+    left = 176
+    top = 128
   end
   object TrayIcon1: TTrayIcon
     PopUpMenu = PopupMenuSystem
@@ -10157,14 +10157,13 @@ object frmMain: TfrmMain
       E0DDA37EE4EB670501F8A1313F6F657F9EF1032F36FEB3D776560C80738E64C3
       F99EC2594FA734F8F788FF3F9E01B839114D7C480000000049454E44AE426082
     }
-    Visible = True
-    left = 282
-    top = 198
+    left = 353
+    top = 248
   end
   object PopupMenuMain: TPopupMenu
     OnPopup = PopupMenuMainPopup
-    left = 237
-    top = 102
+    left = 296
+    top = 128
     object MenuItemNext: TMenuItem
       Caption = 'Next'
       ShortCut = 39
@@ -10221,26 +10220,26 @@ object frmMain: TfrmMain
     ExceptionDialog = aedOkMessageBox
     ShowMainForm = False
     OnException = ApplicationProperties1Exception
-    left = 282
-    top = 13
+    left = 353
+    top = 16
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Title = 'Open picture file(s)'
     Filter = 'Graphic (*.jpeg;*.jpg;*.jpe;*.png;*.gif)|*.jpeg;*.jpg;*.jpe;*.png;*.gif|Portable Network Graphic (*.png)|*.png|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Graphics Interchange Format (*.gif)|*.gif'
     Options = [ofAllowMultiSelect, ofFileMustExist, ofNoTestFileCreate, ofEnableSizing, ofDontAddToRecent, ofAutoPreview]
-    left = 51
-    top = 19
+    left = 64
+    top = 24
   end
   object XMLConfig: TXMLConfig
     StartEmpty = False
     RootName = 'CONFIG'
     ReadOnly = False
-    left = 84
-    top = 166
+    left = 105
+    top = 208
   end
   object PopupMenuSystem: TPopupMenu
-    left = 230
-    top = 198
+    left = 288
+    top = 248
     object MenuItem1: TMenuItem
       Caption = 'Quit'
       OnClick = MenuItemQuitClick
