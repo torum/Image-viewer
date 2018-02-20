@@ -17,7 +17,7 @@ No extra components required.
 Tested on
  Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
  Ubuntu 17.10: Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
- MacOS 10.03.2 High Sierra on iMac(21.5 Inch, Late 2012 - Intel Core i5, 8GB memory).
+ macOS 10.03.2 High Sierra on iMac(21.5 Inch, Late 2012 - Intel Core i5, 8GB memory).
                Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
  Ubuntu 16.04 LTS
 
@@ -47,9 +47,10 @@ Known issue and bugs:
   https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
  On Ubuntu, OpenPictureDialog won't show thumbnails?
 
- On MacOS, show fullscreen won't work. Modal window is hidden behind?
- On MacOS, bsNone won't work. titlebar/border won't hide.
- On MacOS, inFrame transit effect won't work?
+ On macOS, fullscreen won't hide top bar and dock. But my sample works fine....
+ On macOS, bsNone won't work. titlebar/border won't hide.
+ On macOS, inFrame transit effect won't work?
+ On macOS, trayicon won't show correctly. Black filled.->disabled
 }
 
 
@@ -464,13 +465,14 @@ begin
 
 
 
-
-
-
+  {$ifdef windows}
   //System TrayIcon
+  TrayIcon1.Visible:=true;
   TrayIcon1.Hint:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   //TODO + moniter[1]    etc
-
+  {$else}
+  TrayIcon1.Visible:=false;
+  {$endif}
 
 
   //load ini settings
@@ -547,9 +549,10 @@ begin
       TimerEffectStart.Enabled:=true;
     end else
     begin
-      //Create fullscreen form at "FormActivate"
-      self.AlphaBlendValue := 255;
+      //Create fullscreen form at "FormActivate" >why?
+      self.AlphaBlendValue := 1;
       ShowFullScreen(true);
+      self.AlphaBlendValue := 255;
       self.BringToFront;
       //SetForegroundWindow(self.Handle);
     end;
@@ -591,18 +594,12 @@ begin
     begin
 
       frmFullscreen := TfrmFullscreen.create(self);
-      //frmFullScreen.WindowState:=wsFullScreen;
-
-      {$ifdef windows}
       frmFullscreen.ShowModal;
-      {$else}
-      frmFullscreen.FormStyle := fsSystemStayOnTop;
-      frmFullscreen.ShowModal; //todo
-      {$endif}
 
       close; //when returned (frmFullscreen is closed), self close.
     end;
   end;
+
 
   //just in case
   if FisFullscreen then
@@ -663,12 +660,7 @@ begin
 
     frmFullscreen := TfrmFullscreen.create(self);
     frmFullScreen.StartWith:=FiCurrentFileIndex;
-    {$ifdef windows}
     frmFullscreen.ShowModal;
-    {$else}
-    frmFullscreen.FormStyle := fsSystemStayOnTop;
-    frmFullscreen.ShowModal;
-    {$endif}
 
     //returned from fullscreen
     if FisStartNormal then
@@ -805,6 +797,7 @@ begin
       TimerEffectStart.Enabled:=true;
     end else
     begin
+
       ShowFullScreen(true);
 
       frmFullscreen := TfrmFullscreen.create(self);
@@ -1314,14 +1307,14 @@ begin
     begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
-    ShowWindow(Handle, SW_SHOWFULLSCREEN);
+    //ShowWindow(Handle, SW_SHOWFULLSCREEN);
   end else
   begin
     WindowState:= FOrigWndState;
     {$ifdef windows}
     BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
     {$endif}
-    ShowWindow(Handle, SW_SHOWNORMAL);
+    //ShowWindow(Handle, SW_SHOWNORMAL);
     BoundsRect:= FOrigBounds;
   end;
 end;
@@ -1330,11 +1323,15 @@ procedure TfrmMain.SetFullScreen_Win32(blnOn: boolean);
 begin
   if blnOn then
   begin
+    //self.AlphaBlendValue:=1;
+
     if not FisFullScreen then
     begin
       FOrigWndState:= WindowState;
       FOrigBounds:= BoundsRect;
-      BorderStyle:= bsNone;
+      //must be this order
+      WindowState:=wsFullScreen; //1
+      BorderStyle:= bsNone;      //2
     end;
 
     if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then

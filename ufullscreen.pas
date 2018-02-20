@@ -162,6 +162,7 @@ type
     procedure ChangeMinFileSizeClicked(Sender: TObject);
 
     procedure PlaybackRepeatStart();
+    procedure ResizeImage();
 
   //TODO test this. does this work on linux?
   protected
@@ -325,6 +326,7 @@ procedure TfrmFullscreen.FormShow(Sender: TObject);
 begin
   //changing moniter (show) cause slideshow to star over....
   if FIsSlideshowPlaying then exit;
+  if FIsFullscreen then exit;
 
   if (FFileList.Count > 0) then
   begin
@@ -337,17 +339,17 @@ begin
       StartSlideshow(FiStartWith);
     end else
     begin
+
       ShowFullScreen(true);
+
       StartSlideshow(FiStartWith);
+
     end;
 
   end else begin
     //no files are selected or to open. List empty.
     //this should not happen.
-
   end;
-
-
 end;
 
 
@@ -359,7 +361,6 @@ begin
     TimerInterval.Enabled:=false;
     TimerFadeOut.Enabled:=false;
     TimerFadeIn.Enabled:=false;
-    //frmMain.DoneInFrame();
   end;
 
   CanClose:=true;
@@ -383,6 +384,8 @@ begin
   end else begin
     frmMain.DoneFullscreen(FstrCurr);
   end;
+
+  ShowFullScreen(false);
 end;
 
 procedure TfrmFullscreen.FormDestroy(Sender: TObject);
@@ -744,6 +747,42 @@ begin
   result := FileSize(FFileList[id]);
 end;
 
+procedure TfrmFullscreen.ResizeImage();
+var
+  curWidth,curHeight:integer;
+begin
+  if FisInFrame then
+  begin
+    curWidth := self.Parent.ClientWidth;
+    curHeight:= self.Parent.ClientHeight;
+  end else
+  begin
+    curWidth := screen.Monitors[FOptIntMoniter].Width;
+    curHeight:= screen.Monitors[FOptIntMoniter].Height;
+  end;
+
+  if FStretch then begin
+     Image1.Stretch:=true;
+  end else begin
+    if FFit then begin
+      if ((Image1.Picture.Width > curWidth) or
+              (Image1.Picture.height > curHeight)) then begin
+        Image1.Stretch:=true;
+        Image1.StretchInEnabled:=true;
+        //fit only when larger than screen size.
+      end else begin
+        Image1.Stretch:=false;
+        Image1.StretchInEnabled:=false;
+      end;
+    end else begin
+      Image1.Stretch:=false;
+    end;
+    if FExpand then begin
+      Image1.Stretch:=true;
+    end;
+  end;
+end;
+
 function TfrmFullscreen.DisplayImage(id:integer):integer;
 var
   f,curWidth,curHeight:integer;
@@ -751,61 +790,26 @@ begin
   f:= ValideteFile(id);
   if f >= (FMinimulFileSizeKiloByte * 1024) then
   begin
+
     Image1.Picture.Clear;
     Image1.Stretch:=false;
     Image1.StretchInEnabled:=false;
-
+    {
     if FisInFrame then
     begin
       curWidth := self.Parent.ClientWidth;
       curHeight:= self.Parent.ClientHeight;
     end else
     begin
-      ////todo currentMonitor?
-      ////frmMain.CurrentMonitor.
       curWidth := screen.Monitors[FOptIntMoniter].Width;
       curHeight:= screen.Monitors[FOptIntMoniter].Height;
-
-
-      {
-      //if FisCustumScreen then
-      //begin
-      //  curWidth := screen.Monitors[FOptIntMoniter].Width;
-      //  curHeight:= screen.Monitors[FOptIntMoniter].Height;
-      //end else
-      //begin
-        ////curWidth := screen.Width;
-        ////curHeight:= screen.Height;
-        //curWidth := Monitor.Width;
-        //curHeight:= Monitor.Height;
-      //end;
-      }
-
     end;
+    }
 
     try
       Image1.Picture.LoadFromFile(FFileList[id]);
 
-      if FStretch then begin
-         Image1.Stretch:=true;
-      end else begin
-        if FFit then begin
-          if ((Image1.Picture.Width > curWidth) or
-                  (Image1.Picture.height > curHeight)) then begin
-            Image1.Stretch:=true;
-            Image1.StretchInEnabled:=true;
-            //fit only when larger than screen size.
-          end else begin
-            Image1.Stretch:=false;
-            Image1.StretchInEnabled:=false;
-          end;
-        end else begin
-          Image1.Stretch:=false;
-        end;
-        if FExpand then begin
-          Image1.Stretch:=true;
-        end;
-      end;
+      ResizeImage();
 
       Image1.Refresh;
       FFileListHistory.Add(FFileList[id]);
@@ -1120,6 +1124,7 @@ end;
 
 procedure TfrmFullscreen.Image1DblClick(Sender: TObject);
 begin
+  ShowFullScreen(false);
   close;
 end;
 
@@ -1229,7 +1234,7 @@ end;
 
 procedure TfrmFullscreen.MenuItemQuitClick(Sender: TObject);
 begin
-
+  ShowFullScreen(false);
   close;
 end;
 
@@ -1508,23 +1513,13 @@ end;
 
 procedure TfrmFullscreen.ChangeMoniterClicked(Sender: TObject);
 begin
-  //todo check
-  if (Monitor = Screen.Monitors[TMenuItem(Sender).Tag]) then
-  begin
-    //FisCustumScreen:=false;
-  end else
-  begin
-    //FisCustumScreen:=true;
-  end;
+
   FOptIntMoniter:= TMenuItem(Sender).Tag;
 
-  //self.Visible:=false;//test
   frmMain.OptIntMoniter:= TMenuItem(Sender).Tag;
 
-  //self.Visible:=true;//test
   ShowFullScreen(FisFullScreen);
 
-  self.Resize;
 end;
 
 procedure TfrmFullscreen.ChangeIntervalClicked(Sender: TObject);
@@ -1641,6 +1636,7 @@ procedure TfrmFullscreen.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F')) then
   begin
+    ShowFullScreen(false);
     close;
   end;
 
@@ -1705,7 +1701,6 @@ begin
   if not FisPopupMenuShowing then
   begin
     Screen.Cursor:= crNone;
-
   end;
 end;
 
@@ -1719,19 +1714,19 @@ end;
 
 procedure TfrmFullscreen.ShowFullScreen(blnOn: boolean);
 begin
-
+  FisFullscreen:=blnOn;
   {$ifdef windows}
   SetFullScreen_Win32(blnOn);
   {$else}
   SetFullScreen_Universal(blnOn);
   {$endif}
-  FisFullscreen:=blnOn;
+  //FisFullscreen:=blnOn;
 
   //no effect?
   if blnOn then
   begin
-    self.BringToFront;
-    SetForegroundWindow(self.Handle);
+    //self.BringToFront;
+    //SetForegroundWindow(self.Handle);
   end;
 end;
 
@@ -1740,6 +1735,7 @@ begin
   if blnOn then
   begin
     FOrigWndState:= WindowState;
+    FOrigBounds := BoundsRect;
     //BorderStyle:= bsNone;  //don't do this on linux
     //TODO: on ubuntu, can't to stretch over the top bar or dock.
     //WindowState:=wsFullScreen; //don't use this for modal window.
@@ -1753,13 +1749,12 @@ begin
     ShowWindow(Handle, SW_SHOWFULLSCREEN)
   end else
   begin
-    ShowWindow(Handle, SW_SHOWNORMAL);
     WindowState:= FOrigWndState;
     {$ifdef windows}
     BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
     {$endif}
     ShowWindow(Handle, SW_SHOWNORMAL);
-    //BoundsRect:= FOrigBounds;
+    BoundsRect:= FOrigBounds;
   end;
 
 end;
@@ -1768,32 +1763,34 @@ procedure TfrmFullscreen.SetFullScreen_Win32(blnOn: boolean);
 begin
   if blnOn then
   begin
+    {
     FOrigWndState:= WindowState;
     FOrigBounds:= BoundsRect;
+    }
     BorderStyle:= bsNone;
     //WindowState:=wsFullScreen;  // not good when changing moniter at fullscreen form.
 
     if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
+
+      ResizeImage();
+
     end else
     begin
-      //BoundsRect:= self.Monitor.BoundsRect;
-      //BoundsRect:= frmMain.BoundsRect;
-      //BoundsRect:= frmMain.Monitor.BoundsRect;
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
-      //ShowWindow(Handle, SW_SHOWFULLSCREEN)
     end;
 
-    //ShowWindow(Handle, SW_SHOWFULLSCREEN)
-  end
-  else
+    //ShowWindow(Handle, SW_SHOWFULLSCREEN); //not good when changing moniter.
+  end else
   begin
+    {
     WindowState:= FOrigWndState;
     BoundsRect:= FOrigBounds;
     BorderStyle:= bsSizeable;
     //ShowWindow(Handle, SW_SHOWNORMAL);
     BoundsRect:= FOrigBounds; //again
+    }
   end;
 end;
 

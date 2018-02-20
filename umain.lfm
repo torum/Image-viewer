@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1404
+  Left = 1408
   Height = 301
-  Top = 800
+  Top = 801
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -10158,7 +10158,6 @@ object frmMain: TfrmMain
       E0DDA37EE4EB670501F8A1313F6F657F9EF1032F36FEB3D776560C80738E64C3
       F99EC2594FA734F8F788FF3F9E01B839114D7C480000000049454E44AE426082
     }
-    Visible = True
     left = 352
     top = 248
   end
