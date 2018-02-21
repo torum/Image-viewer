@@ -4,7 +4,7 @@ Simple, minimum, yet configurable photo viewer/slideshow/digital signage softwar
 Feature: normal view, windowless view with slideshow, fullscreen view with slideshow. Keyboard and mouse playback control. 
 Configurable options with GUI and command line.
 
-For those who dont't want annoying "Print This" or "Add to gallery" menus, automatic resizing, and unnecessary animation menu effects. 
+For those who dont't want annoying "Print This" or "Add to gallery" menus, automatic resizing, and unnecessary animation menu effects. In another words, I hated windows' default UWP "photo" apps, so I decided to write my own.
 
 Normal View (on Windows)  
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/ImageViewerScreenshot1.png?raw=true)
