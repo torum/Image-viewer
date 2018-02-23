@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1404
+  Left = 1412
   Height = 301
-  Top = 800
+  Top = 802
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -10232,7 +10232,7 @@ object frmMain: TfrmMain
   end
   object XMLConfig: TXMLConfig
     StartEmpty = False
-    RootName = 'CONFIG'
+    RootName = 'Application'
     ReadOnly = False
     left = 105
     top = 208

@@ -14,15 +14,20 @@ Source:
 
 No extra components required.
 
+Compiled and tested on
+ Windows 10 (64bit): Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
+ Ubuntu 17.10 (64bit): Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
+ Mac - macOS 10.13.3 High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
+
 Tested on
- Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
- Ubuntu 17.10: Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
- macOS 10.03.2 High Sierra on iMac(21.5 Inch, Late 2012 - Intel Core i5, 8GB memory).
-               Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
- Ubuntu 16.04 LTS
+ Ubuntu 16.04 LTS (64bit)
+ Mac OS X 10.11.6 El Capitan (late 2008)
+
 
 TODO:
  Save and load options.
+  use AppName.ini in the apps dir on windows.
+  use .AppNameConfig hidden file in the home dir on linux.
  Command line options.
  GUI settings.
  stop using config xml use ini.
@@ -31,12 +36,10 @@ TODO:
  load playlist.
  OS-power-save event aware.
  i18n
-  http://wiki.lazarus.freepascal.org/Step-by-step_instructions_for_creating_multi-language_applications
-  http://wiki.lazarus.freepascal.org/Translations_/_i18n_/_localizations_for_programs
  UWP packaging and release.
 
 
-Known issue and bugs:
+Known issues and bugs:
  On Windows, PNG (depth 24) antialising isn't working when stretch.
   https://forum.lazarus.freepascal.org/index.php?topic=24408.0
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
@@ -49,11 +52,14 @@ Known issue and bugs:
  On Ubuntu, OpenPictureDialog won't show thumbnails?
  On Ubuntu, inFrame transit effect won't work?
 
- Fixed->On macOS, fullscreen won't hide top bar and dock. But my sample works fine....
+ Fixed->On macOS, fullscreen won't hide top bar and dock.
+  > Don't call SW_SHOWFULLSCREEN on main. And make sure to call SW_SHOWNORMAL on close window on Mac.
  Fixed->On macOS, bsNone won't work. titlebar/border won't hide.
+  https://forum.lazarus.freepascal.org/index.php?topic=38675.0
  On macOS, window pos, size aren't saved. It always shows up at design time pos.
  On macOS, inFrame transit effect won't work?
  On macOS, trayicon won't show correctly. Black filled.->disabled
+ On macOS, awaking from sleep >blank screen?
 }
 
 
@@ -118,12 +124,13 @@ type
     procedure TimerEffectStartTimer(Sender: TObject);
 
   private
-    FstFileList:TStringList;
+    FstFileList:TStringList; // main file list.
     FstDirectoryList:TStringList;
     FstPlaylistList:TStringList;
     FstMoniterList:TStringList;
     FstFileExtList:TStringList;
     FstPlaylistExtList:TStringList;
+
     //opts
     FOptFullscreen:boolean;
     FOptTransitEffect:boolean;
@@ -132,26 +139,23 @@ type
     FOptExpand:boolean;
     FOptIntervalIntSeconds:integer;
     FOptMinimulFileSizeKiloByte:integer; //be carefull when setting this
-
     FOptRepeat:boolean;
     FOptRandom:boolean;
     FoptStayOnTopInframe:boolean;
-
     FOptFileExts:string;
     FOptPlaylistExts:string;
-
     FOptIncludeSubFolders:boolean;
+    FOptIntMoniter:integer;
     FOptSlideshowAutoStart:boolean;
-
-    FoptFrameSkinWidth:integer; //not using for now
+    FoptFrameSkinWidth:integer; //not using this for now
 
     //app status
     FisFullScreen: boolean;
     FisStartNormal: boolean;
+    FisInFrame:boolean;
     FisSingleFileSelected: boolean;
     FisManualTransition:boolean;
-    FOptIntMoniter:integer;
-    FisInFrame:boolean;
+
     FCurrentMonitor:TMonitor;
 
     FOrigBounds: TRect;
@@ -169,6 +173,10 @@ type
     procedure RestoreFormState;
     procedure StoreFormState;
     procedure LoadImage;
+
+    //TODO test this.
+    protected
+      procedure CreateParams(var Params: TCreateParams); override;
 
   public
     property FileList: TStringList read FstFileList;
@@ -208,6 +216,14 @@ uses UFullscreen;
 
 { TfrmMain }
 
+//test ...not working
+procedure TfrmMain.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  Params.WindowClass.style := Params.WindowClass.Style or CS_DROPSHADOW;
+  Params.Style := Params.Style or WS_SIZEBOX;// or WS_BORDER or WS_THICKFRAME;
+  //Params.ExStyle:=Params.ExStyle or WS_EX_STATICEDGE or WS_EX_CONTROLPARENT or WS_EX_APPWINDOW;
+end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
@@ -439,6 +455,7 @@ begin
     exit;
   end;
 
+
   if Screen.MonitorCount > 1 then
   begin
     for i:=0 to Screen.MonitorCount-1 do
@@ -480,18 +497,19 @@ begin
 
   //load ini settings
   // since linux don't have ext(.exe or any ext), so... replace and append ext.
-  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.xml';
-
+  //XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.xml';
+  {$ifdef windows}
+  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.ini';
+  {$else}
+  XMLConfig.FileName:='.' + ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'Config';
+  {$endif}
 
   if FOptFullscreen then
   begin
-    //start fullscreen.
-
-    //main form become just background.
+    //fullscreen. main form become just background.
     self.ShowInTaskBar:=stNever;
     self.Image1.Visible:=false;
 
-    //self.WindowState:=wsFullScreen;
     self.AlphaBlend:=true;
     self.AlphaBlendValue:=1;
 
@@ -538,12 +556,8 @@ begin
 
   if Application.Terminated then exit;
 
-  //if FOptFullscreen then
   if (FOptFullscreen and (not FisFullscreen) and (not FisStartNormal)) then
   begin
-    //Screen.Cursor:=crNone;
-    //Screen.UpdateScreen;
-
     if FOptTransitEffect then
     begin
       self.AlphaBlendValue:=1;
@@ -567,9 +581,8 @@ begin
     if fileexists(XMLConfig.FileName) then begin
        RestoreFormState;
     end;
-
+    //show image.
     LoadImage;
-
   end;
 
   //just in case
@@ -584,7 +597,6 @@ begin
       FisFullscreen:=false;
     end;
   end;
-
 end;
 
 procedure TfrmMain.FormActivate(Sender: TObject);
@@ -603,7 +615,6 @@ begin
     end;
   end;
 
-
   //just in case
   if FisFullscreen then
   begin
@@ -616,7 +627,6 @@ begin
       FisFullscreen:=false;
     end;
   end;
-
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -632,6 +642,7 @@ end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  //clean up
   FstFileExtList.Free;
   FstPlaylistExtList.Free;
   FstFileList.Free;
@@ -710,7 +721,6 @@ var
 begin
   if not Assigned(Image1.Picture) then exit;
 
-  //TODO: don't
   Image1.Stretch:=false;
   //Image1.StretchInEnabled:=false;
   //Image1.StretchOutEnabled:=false;
@@ -776,7 +786,6 @@ end;
 
 procedure TfrmMain.MenuItemSlideshowClick(Sender: TObject);
 begin
-
   //start fullscreen
   if (not FisFullscreen) and (not FisInFrame) then
   begin
@@ -877,7 +886,6 @@ begin
   }
 end;
 
-
 procedure TfrmMain.DoneFullscreen(strCurr:string);
 var
   i:integer;
@@ -944,7 +952,6 @@ begin
     Image1.Visible:=false;
 
     frmFullscreen := TfrmFullscreen.create(self);
-    //frmFullScreen.WindowState:=wsNormal;
     frmFullScreen.StartWith:=FiCurrentFileIndex;
 
     //frmFullscreen.Parent := self;
@@ -971,7 +978,6 @@ var{$ifdef windows}{$else}
   Form: TForm;{$endif}
   i:integer;
 begin
-
   FisInFrame:=false;
 
   {$ifdef windows}
@@ -990,10 +996,6 @@ begin
     end;
   {$endif}
 
-
-  //self.BoundsRect := frmFullscreen.BoundsRect;
-
-  //test end
   PanelInframe.Visible:=false;
 
   Image1.BringToFront;
@@ -1010,11 +1012,6 @@ begin
       LoadImage();
     end;
   end;
-
-  {
-  FiCurrentFileIndex:=iCurr;
-  LoadImage();
-  }
 
   Image1.Repaint;
   Image1.Refresh;
@@ -1040,7 +1037,6 @@ end;
 
 procedure TfrmMain.SetStayOnTop(bln:Boolean);
 begin
-  //if (self.FormStyle = fsSystemStayOnTop) then
   if bln then
   begin
     self.FormStyle:=fsSystemStayOnTop;
@@ -1066,7 +1062,6 @@ begin
 
   // http://lists.elists.org/pipermail/delphi/2000-September/010939.html
 end;
-
 
 procedure TfrmMain.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
@@ -1224,7 +1219,6 @@ end;
 
 procedure TfrmMain.PopupMenuMainPopup(Sender: TObject);
 begin
-
   if (FstFileList.Count > 1) then
   begin
     //MenuItemSlideshowInFrame.Visible:=true;
@@ -1251,7 +1245,6 @@ begin
 
   if FOptFit then MenuItemStretchIn.Checked:=true else MenuItemStretchIn.Checked:=false;
   if FOptExpand then MenuItemStretchOut.Checked:=true else MenuItemStretchOut.Checked:=false;
-
 
 end;
 
