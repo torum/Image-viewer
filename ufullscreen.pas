@@ -90,7 +90,6 @@ type
     FFileList:TStringlist;
     FFileListHistory:TStringlist;
     FFileListRemaining:TStringList;
-    //FFileListIgnore:TStringList;
     FiCurr:integer;
     FstrCurr:string;
     FInterval:integer;
@@ -103,17 +102,13 @@ type
     FRandom:boolean;
     FRepeat:boolean;
     FIsFullScreen: boolean;
-    FIsSlideshowPlaying:boolean;//TODO this actually doing nothing.Reconsider.
+    FIsSlideshowPlaying:boolean;
     FOrigBounds: TRect;
     FOrigWndState: TWindowState;
-
     FiStartWith:integer;
-
     FOptIntMoniter:integer;
-    //FisCustumScreen: boolean;
     FisInFrame :boolean;
     FisStartNormal:boolean;
-
     FXPos, FYPos: Integer;
     FisMoving: Boolean;
     FisPopupMenuShowing:boolean;
@@ -164,16 +159,11 @@ type
     procedure PlaybackRepeatStart();
     procedure ResizeImage();
 
-  //TODO test this. does this work on linux?
-  protected
-    procedure CreateParams(var Params: TCreateParams); override;
-
   public
     procedure PlaybackNext(Sender: TObject);
     procedure PlaybackBack(Sender: TObject);
     procedure PlaybackPause(Sender: TObject);
     procedure PlaybackPlay(preLoad:boolean);
-
     property Current: integer read FiCurr;
     property StartWith: integer write FiStartWith;
   end;
@@ -187,15 +177,6 @@ uses UMain;
 
 {$R *.lfm}
 
-
-//I don't think I need this.
-
-procedure TfrmFullscreen.CreateParams(var Params: TCreateParams);
-begin
-  inherited;
-  //Params.Style := Params.Style or WS_BORDER or WS_THICKFRAME;
-
-end;
 
 procedure TfrmFullscreen.FormCreate(Sender: TObject);
 var
@@ -216,7 +197,6 @@ begin
   FFileList.Assign(frmMain.FileList);
   FFileListHistory:=TStringList.Create;
   FFileListRemaining:=TStringlist.Create;
-  //FFileListIgnore:=TStringlist.Create;
 
   FInterval:= frmMain.OptIntervalIntSeconds*1000;
   TimerInterval.Interval:=FInterval;
@@ -313,13 +293,15 @@ begin
   self.AlphaBlend:=true;
   if FEffect then
   begin
-    self.AlphaBlendValue := 1; // do NOT ever set it to 0.
+    // do NOT ever set it to 0.
+    self.AlphaBlendValue := 1;
   end else
   begin
     self.AlphaBlendValue := 255;
   end;
 
-  Randomize;//important
+  //important
+  Randomize;
 end;
 
 procedure TfrmFullscreen.FormShow(Sender: TObject);
@@ -1736,12 +1718,17 @@ begin
   begin
     FOrigWndState:= WindowState;
     FOrigBounds := BoundsRect;
-    //BorderStyle:= bsNone;  //don't do this on linux
-    //TODO: on ubuntu, can't to stretch over the top bar or dock.
-    //WindowState:=wsFullScreen; //don't use this for modal window.
+    {$ifdef windows}
+    // don't do this at runtime on linux. It won't work anyway.
+    BorderStyle:= bsNone;
+    {$endif}
+    // don't use this for modal window. And it won't work with multi moniters.
+    //WindowState:=wsFullScreen;
     if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
-      BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
+      //TODO: need to test this.
+      BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
+      //BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
     end else
     begin
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
@@ -1749,11 +1736,17 @@ begin
     ShowWindow(Handle, SW_SHOWFULLSCREEN)
   end else
   begin
+    // we don't do this, because of the flickering when closing fullscreen window.
     //WindowState:= FOrigWndState;
+
     {$ifdef windows}
-    BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
+    //don't do this at runtime on linux! It won't work anyway.
+    BorderStyle:= bsSizeable;
     {$endif}
+    // On macOS, we have to call SW_SHOWNORMAL otherwise you don't get fullscreen next time.
     ShowWindow(Handle, SW_SHOWNORMAL);
+
+    // we don't do this, because of the flickering when closing fullscreen window.
     //BoundsRect:= FOrigBounds;
   end;
 
@@ -1763,19 +1756,21 @@ procedure TfrmFullscreen.SetFullScreen_Win32(blnOn: boolean);
 begin
   if blnOn then
   begin
+    // we don't need this because frmFullscreen is always fullscreen.
     {
     FOrigWndState:= WindowState;
     FOrigBounds:= BoundsRect;
     }
     BorderStyle:= bsNone;
-    //WindowState:=wsFullScreen;  // not good when changing moniter at fullscreen form.
+
+    // not good when changing moniter at fullscreen form.
+    //WindowState:=wsFullScreen;
 
     if (frmMain.CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
     begin
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
-
-      ResizeImage();
-
+      // need this when changin the moniter.
+      ResizeImage(); x
     end else
     begin
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
@@ -1784,6 +1779,7 @@ begin
     //ShowWindow(Handle, SW_SHOWFULLSCREEN); //not good when changing moniter.
   end else
   begin
+    // we don't do this, because of the flickering when closing fullscreen window.
     {
     WindowState:= FOrigWndState;
     BoundsRect:= FOrigBounds;

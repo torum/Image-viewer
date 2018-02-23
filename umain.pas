@@ -30,7 +30,6 @@ TODO:
   use .AppNameConfig hidden file in the home dir on linux.
  Command line options.
  GUI settings.
- stop using config xml use ini.
  file drop handling.
  PreLoading image for slideshow.
  load playlist.
@@ -43,19 +42,12 @@ Known issues and bugs:
  On Windows, PNG (depth 24) antialising isn't working when stretch.
   https://forum.lazarus.freepascal.org/index.php?topic=24408.0
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
+ On Windows, inFrame "window" does not have shaddow.
 
- Fixed->On Ubuntu(and MacOS), bsNone won't work. titlebar/border won't hide.
-  https://forum.lazarus.freepascal.org/index.php?topic=38675.0
- Fixed->On Ubuntu 16.04 with unity won't show fullscreen.
- Fixed->On Ubuntu, modal window won't become fullscreen. "Top bar" and "Dock" won't hide.
-  https://forum.lazarus.freepascal.org/index.php/topic,40151.0.html
  On Ubuntu, OpenPictureDialog won't show thumbnails?
- On Ubuntu, inFrame transit effect won't work?
+ On Ubuntu, inFrame transit effect won't work..
 
- Fixed->On macOS, fullscreen won't hide top bar and dock.
-  > Don't call SW_SHOWFULLSCREEN on main. And make sure to call SW_SHOWNORMAL on close window on Mac.
- Fixed->On macOS, bsNone won't work. titlebar/border won't hide.
-  https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+
  On macOS, window pos, size aren't saved. It always shows up at design time pos.
  On macOS, inFrame transit effect won't work?
  On macOS, trayicon won't show correctly. Black filled.->disabled
@@ -124,21 +116,22 @@ type
     procedure TimerEffectStartTimer(Sender: TObject);
 
   private
-    FstFileList:TStringList; // main file list.
+    // main file list.
+    FstFileList:TStringList;
     FstDirectoryList:TStringList;
     FstPlaylistList:TStringList;
     FstMoniterList:TStringList;
     FstFileExtList:TStringList;
     FstPlaylistExtList:TStringList;
 
-    //opts
+    // opts
     FOptFullscreen:boolean;
     FOptTransitEffect:boolean;
     FOptStretch:boolean;
     FOptFit:boolean;
     FOptExpand:boolean;
     FOptIntervalIntSeconds:integer;
-    FOptMinimulFileSizeKiloByte:integer; //be carefull when setting this
+    FOptMinimulFileSizeKiloByte:integer; // be carefull when setting this
     FOptRepeat:boolean;
     FOptRandom:boolean;
     FoptStayOnTopInframe:boolean;
@@ -147,20 +140,17 @@ type
     FOptIncludeSubFolders:boolean;
     FOptIntMoniter:integer;
     FOptSlideshowAutoStart:boolean;
-    FoptFrameSkinWidth:integer; //not using this for now
+    FoptFrameSkinWidth:integer; // not using this for now
 
-    //app status
+    // app status
     FisFullScreen: boolean;
     FisStartNormal: boolean;
     FisInFrame:boolean;
     FisSingleFileSelected: boolean;
     FisManualTransition:boolean;
-
     FCurrentMonitor:TMonitor;
-
     FOrigBounds: TRect;
     FOrigWndState: TWindowState;
-
     FiCurrentFileIndex:integer;
 
     procedure ShowFullScreen(blnOn: boolean);
@@ -174,14 +164,9 @@ type
     procedure StoreFormState;
     procedure LoadImage;
 
-    //TODO test this.
-    protected
-      procedure CreateParams(var Params: TCreateParams); override;
-
   public
     property FileList: TStringList read FstFileList;
     property OptIntMoniter: integer read FOptIntMoniter write SetMoniter;
-    //property IsCustumScreen: boolean read FisCustumScreen;
     property MoniterList: TStringList read FstMoniterList;
     property OptTransitEffect: boolean read FoptTransitEffect;
     property OptFit: boolean read FOptFit;
@@ -189,7 +174,6 @@ type
     property OptStretch: boolean read FOptStretch;
     property OptIntervalIntSeconds: integer read FOptIntervalIntSeconds;
     property OptMinimulFileSizeKiloByte: integer read FOptMinimulFileSizeKiloByte;
-
     property OptRandom: boolean read FOptRandom;
     property OptRepeat: boolean read FOptRepeat;
     property CurrentMonitor:TMonitor read GetCurrentMonitor;
@@ -199,9 +183,9 @@ type
     property OptSlideshowAutoStart:boolean read FOptSlideshowAutoStart;
     property IsSingleFileSelected: boolean read FisSingleFileSelected;
     property IsManualTransition: boolean read FisManualTransition;
-    procedure DoneInFrame(strCurr:string);
-    procedure DoneFullscreen(strCurr:string);
-    procedure SetCaption(strCaption:string);
+    procedure DoneInFrame(strCurr:string);   // called from inFrame.
+    procedure DoneFullscreen(strCurr:string);// called from fullscreen.
+    procedure SetCaption(strCaption:string); // called from inFrame.
 
   end;
 
@@ -216,14 +200,6 @@ uses UFullscreen;
 
 { TfrmMain }
 
-//test ...not working
-procedure TfrmMain.CreateParams(var Params: TCreateParams);
-begin
-  inherited;
-  Params.WindowClass.style := Params.WindowClass.Style or CS_DROPSHADOW;
-  Params.Style := Params.Style or WS_SIZEBOX;// or WS_BORDER or WS_THICKFRAME;
-  //Params.ExStyle:=Params.ExStyle or WS_EX_STATICEDGE or WS_EX_CONTROLPARENT or WS_EX_APPWINDOW;
-end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
@@ -239,13 +215,13 @@ begin
   self.AlphaBlendValue:=255;
   TimerEffectStart.Enabled:=false;
 
-  //init
+  // init
   FstFileList:=TStringList.create;
   FstDirectoryList:=TStringList.create;
   FstPlaylistList:=TstringList.Create;
   FstMoniterList:=TStringList.Create;
 
-  //set defaults
+  // set defaults
   FOptFullscreen:=false;
   FOptTransitEffect:=true;
   FOptStretch:=false;
@@ -253,7 +229,7 @@ begin
   FOptFit:=true;
   FOptIntMoniter:=0;
   FOptIntervalIntSeconds:=4;
-  FOptMinimulFileSizeKiloByte:=1;//don't change
+  FOptMinimulFileSizeKiloByte:=1;// don't change this.
 
   FOptRandom:=true;
   FOptRepeat:=true;
@@ -275,21 +251,21 @@ begin
   FstPlaylistExtList.DelimitedText:=FOptPlaylistExts;
 
 
-  //parse prameter string.
+  // parse prameter string.
   for I := 1 to ParamCount do
   begin
     if (AnsiStartsStr('-',ParamStr(I))) then
     begin
-      //options
+      //TODO: options
 
     end else if (FileExists(ParamStr(I))) then
     begin
-      //found a file
+      // found a file
       {$ifdef windows}
       {$else}
-      //on unix, directory is also file.
+      // on unix, directory is also file.
       if (DirectoryExists(ParamStr(I))) then begin
-        //found a folder
+        // found a folder
         if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
         begin
           FstDirectoryList.Add(ParamStr(I));
@@ -300,7 +276,7 @@ begin
 
       if (FstFileExtList.IndexOf(LowerCase(ExtractFileExt(ParamStr(I)))) >= 0) then
       begin
-        //is picture file
+        // is picture file
         if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
         begin
           f:= FileSize(ParamStr(I));
@@ -311,14 +287,14 @@ begin
         end;
       end else if (FstPlaylistExtList.IndexOf(LowerCase(ExtractFileExt(ParamStr(I)))) >= 0) then
       begin
-        //found a playlist
+        // found a playlist
         FstPlaylistList.Add(ParamStr(I));
       end;
 
     {$ifdef windows}
     end else if (DirectoryExists(ParamStr(I))) then
     begin
-      //found a folder
+      // found a folder
       if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
       begin
         FstDirectoryList.Add(ParamStr(I));
@@ -328,10 +304,10 @@ begin
 
   end;
 
-  //search inside folder(s)
+  // search inside folder(s)
   if FstDirectoryList.Count > 0 then
   begin
-    //create search mask
+    // create search mask
     fileSearchMask:='';
     for i:=0 to FstFileExtList.Count-1 do
     begin
@@ -339,13 +315,12 @@ begin
          fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
       end;
     end;
-    //loop
+    // loop
     for i:=0 to FstDirectoryList.Count -1 do
     begin
       try
-        //Application.ProcessMessages;
-        //recursively search files
-        folderfiles := FindAllFiles(FstDirectoryList[i], fileSearchMask, FOptIncludeSubFolders); //'*.jpg;*.jpeg;*.png;'
+        // recursively search files
+        folderfiles := FindAllFiles(FstDirectoryList[i], fileSearchMask, FOptIncludeSubFolders);
         for j:=0 to folderfiles.Count - 1 do
         begin
           if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
@@ -373,12 +348,12 @@ begin
 
   if Application.HasOption('h', 'help') then
   begin
-    //todo
+    //TODO:
   end;
 
   if (FstFileList.Count < 1) then begin
-    //No files are provided in the parameter string, so open "file open" dialog.
-    //TODO modal dialog with options and playlist edit tab (drag & drop files) and "About" tab.
+    // No files are provided in the parameter string, so open "file open" dialog.
+    //TODO: modal dialog with options and playlist edit tab (drag & drop files) and "About" tab.
 
     OpenPictureDialog1.Title:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'')+' - Open picture file(s)';
     if OpenPictureDialog1.Execute then
@@ -403,17 +378,17 @@ begin
       end;
     end;
 
-    //TODO playlist
-    //open ploylist files and add them to the filelist.
+    //TODO: playlist
+    // open ploylist files and add them to the filelist.
 
   end;
 
-  //if only one image was selected, add all siblings automatically.
-  //since "send to" command-line parameters don't accept more than 255.
+  // if only one image was selected, add all siblings automatically.
+  // since "send to" command-line parameters don't accept more than 255.
   if FstFileList.Count = 1 then
   begin
     fileFolder:=ReplaceStr(FstFileList[0],ExtractFileName(FstFileList[0]),'');
-    //create search mask
+    // create search mask
     fileSearchMask:='';
     for i:=0 to FstFileExtList.Count-1 do
     begin
@@ -422,13 +397,13 @@ begin
       end;
     end;
     try
-      //find siblings.
+      // find siblings.
       folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
       for j:=0 to folderfiles.Count - 1 do
       begin
         if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
         begin
-          //ignore first selected image.
+          // ignore first selected image.
           if (folderfiles[j] <> FstFileList[0]) then
           begin
             f:= FileSize(folderfiles[j]);
@@ -442,14 +417,14 @@ begin
     finally
       folderfiles.Free;
     end;
-    //Since automatically added, do not start slideshow at fullscreen.
-    //FOptSlideshowAutoStart:=false;
+    // since automatically added, do not start slideshow at fullscreen.
+    // FOptSlideshowAutoStart:=false;
     FisSingleFileSelected:=true;
   end;
 
 
 
-  //We tried. But there is nothing to do, so self terminate.
+  // We tried. But there is nothing to do, so self terminate.
   if (FstFileList.Count < 1) then begin
     Application.Terminate;
     exit;
@@ -491,15 +466,14 @@ begin
   TrayIcon1.Hint:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   //TODO + moniter[1]    etc
   {$else}
+  // icons don't show up nicely on Mac.
   TrayIcon1.Visible:=false;
   {$endif}
 
 
-  //load ini settings
-  // since linux don't have ext(.exe or any ext), so... replace and append ext.
-  //XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.xml';
+  // load settings
   {$ifdef windows}
-  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.ini';
+  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.ini');
   {$else}
   XMLConfig.FileName:='.' + ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'Config';
   {$endif}
@@ -1309,17 +1283,20 @@ begin
   begin
     if not FisFullScreen then
     begin
-      //save original windowstate
+      // save original windowstate
       FOrigWndState:= WindowState;
       FOrigBounds := BoundsRect;
     end;
-    //WindowState:=wsFullScreen; //don't do this if the form is modal on linux.And it won't work with multi moniters.
+    // don't do this if the form is modal on linux. And it won't work with multi moniters.
+    // WindowState:=wsFullScreen;
     {$ifdef windows}
-    BorderStyle:= bsNone;  //don't do this at runtime on linux!
+    // don't do this at runtime on linux!
+    // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+    BorderStyle:= bsNone;
     {$endif}
 
     {$IFDEF DARWIN}
-    //hide title bar
+    // hide title bar
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsNone;
     Form := TForm.Create(nil);
@@ -1338,18 +1315,21 @@ begin
     begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
-    {$IFDEF DARWIN}{$ELSE}
+    {$IFDEF DARWIN}
+    // on Mac, don't call SW_SHOWFULLSCREEN on main. And make sure to call SW_SHOWNORMAL on close window on Mac.
+    {$ELSE}
     ShowWindow(Handle, SW_SHOWFULLSCREEN);
     {$ENDIF}
   end else
   begin
     WindowState:= FOrigWndState;
     {$ifdef windows}
-    BorderStyle:= bsSizeable;  //don't do this at runtime on linux!
+    // don't do this at runtime on linux!
+    BorderStyle:= bsSizeable;
     {$endif}
 
     {$IFDEF DARWIN}
-    //un-hide title bar
+    // un-hide title bar
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsSizeable;
     Form := TForm.Create(nil);
@@ -1372,13 +1352,11 @@ procedure TfrmMain.SetFullScreen_Win32(blnOn: boolean);
 begin
   if blnOn then
   begin
-    //self.AlphaBlendValue:=1;
-
     if not FisFullScreen then
     begin
       FOrigWndState:= WindowState;
       FOrigBounds:= BoundsRect;
-      //must be this order
+      // must be this order
       WindowState:=wsFullScreen; //1
       BorderStyle:= bsNone;      //2
     end;
@@ -1391,14 +1369,15 @@ begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
 
-    //ShowWindow(Handle, SW_SHOWFULLSCREEN);
+    // ShowWindow(Handle, SW_SHOWFULLSCREEN);
   end else
   begin
     WindowState:= FOrigWndState;
     BoundsRect:= FOrigBounds;
     BorderStyle:= bsSizeable;
-    //ShowWindow(Handle, SW_SHOWNORMAL);
-    BoundsRect:= FOrigBounds; //again
+
+    // ShowWindow(Handle, SW_SHOWNORMAL);
+    BoundsRect:= FOrigBounds;
   end;
 end;
 
