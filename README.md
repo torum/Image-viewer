@@ -1,10 +1,12 @@
 # Image viewer/slideshow (Windows/Linux/Mac)
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software. (Windows/Linux/macOS)
 
-Feature: normal view, windowless view with slideshow, fullscreen view with slideshow. Keyboard and mouse playback control. 
-Configurable options with GUI and command line.
+Feature:  
+Normal view, "Windowless" view with slideshow, and Fullscreen view with slideshow.   
+Keyboard and mouse playback control. 
+Configurable options with GUI and command line parameters.
 
-For those who dont't want annoying "Print This" or "Add to gallery" menus, automatic resizing, and unnecessary animation menu effects. In another words, I hated Windows 10's default UWP "photo" apps, so I decided to create my own.
+This is for those who dont't want annoying extra features in photo viewer apps such as "print this", "Add to gallery", or automatic resizing and unnecessary animation menu effects. In another words, I hated Windows 10's default UWP "photo" apps, so I decided to create my own.
 
 Normal View (on Windows)  
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/ImageViewerScreenshot1.png?raw=true)
