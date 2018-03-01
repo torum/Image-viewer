@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1412
+  Left = 1265
   Height = 301
-  Top = 802
+  Top = 799
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -10162,7 +10162,7 @@ object frmMain: TfrmMain
   end
   object PopupMenuMain: TPopupMenu
     OnPopup = PopupMenuMainPopup
-    left = 296
+    left = 248
     top = 128
     object MenuItemNext: TMenuItem
       Caption = 'Next'
@@ -10174,18 +10174,18 @@ object frmMain: TfrmMain
       ShortCut = 37
       OnClick = MenuItemBackClick
     end
-    object MenuItem6: TMenuItem
+    object MenuItemBo6: TMenuItem
       Caption = '-'
     end
     object MenuItem7: TMenuItem
       Caption = 'Stretch'
       object MenuItemStretchIn: TMenuItem
-        Caption = 'In'
+        Caption = 'In (big->screen)'
         ShortCut = 73
         OnClick = MenuItemStretchInClick
       end
       object MenuItemStretchOut: TMenuItem
-        Caption = 'Out'
+        Caption = 'Out (small->screen)'
         ShortCut = 79
         OnClick = MenuItemStretchOutClick
       end
@@ -10212,7 +10212,7 @@ object frmMain: TfrmMain
     end
     object MenuItemQuit: TMenuItem
       Caption = '&Quit'
-      ShortCut = 81
+      ShortCut = 16465
       OnClick = MenuItemQuitClick
     end
   end
@@ -10240,9 +10240,16 @@ object frmMain: TfrmMain
   object PopupMenuSystem: TPopupMenu
     left = 288
     top = 248
-    object MenuItem1: TMenuItem
-      Caption = 'Quit'
-      OnClick = MenuItemQuitClick
+    object MenuItemSysAbout: TMenuItem
+      Caption = 'About'
+      OnClick = MenuItemSysAboutClick
+    end
+    object MenuItem4: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemSysQuit: TMenuItem
+      Caption = 'Close'
+      OnClick = MenuItemSysQuitClick
     end
   end
 end

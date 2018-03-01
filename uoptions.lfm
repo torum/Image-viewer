@@ -1,7 +1,7 @@
 object frmOptions: TfrmOptions
-  Left = 1843
+  Left = 1854
   Height = 303
-  Top = 804
+  Top = 807
   Width = 542
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
@@ -28,9 +28,6 @@ object frmOptions: TfrmOptions
     end
     object TabSheet3: TTabSheet
       Caption = 'Options'
-    end
-    object TabSheet4: TTabSheet
-      Caption = 'About'
     end
   end
 end

@@ -12,6 +12,8 @@
       <UseXPManifest Value="True"/>
       <XPManifest>
         <DpiAware Value="True"/>
+        <TextName Value="Witha.ImageViewer.ImageViewer"/>
+        <TextDesc Value="Image Viewer/Slideshow"/>
       </XPManifest>
       <Icon Value="0"/>
     </General>
@@ -34,7 +36,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="5">
       <Unit0>
         <Filename Value="ImageViewer.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -63,6 +65,14 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UOptions"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="uabout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmAbout"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UAbout"/>
+      </Unit4>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -76,7 +86,6 @@
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>
-      <TargetCPU Value="x86_64"/>
       <Optimizations>
         <OptimizationLevel Value="2"/>
       </Optimizations>

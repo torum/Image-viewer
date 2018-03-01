@@ -7,14 +7,14 @@ Memo:
  Right now, the code is a mess. Once I finish implementing all the
  basic functionality, I have to clean this up.
 
- {$DEFINE MyDebug}
+ DEFINE MyDebug
 }
 
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus, strutils, Types, Dos{$ifdef windows}, Windows{$endif};
+  LclType, LclProc, LclIntf, Menus{$ifdef windows}, Windows{$endif};
 
 type
 
@@ -590,28 +590,7 @@ begin
 
       self.AlphaBlendValue:=255;
     end;
-    {
-    if TimerInterval.Enabled or TimerFadeIn.Enabled or TimerFadeOut.Enabled then
-    begin
-      TimerInterval.Enabled:=false;
-      TimerFadeIn.Enabled:=false;
-      TimerFadeOut.Enabled:=false;
 
-      self.AlphaBlendValue:=255;
-      {
-      if self.AlphaBlendValue < 50 then begin
-        //we don't wanna totall black screen.
-        self.AlphaBlendValue:=255;
-      end;
-      }
-    end else begin
-      if FEffect then begin
-        TimerFadeOut.Enabled:=true;
-      end else begin
-        PlaybackPlay(false);
-      end;
-    end;
-    }
   end;
 end;
 
@@ -767,7 +746,7 @@ end;
 
 function TfrmFullscreen.DisplayImage(id:integer):integer;
 var
-  f,curWidth,curHeight:integer;
+  f:integer;
 begin
   f:= ValideteFile(id);
   if f >= (FMinimulFileSizeKiloByte * 1024) then
@@ -1770,7 +1749,7 @@ begin
     begin
       BoundsRect:= Screen.Monitors[FOptIntMoniter].BoundsRect;
       // need this when changin the moniter.
-      ResizeImage(); x
+      ResizeImage();
     end else
     begin
       BoundsRect:= frmMain.CurrentMonitor.BoundsRect;
