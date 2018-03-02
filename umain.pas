@@ -1304,8 +1304,8 @@ begin
 end;
 
 procedure TfrmMain.SetFullScreen_Universal(blnOn: boolean);
-{$IFDEF DARWIN}var
-  Form: TForm;{$ENDIF}
+{$ifdef darwin}var
+  Form: TForm;{$endif}
 begin
   if blnOn then
   begin
@@ -1324,7 +1324,7 @@ begin
     {$endif}
     //
 
-    {$IFDEF DARWIN}
+    {$ifdef darwin}
     // hide title bar
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsNone;
@@ -1335,7 +1335,7 @@ begin
     finally
       Form.Free;
     end;
-    {$ENDIF}
+    {$endif}
     //
 
     if (CurrentMonitor <> Screen.Monitors[FOptIntMoniter]) then
@@ -1346,11 +1346,11 @@ begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
 
-    {$IFDEF DARWIN}
+    {$ifdef darwin}
     // on Mac, don't call SW_SHOWFULLSCREEN on main. And make sure to call SW_SHOWNORMAL on close window on Mac.
-    {$ELSE}
+    {$else}
     ShowWindow(Handle, SW_SHOWFULLSCREEN);
-    {$ENDIF}
+    {$endif}
     //
   end else
   begin
@@ -1360,7 +1360,7 @@ begin
     BorderStyle:= bsSizeable;
     {$endif}
 
-    {$IFDEF DARWIN}
+    {$ifdef darwin}
     // un-hide title bar
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsSizeable;
@@ -1371,11 +1371,13 @@ begin
     finally
       Form.Free;
     end;
-    {$ENDIF}
+    {$endif}
 
-    {$IFDEF DARWIN}{$ELSE}
+    {$ifdef darwin}
+    // on Mac, don't call SW_SHOWFULLSCREEN on main. And make sure to call SW_SHOWNORMAL on close window on Mac.
+    {$else}
     ShowWindow(Handle, SW_SHOWNORMAL);
-    {$ENDIF}
+    {$endif}
     BoundsRect:= FOrigBounds;
   end;
 end;
