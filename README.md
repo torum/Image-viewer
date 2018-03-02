@@ -25,7 +25,7 @@ Windowless View (with slideshow) on macOS
 
 
 
-Image Viewer can be launched via command-line, meaning other application or scripts can launch.  
+Image Viewer can be launched via command-line, meaning other applications or scripts can launch Image Viewer with following options.  
   
 Command-line options:  
   
@@ -71,9 +71,12 @@ stayOnTop
 Specify window should stay on top (default off):  
 "-y on" or "--stayOnTop=on"  
 "-y off" or "--stayOnTop=off"  
+
+Help shows About dialog.
+"-h" or "--help"
   
 Useage:    
-$ ImageViewer -i 2 -f on    
+$ ImageViewer -i 2 -f on -o on -e off
   
 
 
