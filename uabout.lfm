@@ -7,6 +7,7 @@ object frmAbout: TfrmAbout
   ClientHeight = 293
   ClientWidth = 400
   DesignTimePPI = 120
+  OnClose = FormClose
   Position = poOwnerFormCenter
   LCLVersion = '1.8.0.6'
   object Image1: TImage
@@ -1032,6 +1033,7 @@ object frmAbout: TfrmAbout
     Caption = 'Close'
     Default = True
     ModalResult = 1
+    OnClick = ButtonCloseClick
     TabOrder = 3
   end
   object Bevel1: TBevel

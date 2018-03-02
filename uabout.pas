@@ -20,6 +20,8 @@ type
     StaticTextAppsVer: TStaticText;
     StaticTextWho: TStaticText;
     StaticTextWebSite: TStaticText;
+    procedure ButtonCloseClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure StaticTextWebSiteClick(Sender: TObject);
     procedure StaticTextWebSiteMouseEnter(Sender: TObject);
     procedure StaticTextWebSiteMouseLeave(Sender: TObject);
@@ -41,6 +43,16 @@ implementation
 procedure TfrmAbout.StaticTextWebSiteClick(Sender: TObject);
 begin
   OpenURL(StaticTextWebSite.Caption);
+end;
+
+procedure TfrmAbout.ButtonCloseClick(Sender: TObject);
+begin
+
+end;
+
+procedure TfrmAbout.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  CloseAction := caFree;
 end;
 
 procedure TfrmAbout.StaticTextWebSiteMouseEnter(Sender: TObject);

@@ -110,7 +110,10 @@ type
     procedure MenuItemSysAboutClick(Sender: TObject);
     procedure MenuItemSysQuitClick(Sender: TObject);
     procedure PopupMenuMainPopup(Sender: TObject);
+    procedure PopupMenuSystemPopup(Sender: TObject);
     procedure TimerEffectStartTimer(Sender: TObject);
+    procedure TrayIcon1Click(Sender: TObject);
+    procedure TrayIcon1DblClick(Sender: TObject);
 
   private
     // main file list.
@@ -149,6 +152,7 @@ type
     FOrigBounds: TRect;
     FOrigWndState: TWindowState;
     FiCurrentFileIndex:integer;
+    FstrAppVer:string;
 
     procedure ShowFullScreen(blnOn: boolean);
     procedure SetFullScreen_Universal(blnOn: boolean);
@@ -191,7 +195,7 @@ var
 
 implementation
 
-uses UFullscreen;
+uses UFullscreen, UAbout;
 
 {$R *.lfm}
 
@@ -204,7 +208,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-
+  FstrAppVer:='0.1.0';
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
 
@@ -684,6 +688,30 @@ begin
   end;
 end;
 
+procedure TfrmMain.TrayIcon1Click(Sender: TObject);
+begin
+
+end;
+
+procedure TfrmMain.TrayIcon1DblClick(Sender: TObject);
+begin
+  // Restore form if minimized or hide if non-minimized.
+  if (not FisFullscreen) then
+  begin
+    if (self.WindowState = wsMinimized) then
+    begin
+      self.WindowState := wsNormal;
+      self.Show;
+      self.BringToFront;
+      SetForegroundWindow(self.Handle);
+    end else if (self.WindowState = wsNormal) then
+    begin
+      WindowState:=wsMinimized;
+      Hide;
+    end;
+  end;
+end;
+
 procedure TfrmMain.LoadImage;
 begin
   if FileList.Count > 0 then
@@ -778,26 +806,28 @@ end;
 
 procedure TfrmMain.MenuItemSlideshowClick(Sender: TObject);
 begin
-  //start fullscreen
+  // Start fullscreen
   if (not FisFullscreen) and (not FisInFrame) then
   begin
-    //TODO, do not change option value...
+    //TODO: do not change option value...
     FOptFullscreen:=true;
 
-    FisStartNormal:=true;//so tell TimerEffectStart to go back to normal when done.
+    // FisStartNormal, so this is telling TimerEffectStart to go back to normal when done.
+    FisStartNormal:=true;
 
     Image1.Visible:=false;
 
-    //sets current screen of the form.
+    // Sets current screen of the form.
     FCurrentMonitor:=Screen.MonitorFromWindow(handle);
     FOptIntMoniter:=getCurrentMonitorIndex();
 
     if FOptTransitEffect then
     begin
-      self.AlphaBlendValue:=1; //TODO form dissapears at once. maybe fadeout timer?
+      //TODO: form dissapears at once. maybe fadeout timer?
+      self.AlphaBlendValue:=1;
       ShowFullScreen(true);
 
-      //start transition timer, and timer creates fullscreen
+      // Start transition timer, and timer creates fullscreen
       TimerEffectStart.Enabled:=true;
     end else
     begin
@@ -808,7 +838,7 @@ begin
       frmFullScreen.StartWith:=FiCurrentFileIndex;
       frmFullscreen.ShowModal;
 
-      //DoneFullscreen will be called
+      // DoneFullscreen will be called
 
       Image1.Visible:=true;
       ShowFullScreen(false);
@@ -856,12 +886,29 @@ end;
 
 procedure TfrmMain.MenuItemNextClick(Sender: TObject);
 begin
+  if FiCurrentFileIndex < FileList.Count -1 then
+  begin
+   screen.Cursor:=crHourGlass;
+   Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+   Image1Resize(self);
+   FiCurrentFileIndex:=FiCurrentFileIndex+1;
+   Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+   screen.Cursor:=crDefault;
+  end;
 
 end;
 
 procedure TfrmMain.MenuItemBackClick(Sender: TObject);
 begin
-
+  if FiCurrentFileIndex > 0 then
+  begin
+   screen.Cursor:=crHourGlass;
+   Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+   Image1Resize(self);
+   FiCurrentFileIndex:=FiCurrentFileIndex-1;
+   Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+   screen.Cursor:=crDefault;
+  end;
 end;
 
 procedure TfrmMain.MenuItemQuitClick(Sender: TObject);
@@ -1147,28 +1194,12 @@ begin
 
     //next
     if (Key = VK_RIGHT) then begin
-      if FiCurrentFileIndex < FileList.Count -1 then
-      begin
-       screen.Cursor:=crHourGlass;
-       Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
-       Image1Resize(self);
-       FiCurrentFileIndex:=FiCurrentFileIndex+1;
-       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
-       screen.Cursor:=crDefault;
-      end;
+      MenuItemNextClick(nil);
     end;
     //back
     if (Key = VK_LEFT) or (Key = VK_BACK) then
     begin
-      if FiCurrentFileIndex > 0 then
-      begin
-       screen.Cursor:=crHourGlass;
-       Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
-       Image1Resize(self);
-       FiCurrentFileIndex:=FiCurrentFileIndex-1;
-       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
-       screen.Cursor:=crDefault;
-      end;
+      MenuItemBackClick(nil);
     end;
     //stretch in
     if (Chr(Key) = 'I') then
@@ -1211,7 +1242,18 @@ end;
 
 procedure TfrmMain.MenuItemSysAboutClick(Sender: TObject);
 begin
-  //TODO:
+  if (not FisFullscreen) and (not FisInFrame) then
+  begin
+    frmAbout := TfrmAbout.Create(self);
+    frmAbout.Caption:=' '+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
+
+    frmAbout.StaticTextAppsVer.Caption := 'Image Viewer' + ' - ' + FstrAppVer;
+    frmAbout.StaticTextWho.Caption := 'by torumyax';
+    frmAbout.StaticTextWebSite.Caption:='https://github.com/torumyax/Image-viewer';
+
+    frmAbout.ShowModal;
+    // close action caFree.
+  end;
 end;
 
 procedure TfrmMain.MenuItemSysQuitClick(Sender: TObject);
@@ -1248,6 +1290,17 @@ begin
   if FOptFit then MenuItemStretchIn.Checked:=true else MenuItemStretchIn.Checked:=false;
   if FOptExpand then MenuItemStretchOut.Checked:=true else MenuItemStretchOut.Checked:=false;
 
+end;
+
+procedure TfrmMain.PopupMenuSystemPopup(Sender: TObject);
+begin
+  if (FisFullscreen) and (FisInFrame) then
+  begin
+    MenuItemSysAbout.Enabled:=false;
+  end else
+  begin
+    MenuItemSysAbout.Enabled:=true;
+  end;
 end;
 
 

@@ -10157,6 +10157,8 @@ object frmMain: TfrmMain
       E0DDA37EE4EB670501F8A1313F6F657F9EF1032F36FEB3D776560C80738E64C3
       F99EC2594FA734F8F788FF3F9E01B839114D7C480000000049454E44AE426082
     }
+    OnClick = TrayIcon1Click
+    OnDblClick = TrayIcon1DblClick
     left = 353
     top = 248
   end
@@ -10241,6 +10243,7 @@ object frmMain: TfrmMain
     top = 208
   end
   object PopupMenuSystem: TPopupMenu
+    OnPopup = PopupMenuSystemPopup
     left = 288
     top = 248
     object MenuItemSysAbout: TMenuItem
