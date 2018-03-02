@@ -3,10 +3,6 @@ unit UMain;
 {$mode objfpc}{$H+}
 
 {
-Memo:
- Right now, the code is a mess. Once I finish implementing all the
- basic functionality, I have to clean this up.
-
 Source:
  https://github.com/torumyax/Image-viewer
 
@@ -22,10 +18,9 @@ Tested on
 
 TODO:
  - priority 1 -
- saving the options.
- - priority 2 -
  i18n
  UWP packaging and release beta.
+ - priority 2 -
  load playlist.
  - priority 3 -
  more Command line options.
@@ -40,7 +35,7 @@ Known issues and bugs:
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
  On Windows, inFrame "window" does not have shaddow.
  On Ubuntu, inFrame transit effect doesn't seem to be working..
- On macOS, window pos, size aren't saved. It always shows up at design time pos.
+ On macOS, window pos & size aren't saved. <- need to check again.
  On macOS, inFrame transit effect won't work?
  On macOS, trayicon won't show up correctly. Black filled.->disabled
  On macOS, awaking from sleep >blank screen?
@@ -282,6 +277,20 @@ begin
     //TODO: Make it hidden file in Linux?
     {$endif}
   end;
+
+  FOptRandom := XMLConfig.GetValue('/Opts/Random',FOptRandom);
+  FOptRepeat := XMLConfig.GetValue('/Opts/Repeat',FOptRepeat);
+  FOptFullscreen := XMLConfig.GetValue('/Opts/Fullscreen',FOptFullscreen);
+  FOptTransitEffect := XMLConfig.GetValue('/Opts/TransitEffect',FOptTransitEffect);
+  FOptFit := XMLConfig.GetValue('/Opts/Fit',FOptFit);
+  FOptExpand := XMLConfig.GetValue('/Opts/Expand',FOptExpand);
+  FOptIntMoniter := XMLConfig.GetValue('/Opts/Moniter',FOptIntMoniter);
+  FOptMinimulFileSizeKiloByte := XMLConfig.GetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
+  FoptStayOnTop := XMLConfig.GetValue('/Opts/StayOnTop',FoptStayOnTop);
+  FOptIncludeSubFolders := XMLConfig.GetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
+  FOptFileExts := XMLConfig.GetValue('/Opts/FileExts',FOptFileExts);
+  FOptPlaylistExts := XMLConfig.GetValue('/Opts/PlaylistExts',FOptPlaylistExts);
+
 
   // Command line parameters
 
@@ -1646,6 +1655,7 @@ end;
 procedure TfrmMain.StoreFormState;
 begin
 
+  // Save form state.
   with XMLConfig do
   begin
     SetValue('NormalLeft', Left);
@@ -1660,6 +1670,20 @@ begin
 
     SetValue('WindowState', Integer(WindowState));
   end;
+
+  // Save options.
+  XMLConfig.SetValue('/Opts/Random',FOptRandom);
+  XMLConfig.SetValue('/Opts/Repeat',FOptRepeat);
+  XMLConfig.SetValue('/Opts/Fullscreen',FOptFullscreen);
+  XMLConfig.SetValue('/Opts/TransitEffect',FOptTransitEffect);
+  XMLConfig.SetValue('/Opts/Fit',FOptFit);
+  XMLConfig.SetValue('/Opts/Expand',FOptExpand);
+  XMLConfig.SetValue('/Opts/Moniter',FOptIntMoniter);
+  XMLConfig.SetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
+  XMLConfig.SetValue('/Opts/StayOnTop',FoptStayOnTop);
+  XMLConfig.SetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
+  XMLConfig.SetValue('/Opts/FileExts',FOptFileExts);
+  XMLConfig.SetValue('/Opts/PlaylistExts',FOptPlaylistExts);
 
 end;
 

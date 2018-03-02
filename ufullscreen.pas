@@ -3,10 +3,6 @@ unit UFullscreen;
 {$mode objfpc}{$H+}
 
 {
-Memo:
- Right now, the code is a mess. Once I finish implementing all the
- basic functionality, I have to clean this up.
-
 Debug:
  DEFINE MyDebug
 }
