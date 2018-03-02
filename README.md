@@ -6,6 +6,7 @@ Normal view, "Windowless" view with slideshow, and Fullscreen view with slidesho
 Keyboard and mouse playback control. 
 Configurable options with command line parameters and popup menus.  
 
+
 Normal View (on Windows)  
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/ImageViewerScreenshot1.png?raw=true)
 
@@ -20,6 +21,60 @@ Windowless View (with slideshow) on Windows 10
 
 Windowless View (with slideshow) on macOS  
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/macOS-inFrameScreenshot-2018-02-20%2023.56.00.png?raw=true)
+
+
+
+
+Image Viewer can be launched via command-line, meaning other application or scripts can launch.  
+  
+Command-line options:  
+  
+Slideshow interval in seconds (default 4 seconds):  
+"-i 4" or "--interval=4"  
+  
+Slideshow random (default on):  
+"-r on" or "--random=on"  
+"-r off" or "--random=off"  
+  
+Slideshow repeat (default on):  
+"-e on" or "--repeat=on"  
+"-e off" or "--repeat=off"  
+  
+Slideshow start fullscreen (default off):  
+"-f on" or "--fullscreen=on"  
+"-f off" or "--fullscreen=off"  
+  
+Slideshow transitional effect (default on):  
+"-t on" or "--effect=on"  
+"-t off" or "--effect=off"  
+  
+Picture stretch In (fit to window/screen when the size is bigger than window/screen. default on):  
+"-i on" or "--stretchIn=on"  
+"-i off" or "--stretchIn=off"  
+  
+Picture stretch Out (fit to window/screen when the size is smaller than window/screen. default off):  
+"-o on" or "--stretchOut=on"  
+"-o off" or "--stretchOut=off"  
+  
+Load pictures in the sub folders as well when manually open a picture (default on):  
+"-u on" or "--includSubFolders=on"  
+"-u off" or "--includSubFolders=off"  
+  
+Specify a moniter to show fullscreen slideshow (default 0 is the main moniter):  
+"-m 1" or "--moniter=1"  
+  
+minimuFileSizeKB  
+Filter files to show in fullscreen slideshow with file size:  
+"-n 1024" or "--minimuFileSizeKB=1024"  
+  
+stayOnTop  
+Specify window should stay on top (default off):  
+"-y on" or "--stayOnTop=on"  
+"-y off" or "--stayOnTop=off"  
+  
+Useage:    
+$ ImageViewer -i 2 -f on    
+  
 
 
 Tested on  
