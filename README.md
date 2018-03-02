@@ -72,12 +72,12 @@ Specify window should stay on top (default off):
 "-y on" or "--stayOnTop=on"  
 "-y off" or "--stayOnTop=off"  
 
-Help shows About dialog.
-"-h" or "--help"
+Help shows About dialog.  
+"-h" or "--help"  
   
 Useage:    
-$ ImageViewer -i 2 -f on -o on -e off
-  
+$ ImageViewer -i 2 -f on -o on -e off C:\Users\me\Pictures\Wallpapers\
+
 
 
 Tested on  
