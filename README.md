@@ -1,10 +1,10 @@
 # Image viewer/slideshow (Windows/Linux/Mac)
-Simple, minimum, yet configurable photo viewer/slideshow/digital signage software. (Windows/Linux/macOS)
+Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by "feh" https://feh.finalrewind.org/
 
 Feature:  
 Normal view, "Windowless" view with slideshow, and Fullscreen view with slideshow.   
 Keyboard and mouse playback control. 
-Configurable options with GUI and command line parameters.  
+Configurable options with command line parameters and popup menus.  
 
 Normal View (on Windows)  
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/ImageViewerScreenshot1.png?raw=true)
