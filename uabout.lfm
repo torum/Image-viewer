@@ -1,7 +1,7 @@
 object frmAbout: TfrmAbout
-  Left = 925
+  Left = 1157
   Height = 293
-  Top = 654
+  Top = 606
   Width = 400
   BorderStyle = bsToolWindow
   ClientHeight = 293

@@ -10197,6 +10197,9 @@ object frmMain: TfrmMain
       Caption = 'Stay on top'
       OnClick = MenuItemStayOnTopClick
     end
+    object MenuItem1: TMenuItem
+      Caption = '-'
+    end
     object MenuItemSlideshowInFrame: TMenuItem
       Caption = 'Start InFrame Slideshow'
       ShortCut = 83

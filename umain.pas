@@ -23,16 +23,16 @@ Tested on
 
 TODO:
  About Dialog.
- Save and load options.
-  use AppName.ini in the GetAppConfigDir dir on windows.
-  use .AppName.config hidden file in the GetAppConfigDir dir on linux.
  Command line options.
+ -
+ i18n
+ UWP packaging and release.
+ -
  file drop handling.
  PreLoading image for slideshow.
  load playlist.
  OS-power-save event aware.
- i18n
- UWP packaging and release.
+
 
 Known issues and bugs:
  On Windows, PNG (depth 24) antialising isn't working when stretch.
@@ -40,8 +40,7 @@ Known issues and bugs:
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
  On Windows, inFrame "window" does not have shaddow.
 
- On Ubuntu, OpenPictureDialog won't show thumbnails?
- On Ubuntu, inFrame transit effect won't work..
+ On Ubuntu, inFrame transit effect doesn't seem to be working..
 
  On macOS, window pos, size aren't saved. It always shows up at design time pos.
  On macOS, inFrame transit effect won't work?
@@ -63,6 +62,7 @@ type
   TfrmMain = class(TForm)
     ApplicationProperties1: TApplicationProperties;
     Image1: TImage;
+    MenuItem1: TMenuItem;
     MenuItemSysAbout: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItemSysQuit: TMenuItem;
@@ -257,16 +257,24 @@ begin
 
 
   // Load settings
-  {$ifdef windows}
-  XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.ini');
-  {$else}
-  XMLConfig.FileName:='.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
-  {$endif}
+  if ForceDirectories(GetAppConfigDir(false)) then
+  begin
+    //XMLConfig.FileName:=GetAppConfigFile(False);
+    {$ifdef windows}
+    XMLConfig.FileName:=GetAppConfigDir(false)+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
+    {$else}
+    XMLConfig.FileName:=GetAppConfigDir(false)+'.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
+    //TODO: Make it hidden file in Linux?
+    {$endif}
+  end else begin
+    {$ifdef windows}
+    XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
+    {$else}
+    XMLConfig.FileName:='.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
+    //TODO: Make it hidden file in Linux?
+    {$endif}
+  end;
 
-  //TODO: Create config dir.
-  // GetAppConfigDir
-  //XMLConfig.FileName:=GetAppConfigFile(False);
-  //TODO: Make it hidden file?
 
 
   // Parse prameter string.
