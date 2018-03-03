@@ -11,15 +11,14 @@ No extra components required.
 Compiled and tested on
  Windows 10 (64bit): Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
  Ubuntu 17.10 (64bit): Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
- Mac - macOS 10.13.3 High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
-Tested on
- Ubuntu 16.04 LTS (64bit)
- Mac OS X 10.11.6 El Capitan (late 2008)
+ Ubuntu 16.04 LTS (64bit): Lazarus 1.9.0 trunk, FPC 3.0.4
+ macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
+ macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
 TODO:
  - priority 1 -
  i18n
- UWP packaging and release beta.
+ UWP packaging.
  - priority 2 -
  load playlist.
  - priority 3 -
@@ -35,8 +34,8 @@ Known issues and bugs:
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
  On Windows, inFrame "window" does not have shaddow.
  On Ubuntu, inFrame transit effect doesn't seem to be working..
- On macOS, window pos & size aren't saved. <- need to check again.
  On macOS, inFrame transit effect won't work?
+ On macOS El Capitan, the top bar won't hide. It's fine on High Sierra.
  On macOS, trayicon won't show up correctly. Black filled.->disabled
  On macOS, awaking from sleep >blank screen?
 }
