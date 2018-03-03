@@ -720,11 +720,15 @@ begin
     //?
   end else
   begin
+    // Normal Show for the first time.
+
     // It must be in "FormShow"
     if fileexists(XMLConfig.FileName) then
     begin
        RestoreFormState;
     end;
+    if FoptStayOnTop then SetStayOnTop(true);
+
     // Show image.
     LoadImage;
   end;
