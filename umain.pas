@@ -38,6 +38,7 @@ Known issues and bugs:
  On macOS El Capitan, the top bar won't hide. It's fine on High Sierra.
  On macOS, trayicon won't show up correctly. Black filled.->disabled
  On macOS, awaking from sleep >blank screen?
+ Cocoa based 64bit apps for macOS may not be ready some time soon...
 }
 
 interface
@@ -122,7 +123,7 @@ type
     FOptFit:boolean;
     FOptExpand:boolean;
     FOptIntervalIntSeconds:integer;
-    // Be carefull when setting this.
+    // Be carefull when setting this. If the value is too large, the file list will be empty.
     FOptMinimulFileSizeKiloByte:integer;
     FOptRepeat:boolean;
     FOptRandom:boolean;
@@ -158,23 +159,27 @@ type
     procedure RestoreFormState;
     procedure StoreFormState;
     procedure LoadImage;
+    function DispayImage(filename:string):boolean;
 
   public
     property FileList: TStringList read FstFileList;
-    property OptIntMoniter: integer read FOptIntMoniter write SetMoniter;
     property MoniterList: TStringList read FstMoniterList;
-    property OptTransitEffect: boolean read FoptTransitEffect;
-    property OptFit: boolean read FOptFit;
-    property OptExpand: boolean read FOptExpand;
-    property OptStretch: boolean read FOptStretch;
-    property OptIntervalIntSeconds: integer read FOptIntervalIntSeconds;
+
+    // User options. Read/Write.
+    property OptTransitEffect: boolean read FoptTransitEffect write FoptTransitEffect;
+    property OptFit: boolean read FOptFit write FOptFit;
+    property OptExpand: boolean read FOptExpand write FOptExpand;
+    property OptIntMoniter: integer read FOptIntMoniter write SetMoniter;
+    property OptIntervalIntSeconds: integer read FOptIntervalIntSeconds write FOptIntervalIntSeconds;
+    property OptRandom: boolean read FOptRandom write FOptRandom;
+    property OptRepeat: boolean read FOptRepeat write FOptRepeat;
+    property OptStayOnTopInframe:boolean read FoptStayOnTop write SetStayOnTop;
+
     property OptMinimulFileSizeKiloByte: integer read FOptMinimulFileSizeKiloByte;
-    property OptRandom: boolean read FOptRandom;
-    property OptRepeat: boolean read FOptRepeat;
+    property OptStretch: boolean read FOptStretch;
     property CurrentMonitor:TMonitor read GetCurrentMonitor;
     property IsInFrame:boolean read FisInFrame;
     property IsStartNormal:boolean read FisStartNormal;
-    property OptStayOnTopInframe:boolean read FoptStayOnTop write SetStayOnTop;
     property OptSlideshowAutoStart:boolean read FOptSlideshowAutoStart;
     property IsSingleFileSelected: boolean read FisSingleFileSelected;
     property IsManualTransition: boolean read FisManualTransition;
@@ -203,7 +208,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='0.1.0';
+  FstrAppVer:='0.1.1';
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
 
@@ -266,14 +271,12 @@ begin
     XMLConfig.FileName:=GetAppConfigDir(false)+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
     {$else}
     XMLConfig.FileName:=GetAppConfigDir(false)+'.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
-    //TODO: Make it hidden file in Linux?
     {$endif}
   end else begin
     {$ifdef windows}
     XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
     {$else}
     XMLConfig.FileName:='.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
-    //TODO: Make it hidden file in Linux?
     {$endif}
   end;
 
@@ -284,12 +287,13 @@ begin
   FOptFit := XMLConfig.GetValue('/Opts/Fit',FOptFit);
   FOptExpand := XMLConfig.GetValue('/Opts/Expand',FOptExpand);
   FOptIntMoniter := XMLConfig.GetValue('/Opts/Moniter',FOptIntMoniter);
-  FOptMinimulFileSizeKiloByte := XMLConfig.GetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
+  // Don't load FOptMinimulFileSizeKiloByte...  If the size is too large, the list will be empty.
+  //FOptMinimulFileSizeKiloByte := XMLConfig.GetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
   FoptStayOnTop := XMLConfig.GetValue('/Opts/StayOnTop',FoptStayOnTop);
   FOptIncludeSubFolders := XMLConfig.GetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
   FOptFileExts := XMLConfig.GetValue('/Opts/FileExts',FOptFileExts);
   FOptPlaylistExts := XMLConfig.GetValue('/Opts/PlaylistExts',FOptPlaylistExts);
-
+  FOptIntervalIntSeconds := XMLConfig.GetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
 
   // Command line parameters
 
@@ -408,6 +412,8 @@ begin
       end
     end;
   end;
+  // Don't load FOptMinimulFileSizeKiloByte...  If the size is too large, the list will be empty.
+  {
   if Application.HasOption('n', 'minimuFileSizeKB') then
   begin
     s := trim(Application.GetOptionValue('n', 'minimuFileSizeKB'));
@@ -418,10 +424,11 @@ begin
     end;
     if (i > 0) then
     begin
-      //TODO: Warn users.
-      FOptMinimulFileSizeKiloByte:=i;
+      // Don't load FOptMinimulFileSizeKiloByte...  If the size is too large, the list will be empty.
+      //FOptMinimulFileSizeKiloByte:=i;
     end;
   end;
+  }
   if Application.HasOption('p', 'windowPosition') then
   begin
     //TODO:
@@ -493,6 +500,7 @@ begin
         if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
         begin
           f:= FileSize(ParamStr(I));
+          // Check file size.
           if f >= (FOptMinimulFileSizeKiloByte * 1024) then
           begin
             FstFileList.Add(ParamStr(I));
@@ -542,6 +550,7 @@ begin
           if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
           begin
             f:= FileSize(folderfiles[j]);
+            // Check file size.
             if f >= (FOptMinimulFileSizeKiloByte * 1024) then
             begin
               FstFileList.Add(folderfiles[j]);
@@ -573,6 +582,7 @@ begin
           if not (AnsiStartsStr('.',ExtractFilename(OpenPictureDialog1.Files[i]))) then
           begin
             f:= FileSize(OpenPictureDialog1.Files[i]);
+            // Check file size.
             if f >= (FOptMinimulFileSizeKiloByte * 1024) then
             begin
               FstFileList.Add(OpenPictureDialog1.Files[i]);
@@ -618,6 +628,7 @@ begin
           if (folderfiles[j] <> FstFileList[0]) then
           begin
             f:= FileSize(folderfiles[j]);
+            // Check file size.
             if f >= (FOptMinimulFileSizeKiloByte * 1024) then
             begin
               FstFileList.Add(folderfiles[j]);
@@ -781,13 +792,27 @@ end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
 begin
-  if FOptFullscreen or FisFullscreen then
+  if not (FOptFullscreen and FisFullscreen) then
   begin
-    //TODO: Save fullscreen options
-  end else begin
     // Save normal form size and pos.
     StoreFormState;
   end;
+
+  // Save options.
+  XMLConfig.SetValue('/Opts/Random',FOptRandom);
+  XMLConfig.SetValue('/Opts/Repeat',FOptRepeat);
+  XMLConfig.SetValue('/Opts/Fullscreen',FOptFullscreen);
+  XMLConfig.SetValue('/Opts/TransitEffect',FOptTransitEffect);
+  XMLConfig.SetValue('/Opts/Fit',FOptFit);
+  XMLConfig.SetValue('/Opts/Expand',FOptExpand);
+  XMLConfig.SetValue('/Opts/Moniter',FOptIntMoniter);
+  XMLConfig.SetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
+  XMLConfig.SetValue('/Opts/StayOnTop',FoptStayOnTop);
+  XMLConfig.SetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
+  XMLConfig.SetValue('/Opts/FileExts',FOptFileExts);
+  XMLConfig.SetValue('/Opts/PlaylistExts',FOptPlaylistExts);
+  XMLConfig.SetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
+
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -874,6 +899,30 @@ begin
   end;
 end;
 
+function TfrmMain.DispayImage(filename:string):boolean;
+begin
+  try
+    Image1.Picture.LoadFromFile(filename);
+    Image1Resize(nil);
+    result:=true;
+  except
+    on E: Exception do
+    begin
+      // 'FPImageException'
+      Image1.Picture.Clear;
+      with image1.Canvas do
+        begin
+          Brush.Style := bsClear;
+          Font.Color := clWhite;
+          TextOut(24,24, 'Opps, we could not open the file. Sorry... : ' + E.ClassName +' - '+ E.Message );
+          TextOut(24,52, 'File: ' + filename);
+      end;
+      Image1.Update;
+      result:=false;
+    end;
+  end;
+end;
+
 procedure TfrmMain.LoadImage;
 begin
   if FileList.Count > 0 then
@@ -885,8 +934,8 @@ begin
     begin
       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
     end;
-    Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex]);
-    Image1Resize(nil);
+
+    DispayImage(FileList[FiCurrentFileIndex]);
   end;
 end;
 
@@ -1018,8 +1067,11 @@ begin
     if FiCurrentFileIndex < FileList.Count -1 then
     begin
      screen.Cursor:=crHourGlass;
-     Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
-     Image1Resize(self);
+
+     //Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+     //Image1Resize(self);
+     DispayImage(FileList[FiCurrentFileIndex+1]);
+
      FiCurrentFileIndex:=FiCurrentFileIndex+1;
      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
      screen.Cursor:=crDefault;
@@ -1036,8 +1088,10 @@ begin
     if FiCurrentFileIndex > 0 then
     begin
      screen.Cursor:=crHourGlass;
-     Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
-     Image1Resize(self);
+     //Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+     //Image1Resize(self);
+     DispayImage(FileList[FiCurrentFileIndex-1]);
+
      FiCurrentFileIndex:=FiCurrentFileIndex-1;
      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
      screen.Cursor:=crDefault;
@@ -1051,8 +1105,11 @@ begin
   if FiCurrentFileIndex < FileList.Count -1 then
   begin
    screen.Cursor:=crHourGlass;
-   Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
-   Image1Resize(self);
+
+   //Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex+1]);
+   //Image1Resize(self);
+   DispayImage(FileList[FiCurrentFileIndex+1]);
+
    FiCurrentFileIndex:=FiCurrentFileIndex+1;
    Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
    screen.Cursor:=crDefault;
@@ -1065,8 +1122,10 @@ begin
   if FiCurrentFileIndex > 0 then
   begin
    screen.Cursor:=crHourGlass;
-   Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
-   Image1Resize(self);
+   //Image1.Picture.LoadFromFile(FileList[FiCurrentFileIndex-1]);
+   //Image1Resize(self);
+   DispayImage(FileList[FiCurrentFileIndex-1]);
+
    FiCurrentFileIndex:=FiCurrentFileIndex-1;
    Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
    screen.Cursor:=crDefault;
@@ -1461,19 +1520,19 @@ begin
   end;
 end;
 
-
-
 procedure TfrmMain.SetMoniter(intMoniter:integer);
 begin
-  //TODO validate input value
-  FOptIntMoniter:=intMoniter;
+  if ((Screen.MonitorCount-1) >= intMoniter) and (intMoniter > 0) then
+  begin
+    FOptIntMoniter:=intMoniter;
 
-  if FOptFullscreen and FisFullScreen and Assigned(frmFullscreen) then
-  begin
-      ShowFullScreen(true);
-  end else
-  begin
-    // non fullscreen.
+    if FOptFullscreen and FisFullScreen and Assigned(frmFullscreen) then
+    begin
+        ShowFullScreen(true);
+    end else
+    begin
+      // non fullscreen.
+    end;
   end;
 end;
 
@@ -1674,19 +1733,6 @@ begin
     SetValue('WindowState', Integer(WindowState));
   end;
 
-  // Save options.
-  XMLConfig.SetValue('/Opts/Random',FOptRandom);
-  XMLConfig.SetValue('/Opts/Repeat',FOptRepeat);
-  XMLConfig.SetValue('/Opts/Fullscreen',FOptFullscreen);
-  XMLConfig.SetValue('/Opts/TransitEffect',FOptTransitEffect);
-  XMLConfig.SetValue('/Opts/Fit',FOptFit);
-  XMLConfig.SetValue('/Opts/Expand',FOptExpand);
-  XMLConfig.SetValue('/Opts/Moniter',FOptIntMoniter);
-  XMLConfig.SetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
-  XMLConfig.SetValue('/Opts/StayOnTop',FoptStayOnTop);
-  XMLConfig.SetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
-  XMLConfig.SetValue('/Opts/FileExts',FOptFileExts);
-  XMLConfig.SetValue('/Opts/PlaylistExts',FOptPlaylistExts);
 
 end;
 

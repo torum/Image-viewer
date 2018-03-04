@@ -18,7 +18,7 @@ object frmMain: TfrmMain
   OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '1.8.2.0'
   object PanelInframe: TPanel
     Left = 24
     Height = 248

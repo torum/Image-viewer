@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus{$ifdef windows}, Windows{$endif};
+  LclType, LclProc, LclIntf, Menus{$ifdef MyDebug}, strutils{$endif}{$ifdef windows}, Windows{$endif};
 
 type
 
@@ -344,6 +344,16 @@ begin
   IdleTimerMouseHide.Enabled:=false;
   Screen.Cursor:=crDefault;
 
+  // Apply chagens in options.
+  frmMain.OptTransitEffect := FEffect;
+  frmMain.OptFit := FFit;
+  frmMain.OptExpand := FExpand;
+  frmMain.OptIntervalIntSeconds := FInterval div 1000;
+  frmMain.OptRandom := FRandom;
+  frmMain.OptRepeat := FRepeat;
+  //frmMain.OptStretch
+  //frmMain.OptIntMoniter
+
   if FisInFrame then
   begin
     frmMain.DoneInFrame(FstrCurr);
@@ -433,8 +443,9 @@ begin
 
     if FiCurr < 0 then
     begin
+      //TODO:
       // Skipping or error
-      DisplayError(i,'file skipping error   .'+intToStr(i));
+      //DisplayError(i,'file skipping. error   .'+intToStr(i));
 
       // If you set Repeat and FileSize Filter, it triggers infinite loop.
 
@@ -756,8 +767,13 @@ begin
         OutputDebugString(PChar(TrimRight( 'Exception@DisplayImage_LoadFromFile:id '+ intToStr(id)+':'+E.Message )));
         {$endif}
         Image1.Picture.Clear;
-        DisplayError(id,'DisplayImage@LoadFromFile - '+E.Message);
-        result:=-1;
+        DisplayError(id,'DisplayImage@LoadFromFile - '+E.ClassName+' - '+E.Message);
+
+        // On error, stop.
+        //result:=-1;
+
+        // On error, keep going.
+        result:=id;
       end;
     end;
   end else
@@ -778,7 +794,7 @@ begin
       OutputDebugString(PChar(TrimRight( 'DisplayImage FileNotFound:id '+ intToStr(id) )));
       {$endif}
     end else begin
-      // File size just too small. file size became smaller during the slideshow.
+      // File size just too small. File size became smaller during the slideshow.
       self.AlphaBlendValue:=255;
       Image1.Picture.Clear;
       with image1.Canvas do
@@ -818,11 +834,12 @@ begin
       Brush.Style := bsClear;
       Font.Color := clWhite;
       TextOut(24,24, 'Opps, something went wrong. Sorry... : '+message);
-      TextOut(52,52, strFilePath);
+      TextOut(52,52, 'File: ' + strFilePath);
   end;
   Image1.Update;
 
   {$ifdef MyDebug}
+
   try
     esl:=TStringlist.Create;
     try
@@ -844,6 +861,7 @@ begin
   except
     //
   end;
+
   {$endif}
 
 end;
