@@ -59,11 +59,7 @@ Load pictures in the sub folders as well when manually open a picture (default o
 "-u off" or "--includSubFolders=off"  
   
 Specify a moniter to show fullscreen slideshow (default 0 is the main moniter):  
-"-m 1" or "--moniter=1"  
-  
-minimuFileSizeKB  
-Filter files to show in fullscreen slideshow with file size:  
-"-n 1024" or "--minimuFileSizeKB=1024"  
+"-m 1" or "--moniter=1"   
   
 stayOnTop  
 Specify window should stay on top (default off):  
