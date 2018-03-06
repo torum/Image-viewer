@@ -22,10 +22,11 @@ Windowless View (with slideshow) on Windows 10
 Windowless View (with slideshow) on macOS  
 ![alt text](https://github.com/torumyax/Image-viewer/blob/master/files/bin/macOS-inFrameScreenshot-2018-02-20%2023.56.00.png?raw=true)
 
-
+Usage:  
+Image Viewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder).
 
 Command-line options:  
-Image Viewer can be launched via command-line, meaning other applications or scripts can launch Image Viewer with following options.  
+Image Viewer can be also launched via command-line, meaning other applications or scripts can launch Image Viewer with following options.  
    
 Slideshow interval in seconds (default 4 seconds):  
 "-i 4" or "--interval=4"  
@@ -69,7 +70,7 @@ Specify window should stay on top (default off):
 Help shows About dialog.  
 "-h" or "--help"  
   
-Useage:    
+Command-line Useage:    
 $ ImageViewer -i 2 -f on -o on -e off C:\Users\me\Pictures\Wallpapers\
 
  
