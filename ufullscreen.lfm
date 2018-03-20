@@ -1,7 +1,7 @@
 object frmFullscreen: TfrmFullscreen
-  Left = 1573
+  Left = 921
   Height = 301
-  Top = 410
+  Top = 411
   Width = 400
   Align = alClient
   AlphaBlend = True
@@ -89,12 +89,12 @@ object frmFullscreen: TfrmFullscreen
       Caption = '&Interval'
     end
     object MenuItemRandom: TMenuItem
-      Caption = 'Random'
+      Caption = 'Ran&dom'
       ShortCut = 78
       OnClick = MenuItemRandomClick
     end
     object MenuItemRepeat: TMenuItem
-      Caption = 'Repeat'
+      Caption = 'Repe&at'
       ShortCut = 82
       OnClick = MenuItemRepeatClick
     end
@@ -124,7 +124,7 @@ object frmFullscreen: TfrmFullscreen
     object MenuItemFilter: TMenuItem
       Caption = '&Filter'
       object MenuItemFilterFileSize: TMenuItem
-        Caption = 'FileSize'
+        Caption = 'File size'
       end
     end
     object MenuItemMoniters: TMenuItem

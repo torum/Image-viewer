@@ -9,7 +9,7 @@ object frmAbout: TfrmAbout
   DesignTimePPI = 120
   OnClose = FormClose
   Position = poOwnerFormCenter
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '1.8.2.0'
   object Image1: TImage
     Left = 24
     Height = 113

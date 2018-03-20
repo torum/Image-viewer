@@ -11,7 +11,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus{$ifdef MyDebug}, strutils{$endif}{$ifdef windows}, Windows{$endif};
+  LclType, LclProc, LclIntf, Menus
+  {$ifdef MyDebug}, strutils{$endif}{$ifdef windows}, Windows{$endif};
 
 type
 
@@ -151,9 +152,9 @@ type
     procedure PlaybackRepeatStart();
     procedure ResizeImage();
   public
-    procedure PlaybackNext(Sender: TObject);
-    procedure PlaybackBack(Sender: TObject);
-    procedure PlaybackPause(Sender: TObject);
+    procedure PlaybackNext();
+    procedure PlaybackBack();
+    procedure PlaybackPause();
     procedure PlaybackPlay(preLoad:boolean);
     property Current: integer read FiCurr;
     property StartWith: integer write FiStartWith;
@@ -209,43 +210,65 @@ begin
   FiStartWith:=0;
 
   Image1.Stretch:=false;
-  if FStretch or FFit then begin
-    Image1.StretchInEnabled:=true;
-  end else begin
+  if FStretch or FFit then
+    Image1.StretchInEnabled:=true
+  else
     Image1.StretchInEnabled:=false;
-  end;
   Image1.StretchOutEnabled:=true;
-
   Image1.Proportional:=true;
   Image1.Center:=true;
 
+  // i18n
+
+  MenuItemPlayback.Caption:=resstrPlayback;
+  MenuItemNext.Caption:=resstrPlaybackNext;
+  MenuItemBack.Caption:=resstrPlaybackPrevious;
+  MenuItemPause.Caption:=resstrPlaybackPause;
+  MenuItemInterval.Caption:=resstrInterval;
+  MenuItemRandom.Caption:=resstrRandom;
+  MenuItemRepeat.Caption:=resstrRepeat;
+  MenuItemEffect.Caption:=resstrEffect;
+  MenuItemStretch.Caption:=resstrStretch;
+  MenuItemFit.Caption:=resstrStretchIn;
+  MenuItemExpand.Caption:=resstrStretchOut;
+  MenuItemFilter.Caption:=resstrFilter;
+  MenuItemFilterFileSize.Caption:=resstrFilterFileSize;
+  MenuItemMoniters.Caption:=resstrMoniters;
+  MenuItemQuit.Caption:=resstrQuit;
+  MenuItemStayOnTop.Caption:=resstrStayOnTop;
 
   // Popup Menues
 
-  for i:=0 to 9 do begin
+  childItem := TMenuItem.Create(PopupMenu1);
+  childItem.Caption := '[&1] ' + resstrSecond;
+  childItem.OnClick := @ChangeIntervalClicked;
+  childItem.Tag:=1;
+  MenuItemInterval.Add(childItem);
+
+  for i:=1 to 9 do begin
     childItem := TMenuItem.Create(PopupMenu1);
-    childItem.Caption := '[&'+intToStr(i+1)+'] seconds';
+    childItem.Caption := '[&'+intToStr(i+1)+'] ' + resstrSeconds;
     childItem.OnClick := @ChangeIntervalClicked;
     childItem.Tag:=i+1;
     MenuItemInterval.Add(childItem);
   end;
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[&One] minute';
+  childItem.Caption := '[1] ' + resstrMinute;
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=60;
   MenuItemInterval.Add(childItem);
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[&Five] minutes';
+  childItem.Caption := '[5] ' + resstrMinutes;
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=300;
   MenuItemInterval.Add(childItem);
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[&Ten] minutes';
+  childItem.Caption := '[10] ' + resstrMinutes;
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=600;
   MenuItemInterval.Add(childItem);
   childItem := TMenuItem.Create(PopupMenu1);
-  childItem.Caption := '[&Fifteen] minutes';
+  childItem.Caption := '[15] ' + resstrMinutes;
   childItem.OnClick := @ChangeIntervalClicked;
   childItem.Tag:=900;
   MenuItemInterval.Add(childItem);
@@ -261,7 +284,8 @@ begin
   childItem.OnClick := @ChangeMinFileSizeClicked;
   childItem.Tag:=50;
   MenuItemFilterFileSize.Add(childItem);
-  for i:=0 to 9 do begin
+  for i:=0 to 9 do
+  begin
     childItem := TMenuItem.Create(PopupMenu1);
     childItem.Caption := '> [&'+intToStr(i+1)+'00] KB';
     childItem.OnClick := @ChangeMinFileSizeClicked;
@@ -270,9 +294,10 @@ begin
   end;
 
   // Moniters
-  for i:=0 to frmMain.MoniterList.Count-1 do begin
+  for i:=0 to Screen.MonitorCount-1 do
+  begin
     childItem := TMenuItem.Create(PopupMenu1);
-    childItem.Caption := 'Moniter[&'+intToStr(i+1)+']';
+    childItem.Caption := resstrMoniter + ' [&'+intToStr(i+1)+']';
     childItem.OnClick := @ChangeMoniterClicked;
     childItem.Tag:=i;
     MenuItemMoniters.Add(childItem);
@@ -351,8 +376,6 @@ begin
   frmMain.OptIntervalIntSeconds := FInterval div 1000;
   frmMain.OptRandom := FRandom;
   frmMain.OptRepeat := FRepeat;
-  //frmMain.OptStretch
-  //frmMain.OptIntMoniter
 
   if FisInFrame then
   begin
@@ -394,29 +417,17 @@ begin
     TimerInterval.tag:=startIndex;
   end;
 
-  // Start slideshow.
-  if FEffect then begin
-    // Did not add files manually. started as single file.so,
-    if (Not frmMain.OptSlideshowAutoStart) or frmMain.IsSingleFileSelected then
-    begin
-      FManualTransition:=true;
-      // PlaybackPause(self);
-    end;
-    PlaybackPlay(false);
-  end else begin
-    PlaybackPlay(false);
-
-    // Did not add files manually. started as single file.so,
-    if (Not frmMain.OptSlideshowAutoStart) or frmMain.IsSingleFileSelected then
-    begin
-      FManualTransition:=true;
-      //PlaybackPause(self);
-    end else
-    begin
-      FManualTransition:=false;
-      TimerInterval.Enabled:=true;
-    end;
+  if (not frmMain.OptSlideshowAutoStart) or frmMain.IsSingleFileSelected then
+  begin
+    // Did not add files manually. started as single file. So,
+    FManualTransition:=true;
+  end else
+  begin
+    FManualTransition:=false;
   end;
+
+  // Start slideshow.
+  PlaybackPlay(false);
 
 end;
 
@@ -554,7 +565,7 @@ begin
   end;
 end;
 
-procedure TfrmFullscreen.PlaybackPause(Sender: TObject);
+procedure TfrmFullscreen.PlaybackPause();
 begin
   // Toggle playback pause/start
   if FIsSlideshowPlaying then begin
@@ -563,11 +574,18 @@ begin
     begin
       FManualTransition:=false;
 
-      if FEffect then begin
-        //TimerFadeOut.Enabled:=true;
-        TimerIntervalTimer(self);
-      end else begin
-        PlaybackPlay(false);
+      if TimerFadeIn.Enabled then
+      begin
+        TimerInterval.Enabled:=true;
+      end else
+      begin
+        if FEffect then
+        begin
+          TimerFadeOut.Enabled:=true;
+        end else
+        begin
+          PlaybackPlay(false);
+        end;
       end;
 
     end else
@@ -584,34 +602,27 @@ begin
   end;
 end;
 
-procedure TfrmFullscreen.PlaybackNext(Sender: TObject);
+procedure TfrmFullscreen.PlaybackNext();
 begin
   if FFileList.Count > 1 then begin
 
     TimerInterval.Enabled:=false;
 
     if FEffect then begin
-
       if TimerFadeIn.Enabled then
       begin
         // Fading IN. so just speed up.
         self.AlphaBlendValue:=255;
-
-        // Don't do this. getRandomImageIndex(stringlist remaining) gets messed up.
-        //TimerFadeIn.Enabled:=false;
-        //PlaybackPlay(false);
+        TimerFadeInTimer(nil);
+        TimerFadeOut.Enabled:=true;
       end else if TimerFadeOut.Enabled then
       begin
         // Fading OUT. so let's just speed up.
-        self.AlphaBlendValue:=2;
-
-        // Don't do this. getRandomImageIndex(stringlist remaining) gets messed up.
-        //TimerFadeOut.Enabled:=false;
-        //PlaybackPlay(false);
+        self.AlphaBlendValue:=1;
+        TimerFadeOutTimer(nil);
       end else
       begin
-        self.AlphaBlendValue:=255;//just in case;
-        PlaybackPlay(false);
+        TimerFadeOut.Enabled:=true;
       end;
 
     end else begin
@@ -621,16 +632,15 @@ begin
   end;
 end;
 
-procedure TfrmFullscreen.PlaybackBack(Sender: TObject);
+procedure TfrmFullscreen.PlaybackBack();
 var
   iPrev:integer;
 begin
   if FFileList.Count > 1 then begin
-    //TODO: when you go back, put current to remaining,
+    //TODO: when you go back, put current to remaining?
 
-    //OutputDebugString(PChar(TrimRight('PlaybackBack:(Current):'+intToStr(Current))));
     iPrev:=GetPreviousImageIndex(Current);
-    //OutputDebugString(PChar(TrimRight('PlaybackBack:(iPrev):'+intToStr(iPrev))));
+
     if (iPrev > -1) then
     begin
       if FEffect then begin
@@ -648,12 +658,6 @@ begin
           TimerInterval.Enabled:=false;
           alphablendvalue:=255;
           TimerInterval.Enabled:=true;
-          {
-          TimerInterval.Enabled:=false;
-          TimerInterval.Tag := iPrev;
-          //setting 1 shuld stop timer and going next
-          alphablendvalue:=1;
-          }
         end else
         begin
           TimerInterval.Enabled:=false;
@@ -833,7 +837,7 @@ begin
     begin
       Brush.Style := bsClear;
       Font.Color := clWhite;
-      TextOut(24,24, 'Opps, something went wrong. Sorry... : '+message);
+      TextOut(24,24, 'File load error: ' + message);
       TextOut(52,52, 'File: ' + strFilePath);
   end;
   Image1.Update;
@@ -907,17 +911,10 @@ begin
 
     if (iNext > -1) then begin
       // Start interval timer
-      {$ifdef Mydebug}
-      OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer: ->Next:' + intToStr(iNext) )));
-      {$endif}
       TimerInterval.Enabled:=true;
       //TODO: preLoading.
 
     end else begin
-      //TODO: debug this.
-      {$ifdef Mydebug}
-      OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer: ->PlaybackRepeatStart')));
-      {$endif}
       PlaybackRepeatStart();
     end;
 
@@ -1034,7 +1031,6 @@ begin
     if FFileListHistory.Count > 0 then begin
 
       //TODO: check. when you go back, put current to remaining,
-
 
       // Saving for the "next"
       FFileListRemaining.Insert(0,FFileListHistory[FFileListHistory.Count-1]);
@@ -1189,17 +1185,17 @@ end;
 
 procedure TfrmFullscreen.MenuItemBackClick(Sender: TObject);
 begin
-  PlaybackBack(sender);
+  PlaybackBack();
 end;
 
 procedure TfrmFullscreen.MenuItemNextClick(Sender: TObject);
 begin
-  PlaybackNext(sender);
+  PlaybackNext();
 end;
 
 procedure TfrmFullscreen.MenuItemPauseClick(Sender: TObject);
 begin
-  PlaybackPause(sender);
+  PlaybackPause();
 end;
 
 procedure TfrmFullscreen.MenuItemEffectClick(Sender: TObject);
@@ -1361,14 +1357,14 @@ begin
     begin
       if FManualTransition then
       begin
-        MenuItemQuit.Caption:='&Leave InFrame';
+        MenuItemQuit.Caption:=resstrLeaveInFrame;
       end else
       begin
-        MenuItemQuit.Caption:='&Stop InFrame Slideshow';
+        MenuItemQuit.Caption:=resstrStopInFrameSlideshow;
       end;
     end else
     begin
-      MenuItemQuit.Caption:='&Leave InFrame';
+      MenuItemQuit.Caption:=resstrLeaveInFrame;
     end;
   end else if FisFullscreen then
   begin
@@ -1378,21 +1374,21 @@ begin
       begin
         if FManualTransition then
         begin
-          MenuItemQuit.Caption:='&Leave Fullscreen';
+          MenuItemQuit.Caption:=resstrLeaveFullscreen;
         end else
         begin
-          MenuItemQuit.Caption:='&Stop Fullscreen Slideshow';
+          MenuItemQuit.Caption:=resstrStopFullscreenSlideshow;
         end;
       end else begin
-        MenuItemQuit.Caption:='&Quit';
+        MenuItemQuit.Caption:=resstrQuit;
       end;
     end else
     begin
       if FisStartNormal then
       begin
-        MenuItemQuit.Caption:='&Close Fullscreen';
+        MenuItemQuit.Caption:=resstrLeaveFullscreen;
       end else begin
-        MenuItemQuit.Caption:='&Close';
+        MenuItemQuit.Caption:=resstrClose;
       end;
     end;
   end;
@@ -1578,19 +1574,17 @@ procedure TfrmFullscreen.FormKeyDown(Sender: TObject; var Key: Word;
 begin
   if ((Key = VK_F11) or (Key = VK_ESCAPE) or (Chr(Key) = 'F')) then
   begin
-    //ShowFullScreen(false);
-    close;
+    //close;
   end;
 
 
-  if ((Key = VK_RMENU) or (Key = VK_LMENU)) then
+  if ((Key = VK_RMENU) or (Key = VK_LMENU) or (Key = VK_MENU)) then
   begin
-    //self.Image1.PopupMenu.PopUp(0,0);
-    self.PopupMenu1.PopUp(0,0);
+    //self.PopupMenu1.PopUp(0,0);
   end;
 
 
-  //assigned in popupmenu shortcuts
+  // Assigned in popupmenu shortcuts
   {
   if FManualTransition then begin
 
@@ -1624,7 +1618,7 @@ procedure TfrmFullscreen.FormMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
 
-  PlaybackNext(sender);
+  PlaybackNext();
   //Handled:=true;
 
 end;
@@ -1633,7 +1627,7 @@ procedure TfrmFullscreen.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
 
-  PlaybackBack(sender);
+  PlaybackBack();
   //Handled:=true;
 
 end;

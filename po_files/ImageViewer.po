@@ -1,0 +1,442 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: tfrmfullscreen.caption
+msgid "Fullscreen"
+msgstr ""
+
+#: tfrmfullscreen.menuitemback.caption
+msgctxt "tfrmfullscreen.menuitemback.caption"
+msgid "&Back"
+msgstr ""
+
+#: tfrmfullscreen.menuitemeffect.caption
+msgctxt "tfrmfullscreen.menuitemeffect.caption"
+msgid "&Effect"
+msgstr ""
+
+#: tfrmfullscreen.menuitemexpand.caption
+msgctxt "tfrmfullscreen.menuitemexpand.caption"
+msgid "Out (small->screen)"
+msgstr ""
+
+#: tfrmfullscreen.menuitemfilter.caption
+msgctxt "tfrmfullscreen.menuitemfilter.caption"
+msgid "&Filter"
+msgstr ""
+
+#: tfrmfullscreen.menuitemfilterfilesize.caption
+msgctxt "tfrmfullscreen.menuitemfilterfilesize.caption"
+msgid "File size"
+msgstr ""
+
+#: tfrmfullscreen.menuitemfit.caption
+msgctxt "tfrmfullscreen.menuitemfit.caption"
+msgid "In (big->screen)"
+msgstr ""
+
+#: tfrmfullscreen.menuiteminterval.caption
+msgctxt "tfrmfullscreen.menuiteminterval.caption"
+msgid "&Interval"
+msgstr ""
+
+#: tfrmfullscreen.menuitemmoniters.caption
+msgctxt "tfrmfullscreen.menuitemmoniters.caption"
+msgid "&Moniters"
+msgstr ""
+
+#: tfrmfullscreen.menuitemnext.caption
+msgctxt "tfrmfullscreen.menuitemnext.caption"
+msgid "&Next"
+msgstr ""
+
+#: tfrmfullscreen.menuitempause.caption
+msgctxt "tfrmfullscreen.menuitempause.caption"
+msgid "Pau&se"
+msgstr ""
+
+#: tfrmfullscreen.menuitemplayback.caption
+msgctxt "tfrmfullscreen.menuitemplayback.caption"
+msgid "&Playback"
+msgstr ""
+
+#: tfrmfullscreen.menuitemquit.caption
+msgctxt "tfrmfullscreen.menuitemquit.caption"
+msgid "&Quit"
+msgstr ""
+
+#: tfrmfullscreen.menuitemrandom.caption
+msgctxt "tfrmfullscreen.menuitemrandom.caption"
+msgid "Ran&dom"
+msgstr ""
+
+#: tfrmfullscreen.menuitemrepeat.caption
+msgctxt "tfrmfullscreen.menuitemrepeat.caption"
+msgid "Repe&at"
+msgstr ""
+
+#: tfrmfullscreen.menuitemstart.caption
+msgid "Start"
+msgstr ""
+
+#: tfrmfullscreen.menuitemstayontop.caption
+msgctxt "tfrmfullscreen.menuitemstayontop.caption"
+msgid "Stay on top"
+msgstr ""
+
+#: tfrmfullscreen.menuitemstretch.caption
+msgctxt "tfrmfullscreen.menuitemstretch.caption"
+msgid "&Stretch"
+msgstr ""
+
+#: tfrmfullscreen.menuitemstretchboth.caption
+msgid "In&&Out (fit to screen)"
+msgstr ""
+
+#: tfrmmain.caption
+msgid "Image Viewer Main"
+msgstr ""
+
+#: tfrmmain.menuitemback.caption
+msgid "Previous"
+msgstr ""
+
+#: tfrmmain.menuitemnext.caption
+msgid "Next"
+msgstr ""
+
+#: tfrmmain.menuitemquit.caption
+msgctxt "tfrmmain.menuitemquit.caption"
+msgid "&Quit"
+msgstr ""
+
+#: tfrmmain.menuitemslideshow.caption
+msgctxt "tfrmmain.menuitemslideshow.caption"
+msgid "Fullscreen Slideshow"
+msgstr ""
+
+#: tfrmmain.menuitemslideshowinframe.caption
+msgctxt "tfrmmain.menuitemslideshowinframe.caption"
+msgid "InFrame Slideshow"
+msgstr ""
+
+#: tfrmmain.menuitemstayontop.caption
+msgctxt "tfrmmain.menuitemstayontop.caption"
+msgid "Stay on top"
+msgstr ""
+
+#: tfrmmain.menuitemstretch.caption
+msgctxt "tfrmmain.menuitemstretch.caption"
+msgid "Stretch"
+msgstr ""
+
+#: tfrmmain.menuitemstretchin.caption
+msgctxt "tfrmmain.menuitemstretchin.caption"
+msgid "In (big->screen)"
+msgstr ""
+
+#: tfrmmain.menuitemstretchout.caption
+msgctxt "tfrmmain.menuitemstretchout.caption"
+msgid "Out (small->screen)"
+msgstr ""
+
+#: tfrmmain.menuitemsysabout.caption
+msgctxt "tfrmmain.menuitemsysabout.caption"
+msgid "About"
+msgstr ""
+
+#: tfrmmain.menuitemsysquit.caption
+msgid "Quit"
+msgstr ""
+
+#: tfrmmain.openpicturedialog1.title
+msgctxt "tfrmmain.openpicturedialog1.title"
+msgid "Open picture(s)"
+msgstr ""
+
+#: ufullscreen.resstrclose
+msgctxt "ufullscreen.resstrclose"
+msgid "&Close"
+msgstr ""
+
+#: ufullscreen.resstreffect
+msgctxt "ufullscreen.resstreffect"
+msgid "&Effect"
+msgstr ""
+
+#: ufullscreen.resstrfilter
+msgctxt "ufullscreen.resstrfilter"
+msgid "&Filter"
+msgstr ""
+
+#: ufullscreen.resstrfilterfilesize
+msgctxt "ufullscreen.resstrfilterfilesize"
+msgid "File size"
+msgstr ""
+
+#: ufullscreen.resstrinterval
+msgctxt "ufullscreen.resstrinterval"
+msgid "&Interval"
+msgstr ""
+
+#: ufullscreen.resstrleavefullscreen
+msgctxt "ufullscreen.resstrleavefullscreen"
+msgid "&Leave Fullscreen"
+msgstr ""
+
+#: ufullscreen.resstrleaveinframe
+msgctxt "ufullscreen.resstrleaveinframe"
+msgid "&Leave InFrame"
+msgstr ""
+
+#: ufullscreen.resstrminute
+msgctxt "ufullscreen.resstrminute"
+msgid "minute"
+msgstr ""
+
+#: ufullscreen.resstrminutes
+msgctxt "ufullscreen.resstrminutes"
+msgid "minutes"
+msgstr ""
+
+#: ufullscreen.resstrmoniter
+msgctxt "ufullscreen.resstrmoniter"
+msgid "Moniter"
+msgstr ""
+
+#: ufullscreen.resstrmoniters
+msgctxt "ufullscreen.resstrmoniters"
+msgid "&Moniters"
+msgstr ""
+
+#: ufullscreen.resstrplayback
+msgctxt "ufullscreen.resstrplayback"
+msgid "&Playback"
+msgstr ""
+
+#: ufullscreen.resstrplaybackback
+msgctxt "ufullscreen.resstrplaybackback"
+msgid "&Back"
+msgstr ""
+
+#: ufullscreen.resstrplaybacknext
+msgctxt "ufullscreen.resstrplaybacknext"
+msgid "&Next"
+msgstr ""
+
+#: ufullscreen.resstrplaybackpause
+msgctxt "ufullscreen.resstrplaybackpause"
+msgid "Pau&se"
+msgstr ""
+
+#: ufullscreen.resstrrandom
+msgctxt "ufullscreen.resstrrandom"
+msgid "Ran&dom"
+msgstr ""
+
+#: ufullscreen.resstrrepeat
+msgctxt "ufullscreen.resstrrepeat"
+msgid "Repe&at"
+msgstr ""
+
+#: ufullscreen.resstrsecond
+msgctxt "ufullscreen.resstrsecond"
+msgid "second"
+msgstr ""
+
+#: ufullscreen.resstrseconds
+msgctxt "ufullscreen.resstrseconds"
+msgid "seconds"
+msgstr ""
+
+#: ufullscreen.resstrstopfullscreenslideshow
+msgctxt "ufullscreen.resstrstopfullscreenslideshow"
+msgid "&Stop Fullscreen Slideshow"
+msgstr ""
+
+#: ufullscreen.resstrstopinframeslideshow
+msgctxt "ufullscreen.resstrstopinframeslideshow"
+msgid "&Stop InFrame Slideshow"
+msgstr ""
+
+#: ufullscreen.resstrstretch
+msgctxt "ufullscreen.resstrstretch"
+msgid "&Stretch"
+msgstr ""
+
+#: ufullscreen.resstrstretchin
+msgctxt "ufullscreen.resstrstretchin"
+msgid "In (big->screen)"
+msgstr ""
+
+#: ufullscreen.resstrstretchout
+msgctxt "ufullscreen.resstrstretchout"
+msgid "Out (small->screen)"
+msgstr ""
+
+#: umain.resstrabout
+msgctxt "umain.resstrabout"
+msgid "About"
+msgstr ""
+
+#: umain.resstrclose
+msgctxt "umain.resstrclose"
+msgid "&Close"
+msgstr ""
+
+#: umain.resstreffect
+msgctxt "umain.resstreffect"
+msgid "&Effect"
+msgstr ""
+
+#: umain.resstrfilter
+msgctxt "umain.resstrfilter"
+msgid "&Filter"
+msgstr ""
+
+#: umain.resstrfilterfilesize
+msgctxt "umain.resstrfilterfilesize"
+msgid "File size"
+msgstr ""
+
+#: umain.resstrfullscreenslideshow
+msgctxt "umain.resstrfullscreenslideshow"
+msgid "Fullscreen Slideshow"
+msgstr ""
+
+#: umain.resstrfullscreenview
+msgid "&Fullscreen View"
+msgstr ""
+
+#: umain.resstrinframeslideshow
+msgctxt "umain.resstrinframeslideshow"
+msgid "InFrame Slideshow"
+msgstr ""
+
+#: umain.resstrinframeview
+msgid "&InFrame View"
+msgstr ""
+
+#: umain.resstrinterval
+msgctxt "umain.resstrinterval"
+msgid "&Interval"
+msgstr ""
+
+#: umain.resstrleavefullscreen
+msgctxt "umain.resstrleavefullscreen"
+msgid "&Leave Fullscreen"
+msgstr ""
+
+#: umain.resstrleaveinframe
+msgctxt "umain.resstrleaveinframe"
+msgid "&Leave InFrame"
+msgstr ""
+
+#: umain.resstrminute
+msgctxt "umain.resstrminute"
+msgid "minute"
+msgstr ""
+
+#: umain.resstrminutes
+msgctxt "umain.resstrminutes"
+msgid "minutes"
+msgstr ""
+
+#: umain.resstrmoniter
+msgctxt "umain.resstrmoniter"
+msgid "Moniter"
+msgstr ""
+
+#: umain.resstrmoniters
+msgctxt "umain.resstrmoniters"
+msgid "&Moniters"
+msgstr ""
+
+#: umain.resstropenpictures
+msgctxt "umain.resstropenpictures"
+msgid "Open picture(s)"
+msgstr ""
+
+#: umain.resstrplayback
+msgctxt "umain.resstrplayback"
+msgid "&Playback"
+msgstr ""
+
+#: umain.resstrplaybacknext
+msgctxt "umain.resstrplaybacknext"
+msgid "&Next"
+msgstr ""
+
+#: umain.resstrplaybackpause
+msgctxt "umain.resstrplaybackpause"
+msgid "Pau&se"
+msgstr ""
+
+#: umain.resstrplaybackprevious
+msgctxt "umain.resstrplaybackprevious"
+msgid "&Back"
+msgstr ""
+
+#: umain.resstrquit
+msgctxt "umain.resstrquit"
+msgid "&Quit"
+msgstr ""
+
+#: umain.resstrrandom
+msgctxt "umain.resstrrandom"
+msgid "Ran&dom"
+msgstr ""
+
+#: umain.resstrrepeat
+msgctxt "umain.resstrrepeat"
+msgid "Repe&at"
+msgstr ""
+
+#: umain.resstrsecond
+msgctxt "umain.resstrsecond"
+msgid "second"
+msgstr ""
+
+#: umain.resstrseconds
+msgctxt "umain.resstrseconds"
+msgid "seconds"
+msgstr ""
+
+#: umain.resstrstartfullscreenslideshow
+msgid "Start &Fullscreen Slideshow"
+msgstr ""
+
+#: umain.resstrstartinframeslideshow
+msgid "Start &InFrame Slideshow"
+msgstr ""
+
+#: umain.resstrstayontop
+msgctxt "umain.resstrstayontop"
+msgid "Stay on top"
+msgstr ""
+
+#: umain.resstrstopfullscreenslideshow
+msgctxt "umain.resstrstopfullscreenslideshow"
+msgid "&Stop Fullscreen Slideshow"
+msgstr ""
+
+#: umain.resstrstopinframeslideshow
+msgctxt "umain.resstrstopinframeslideshow"
+msgid "&Stop InFrame Slideshow"
+msgstr ""
+
+#: umain.resstrstretch
+msgctxt "umain.resstrstretch"
+msgid "Stretch"
+msgstr ""
+
+#: umain.resstrstretchin
+msgctxt "umain.resstrstretchin"
+msgid "In (big->screen)"
+msgstr ""
+
+#: umain.resstrstretchout
+msgctxt "umain.resstrstretchout"
+msgid "Out (small->screen)"
+msgstr ""
+

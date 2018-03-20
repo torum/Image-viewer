@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1265
+  Left = 954
   Height = 301
-  Top = 799
+  Top = 203
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -17,21 +17,9 @@ object frmMain: TfrmMain
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
+  PopupMode = pmAuto
   Position = poScreenCenter
   LCLVersion = '1.8.2.0'
-  object PanelInframe: TPanel
-    Left = 24
-    Height = 248
-    Top = 24
-    Width = 352
-    Align = alCustom
-    Anchors = [akTop, akLeft, akRight, akBottom]
-    BevelOuter = bvNone
-    Color = clBlack
-    ParentColor = False
-    TabOrder = 0
-    Visible = False
-  end
   object Image1: TImage
     Left = 0
     Height = 301
@@ -44,7 +32,6 @@ object frmMain: TfrmMain
     OnMouseWheelDown = Image1MouseWheelDown
     OnMouseWheelUp = Image1MouseWheelUp
     OnResize = Image1Resize
-    PopupMenu = PopupMenuMain
     Proportional = True
     Stretch = True
     StretchOutEnabled = False
@@ -10157,7 +10144,6 @@ object frmMain: TfrmMain
       E0DDA37EE4EB670501F8A1313F6F657F9EF1032F36FEB3D776560C80738E64C3
       F99EC2594FA734F8F788FF3F9E01B839114D7C480000000049454E44AE426082
     }
-    OnClick = TrayIcon1Click
     OnDblClick = TrayIcon1DblClick
     left = 353
     top = 248
@@ -10179,7 +10165,7 @@ object frmMain: TfrmMain
     object MenuItemBo6: TMenuItem
       Caption = '-'
     end
-    object MenuItem7: TMenuItem
+    object MenuItemStretch: TMenuItem
       Caption = 'Stretch'
       object MenuItemStretchIn: TMenuItem
         Caption = 'In (big->screen)'
@@ -10192,18 +10178,18 @@ object frmMain: TfrmMain
         OnClick = MenuItemStretchOutClick
       end
     end
-    object MenuItem3: TMenuItem
+    object MenuItemBo7: TMenuItem
       Caption = '-'
     end
     object MenuItemStayOnTop: TMenuItem
       Caption = 'Stay on top'
       OnClick = MenuItemStayOnTopClick
     end
-    object MenuItem1: TMenuItem
+    object MenuItemBo8: TMenuItem
       Caption = '-'
     end
     object MenuItemSlideshowInFrame: TMenuItem
-      Caption = 'Start InFrame Slideshow'
+      Caption = 'InFrame Slideshow'
       ShortCut = 83
       OnClick = MenuItemSlideshowInFrameClick
     end
@@ -10212,7 +10198,7 @@ object frmMain: TfrmMain
       ShortCut = 70
       OnClick = MenuItemSlideshowClick
     end
-    object MenuItem2: TMenuItem
+    object MenuItemBo9: TMenuItem
       Caption = '-'
     end
     object MenuItemQuit: TMenuItem
@@ -10229,7 +10215,7 @@ object frmMain: TfrmMain
     top = 16
   end
   object OpenPictureDialog1: TOpenPictureDialog
-    Title = 'Open picture file(s)'
+    Title = 'Open picture(s)'
     Filter = 'Graphic (*.jpeg;*.jpg;*.jpe;*.png;*.gif)|*.jpeg;*.jpg;*.jpe;*.png;*.gif|Portable Network Graphic (*.png)|*.png|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Graphics Interchange Format (*.gif)|*.gif'
     Options = [ofAllowMultiSelect, ofFileMustExist, ofNoTestFileCreate, ofEnableSizing, ofDontAddToRecent, ofAutoPreview]
     left = 64
@@ -10250,11 +10236,11 @@ object frmMain: TfrmMain
       Caption = 'About'
       OnClick = MenuItemSysAboutClick
     end
-    object MenuItem4: TMenuItem
+    object MenuItemSysBo: TMenuItem
       Caption = '-'
     end
     object MenuItemSysQuit: TMenuItem
-      Caption = 'Close'
+      Caption = 'Quit'
       OnClick = MenuItemSysQuitClick
     end
   end
