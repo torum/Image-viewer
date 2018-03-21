@@ -45,7 +45,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs, DefaultTranslator,
+  LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs, //LCLTranslator,//DefaultTranslator,
   strutils, Types, XMLConf{$ifdef windows}, Windows{$endif};
 
 type

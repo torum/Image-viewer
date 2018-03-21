@@ -40,7 +40,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="5">
+    <Units Count="4">
       <Unit0>
         <Filename Value="ImageViewer.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -62,21 +62,13 @@
         <UnitName Value="UFullscreen"/>
       </Unit2>
       <Unit3>
-        <Filename Value="uoptions.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmOptions"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UOptions"/>
-      </Unit3>
-      <Unit4>
         <Filename Value="uabout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmAbout"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UAbout"/>
-      </Unit4>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
