@@ -17,7 +17,6 @@ Compiled and tested on
 
 TODO:
  - priority 1 -
- i18n
  UWP packaging.
  - priority 2 -
  load playlist.
@@ -1545,7 +1544,7 @@ end;
 
 procedure TfrmMain.SetMoniter(intMoniter:integer);
 begin
-  if ((Screen.MonitorCount-1) >= intMoniter) and (intMoniter > 0) then
+  if ((Screen.MonitorCount-1) >= intMoniter) and (intMoniter >= 0) then
   begin
     FOptIntMoniter:=intMoniter;
 
