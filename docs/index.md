@@ -1,9 +1,13 @@
 ---
 layout: default
-title: This is a top page.
+title: Simple Image Viewer
 ---
 
-# This is a content.
+# Introduction
 
-* hoge
-* huga
+* Project page  
+https://github.com/torumyax/Image-viewer
+
+* Apps Privacy Policy page  
+https://torumyax.github.io/Image-viewer/app-privacy-policy/
+
