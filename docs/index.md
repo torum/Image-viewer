@@ -52,43 +52,43 @@ Slideshow random (default on):
   ` -r off  `  or  ` --random=off  `   
   
 Slideshow repeat (default on):  
-` -e on`  or  ` --repeat=on`   
-` -e off`  or  ` --repeat=off`   
+` -e on `  or  ` --repeat=on `   
+` -e off `  or  ` --repeat=off `   
   
 Slideshow start fullscreen (default off):  
-` -f on`  or  ` --fullscreen=on`   
-` -f off`  or  ` --fullscreen=off`   
+` -f on `  or  ` --fullscreen=on `   
+` -f off `  or  ` --fullscreen=off `   
   
 Slideshow transitional effect (default on):  
-` -t on`  or  ` --effect=on`   
-` -t off`  or  ` --effect=off`   
+` -t on `  or  ` --effect=on `   
+` -t off `  or  ` --effect=off `   
   
 Picture stretch In (fit to window/screen when the size is bigger than window/screen. default on):  
-` -i on`  or  ` --stretchIn=on`   
-` -i off`  or  ` --stretchIn=off`   
+` -i on `  or  ` --stretchIn=on `   
+` -i off `  or  ` --stretchIn=off `   
   
 Picture stretch Out (fit to window/screen when the size is smaller than window/screen. default off):  
-` -o on`  or  ` --stretchOut=on`   
-` -o off`  or  ` --stretchOut=off`   
+` -o on `  or  ` --stretchOut=on `   
+` -o off `  or  ` --stretchOut=off `   
   
 Load pictures in the sub folders as well when manually open a picture (default on):  
-` -u on`  or  ` --includSubFolders=on`   
-` -u off`  or  ` --includSubFolders=off`   
+` -u on `  or  ` --includSubFolders=on `   
+` -u off `  or  ` --includSubFolders=off `   
   
 Specify a moniter to show fullscreen slideshow (default 0 is the main moniter):  
-` -m 1`  or  ` --moniter=1`    
+` -m 1 `  or  ` --moniter=1 `    
   
 stayOnTop  
 Specify window should stay on top (default off):  
-` -y on`  or  ` --stayOnTop=on`   
-` -y off`  or  ` --stayOnTop=off`   
+` -y on `  or  ` --stayOnTop=on `   
+` -y off `  or  ` --stayOnTop=off `   
 
 Help shows About dialog.  
-` -h`  or  ` --help`   
+` -h `  or  ` --help `   
   
    
 #### Command-line Useage example:    
-` $ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\` 
+` $ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\ ` 
 
  
 #### Compiled and tested on:   
