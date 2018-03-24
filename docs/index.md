@@ -10,6 +10,9 @@ title: Simple Image Viewer
 * [Apps Privacy Policy page](https://torumyax.github.io/Image-viewer/app-privacy-policy/)  
 
 ---------------------------------------
+### Introduction  
+
+
 
 # Image viewer/slideshow (Windows/Linux/Mac)
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by [feh](https://feh.finalrewind.org/).
