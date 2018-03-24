@@ -3,7 +3,7 @@ layout: default
 title: Simple Image Viewer
 ---
 
-# Menu
+## Menu
   
 * [Project page](https://github.com/torumyax/Image-viewer)  
 
