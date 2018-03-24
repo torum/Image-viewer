@@ -11,6 +11,7 @@ Image Viewer can be launched by (1) double clicking the executable and selecting
 
 ### Command-line options:  
 Image Viewer can be also launched via command-line, meaning other applications or scripts can launch Image Viewer with following options.  
+
    
 Slideshow interval in seconds (default 4 seconds):  
 ` -i 4`  or ` --interval=4`   
@@ -54,10 +55,11 @@ Specify window should stay on top (default off):
 Help shows About dialog.  
 ` -h`  or  ` --help`   
   
-Command-line Useage:    
+   
+#### Command-line Useage example:    
 ` $ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\` 
 
- 
+
  
 #### Compiled and tested on:   
 
