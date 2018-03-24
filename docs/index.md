@@ -14,7 +14,7 @@ title: Simple Image Viewer
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by [feh](https://feh.finalrewind.org/).
 
 ### Feature:  
-* Multiple viewing styles: 1.Normal view, 2."Windowless" view with slideshow, and 3.Fullscreen view with slideshow.   
+* Multiple viewing styles: 1. Normal window view, 2. "Windowless" view with slideshow, and 3. Fullscreen view with slideshow.   
 * Full keyboard and mouse playback control. 
 * Configurable options with command line parameters and popup menus.  
 
@@ -45,50 +45,50 @@ Image Viewer can be also launched via command-line, meaning other applications o
    
    
 Slideshow interval in seconds (default 4 seconds):  
-` -i 4  `  or ` --interval=4  `   
+`-i 4`  or `--interval=4`   
   
 Slideshow random (default on):  
-  ` -r on  `  or  ` --random=on  `   
-  ` -r off  `  or  ` --random=off  `   
+`-r on`  or  `--random=on`   
+`-r off`  or  `--random=off`   
   
 Slideshow repeat (default on):  
-` -e on `  or  ` --repeat=on `   
-` -e off `  or  ` --repeat=off `   
+`-e on`  or  `--repeat=on`   
+`-e off`  or  `--repeat=off`   
   
 Slideshow start fullscreen (default off):  
-` -f on `  or  ` --fullscreen=on `   
-` -f off `  or  ` --fullscreen=off `   
+`-f on`  or  `--fullscreen=on`   
+`-f off`  or  `--fullscreen=off`   
   
 Slideshow transitional effect (default on):  
-` -t on `  or  ` --effect=on `   
-` -t off `  or  ` --effect=off `   
+`-t on`  or  `--effect=on`   
+`-t off`  or  `--effect=off`   
   
 Picture stretch In (fit to window/screen when the size is bigger than window/screen. default on):  
-` -i on `  or  ` --stretchIn=on `   
-` -i off `  or  ` --stretchIn=off `   
+`-i on`  or  `--stretchIn=on`   
+`-i off`  or  `--stretchIn=off`   
   
 Picture stretch Out (fit to window/screen when the size is smaller than window/screen. default off):  
-` -o on `  or  ` --stretchOut=on `   
-` -o off `  or  ` --stretchOut=off `   
+`-o on`  or  `--stretchOut=on`   
+`-o off`  or  `--stretchOut=off`   
   
 Load pictures in the sub folders as well when manually open a picture (default on):  
-` -u on `  or  ` --includSubFolders=on `   
-` -u off `  or  ` --includSubFolders=off `   
+`-u on`  or  `--includSubFolders=on`   
+`-u off`  or  `--includSubFolders=off`   
   
 Specify a moniter to show fullscreen slideshow (default 0 is the main moniter):  
-` -m 1 `  or  ` --moniter=1 `    
+`-m 1`  or  `--moniter=1`    
   
 stayOnTop  
 Specify window should stay on top (default off):  
-` -y on `  or  ` --stayOnTop=on `   
-` -y off `  or  ` --stayOnTop=off `   
+`-y on`  or  `--stayOnTop=on`   
+`-y off`  or  `--stayOnTop=off`   
 
 Help shows About dialog.  
-` -h `  or  ` --help `   
+`-h`  or  `--help`   
   
    
 #### Command-line Useage example:    
-` $ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\ ` 
+`$ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\` 
 
  
 #### Compiled and tested on:   
