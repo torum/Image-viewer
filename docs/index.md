@@ -45,11 +45,11 @@ Image Viewer can be also launched via command-line, meaning other applications o
    
    
 Slideshow interval in seconds (default 4 seconds):  
-` -i 4`  or ` --interval=4`   
+` -i 4  `  or ` --interval=4  `   
   
 Slideshow random (default on):  
-` -r on`  or  ` --random=on`   
-` -r off`  or  ` --random=off`   
+  ` -r on  `  or  ` --random=on  `   
+  ` -r off  `  or  ` --random=off  `   
   
 Slideshow repeat (default on):  
 ` -e on`  or  ` --repeat=on`   
