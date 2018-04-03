@@ -5,7 +5,7 @@ title: Simple Image Viewer
 
 * [Top page](https://torumyax.github.io/Image-viewer/)
   
-* [Project page](https://github.com/torumyax/Image-viewer)
+* [Github Project page](https://github.com/torumyax/Image-viewer)
   
 
 
