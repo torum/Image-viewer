@@ -17,7 +17,8 @@ title: Simple Image Viewer
 # Image viewer/slideshow (Windows/Linux/Mac)
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by [feh](https://feh.finalrewind.org/).　　
 
-Currently in the process of submitting to the Microsoft Store…　　
+### Download:
+Windows version is [available at the Microsoft Store](https://www.microsoft.com/store/apps/9NNZPQD4WJCK).　　
 
 ### Feature:  
 * Multiple viewing styles: 1. Normal window view, 2. "Windowless" view with slideshow, and 3. Fullscreen view with slideshow.   
