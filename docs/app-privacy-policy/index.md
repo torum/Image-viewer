@@ -3,9 +3,9 @@ layout: default
 title: Simple Image Viewer
 ---
 
-* [Top page](https://torumyax.github.io/Image-viewer/)
+* [Top page](https://torum.github.io/Image-viewer/)
   
-* [Github Project page](https://github.com/torumyax/Image-viewer)
+* [Github Project page](https://github.com/torum/Image-viewer)
   
 
 
