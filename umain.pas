@@ -4,7 +4,7 @@ unit UMain;
 
 {
 Source:
- https://github.com/torumyax/Image-viewer
+ https://github.com/torum/Image-viewer
 
 No extra components required.
 
@@ -44,7 +44,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs, //LCLTranslator,//DefaultTranslator,
+  LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
   strutils, Types, XMLConf{$ifdef windows}, Windows{$endif};
 
 type
@@ -54,6 +54,11 @@ type
   TfrmMain = class(TForm)
     ApplicationProperties1: TApplicationProperties;
     Image1: TImage;
+    MenuItemAbout: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItemBackgroundBlack: TMenuItem;
+    MenuItemBackgroundWhite: TMenuItem;
+    MenuItemBackgroundColor: TMenuItem;
     MenuItemBo8: TMenuItem;
     MenuItemSysAbout: TMenuItem;
     MenuItemSysBo: TMenuItem;
@@ -90,6 +95,9 @@ type
     procedure Image1MouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
     procedure Image1Resize(Sender: TObject);
+    procedure MenuItemAboutClick(Sender: TObject);
+    procedure MenuItemBackgroundBlackClick(Sender: TObject);
+    procedure MenuItemBackgroundWhiteClick(Sender: TObject);
     procedure MenuItemNextClick(Sender: TObject);
     procedure MenuItemBackClick(Sender: TObject);
     procedure MenuItemQuitClick(Sender: TObject);
@@ -122,6 +130,7 @@ type
     FOptRepeat:boolean;
     FOptRandom:boolean;
     FoptStayOnTop:boolean;
+    FoptBackgroundBlack:boolean;
     FOptFileExts:string;
     FOptPlaylistExts:string;
     FOptIncludeSubFolders:boolean;
@@ -222,6 +231,10 @@ resourcestring
 
   resstrOpenPictures = 'Open picture(s)';
 
+  resstrBackground = 'Background Color';
+  resstrBackgroundBlack = 'White';
+  resstrBackgroundWhite = 'Black';
+
 implementation
 
 uses UFullscreen, UAbout;
@@ -237,12 +250,14 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='0.1.2';
+  FstrAppVer:='1.2.2';
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
   self.AlphaBlend:=true;
   self.AlphaBlendValue:=255;
+
+  self.Color:=clBlack;
 
   TimerEffectStart.Enabled:=false;
 
@@ -295,11 +310,14 @@ begin
   MenuItemSlideshow.Caption := resstrFullscreenSlideshow;
   MenuItemQuit.Caption := resstrQuit;
   MenuItemSysAbout.Caption := resstrAbout;
+  MenuItemAbout.Caption := resstrAbout;
   MenuItemSysQuit.Caption := resstrQuit;
 
   OpenPictureDialog1.Title:=resstrOpenPictures;
 
-
+  MenuItemBackgroundColor.Caption:=resstrBackground;
+  MenuItemBackgroundBlack.Caption:=resstrBackgroundBlack;
+  MenuItemBackgroundWhite.Caption:=resstrBackgroundWhite;
 
 
   // Load settings
@@ -329,6 +347,7 @@ begin
   // Don't load FOptMinimulFileSizeKiloByte...  If the size is too large, the list will be empty.
   //FOptMinimulFileSizeKiloByte := XMLConfig.GetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
   FoptStayOnTop := XMLConfig.GetValue('/Opts/StayOnTop',FoptStayOnTop);
+  FoptBackgroundBlack := XMLConfig.GetValue('/Opts/BackgroundBlack',FoptBackgroundBlack);
   FOptIncludeSubFolders := XMLConfig.GetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
   FOptFileExts := string(XMLConfig.GetValue('/Opts/FileExts',widestring(FOptFileExts)));
   FOptPlaylistExts := string(XMLConfig.GetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts)));
@@ -341,8 +360,8 @@ begin
     frmAbout := TfrmAbout.Create(self);
     frmAbout.Caption:=' '+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
     frmAbout.StaticTextAppsVer.Caption := 'Image Viewer' + ' - ' + FstrAppVer;
-    frmAbout.StaticTextWho.Caption := 'by torumyax';
-    frmAbout.StaticTextWebSite.Caption:='https://github.com/torumyax/Image-viewer';
+    frmAbout.StaticTextWho.Caption := 'by torum';
+    frmAbout.StaticTextWebSite.Caption:='https://torum.github.io/Image-viewer/';
     frmAbout.ShowModal;
     Halt;
   end;
@@ -684,6 +703,17 @@ begin
     exit;
   end;
 
+  if FoptBackgroundBlack then
+  begin
+       self.Color:=clBlack;
+       MenuItemBackgroundBlack.Checked:=true;
+       MenuItemBackgroundWhite.Checked:=false;
+  end else
+  begin
+       self.color:=clWhite;  
+       MenuItemBackgroundBlack.Checked:=false;
+       MenuItemBackgroundWhite.Checked:=true;
+  end;
 
   {$ifdef windows}
   // System TrayIcon
@@ -800,6 +830,7 @@ begin
     begin
 
       frmFullscreen := TfrmFullscreen.create(self);
+      frmFullscreen.Color := self.color;
       frmFullscreen.ShowModal;
 
       // When returned (frmFullscreen is closed), self close.
@@ -842,6 +873,7 @@ begin
     XMLConfig.SetValue('/Opts/Moniter',FOptIntMoniter);
     XMLConfig.SetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
     XMLConfig.SetValue('/Opts/StayOnTop',FoptStayOnTop);
+    XMLConfig.SetValue('/Opts/BackgroundBlack',FoptBackgroundBlack);
     XMLConfig.SetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
     XMLConfig.SetValue('/Opts/FileExts',widestring(FOptFileExts));
     XMLConfig.SetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts));
@@ -885,6 +917,7 @@ begin
 
     frmFullscreen := TfrmFullscreen.create(self);
     frmFullScreen.StartWith:=FiCurrentFileIndex;
+    frmFullscreen.Color := self.color;
     // Show full screen.
     frmFullscreen.ShowModal;
 
@@ -1016,6 +1049,31 @@ begin
     end;
 end;
 
+procedure TfrmMain.MenuItemAboutClick(Sender: TObject);
+begin
+  MenuItemSysAboutClick(Sender);
+end;
+
+procedure TfrmMain.MenuItemBackgroundBlackClick(Sender: TObject);
+begin
+
+  FoptBackgroundBlack:=true;
+  self.Color:=clBlack;
+  MenuItemBackgroundBlack.Checked:=true;
+  MenuItemBackgroundWhite.Checked:=false;
+
+end;
+
+procedure TfrmMain.MenuItemBackgroundWhiteClick(Sender: TObject);
+begin
+                                        
+  FoptBackgroundBlack:=false;
+  self.Color:=clWhite;
+  MenuItemBackgroundBlack.Checked:=false;
+  MenuItemBackgroundWhite.Checked:=true;
+
+end;
+
 procedure TfrmMain.Image1DblClick(Sender: TObject);
 begin
   if FisInFrame then
@@ -1065,6 +1123,7 @@ begin
 
       frmFullscreen := TfrmFullscreen.create(self);
       frmFullScreen.StartWith:=FiCurrentFileIndex;
+      frmFullscreen.Color := self.color;
       frmFullscreen.ShowModal;
 
       // DoneFullscreen will be called here.
@@ -1209,6 +1268,7 @@ begin
     Image1.Visible:=false;
     frmFullscreen := TfrmFullscreen.create(self);
     frmFullScreen.StartWith:=FiCurrentFileIndex;
+    frmFullscreen.Color := self.color;
     frmFullscreen.Parent := self;
     // Set main form popup.
     self.PopupMenu:= frmFullscreen.PopupMenu;
@@ -1487,8 +1547,8 @@ begin
     frmAbout.Caption:=' '+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
 
     frmAbout.StaticTextAppsVer.Caption := 'Image Viewer' + ' - ' + FstrAppVer;
-    frmAbout.StaticTextWho.Caption := 'by torumyax';
-    frmAbout.StaticTextWebSite.Caption:='https://github.com/torumyax/Image-viewer';
+    frmAbout.StaticTextWho.Caption := 'by torum';
+    frmAbout.StaticTextWebSite.Caption:='https://torum.github.io/Image-viewer/';
 
     frmAbout.ShowModal;
     // No need to free. closeAction caFree.

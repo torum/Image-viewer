@@ -1011,7 +1011,7 @@ object frmAbout: TfrmAbout
     Height = 21
     Top = 180
     Width = 351
-    Caption = 'https://github.com/torumyax/'
+    Caption = 'https://torum.github.io/Image-viewer/'
     OnClick = StaticTextWebSiteClick
     OnMouseEnter = StaticTextWebSiteMouseEnter
     OnMouseLeave = StaticTextWebSiteMouseLeave

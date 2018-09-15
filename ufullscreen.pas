@@ -62,8 +62,7 @@ type
     procedure Image1DblClick(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure Image1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer
-      );
+    procedure Image1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure Image1MouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure MenuItemStartClick(Sender: TObject);

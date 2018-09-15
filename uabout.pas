@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, lclintf;
+  StdCtrls, lclintf, Menus;
 
 type
 
@@ -42,6 +42,7 @@ implementation
 
 procedure TfrmAbout.StaticTextWebSiteClick(Sender: TObject);
 begin
+  // APPX MS STORE doesn't like shellexecute,but...
   OpenURL(StaticTextWebSite.Caption);
 end;
 

@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 954
+  Left = 1376
   Height = 301
-  Top = 203
+  Top = 464
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 0
@@ -19,7 +19,7 @@ object frmMain: TfrmMain
   OnShow = FormShow
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object Image1: TImage
     Left = 0
     Height = 301
@@ -10185,6 +10185,17 @@ object frmMain: TfrmMain
       Caption = 'Stay on top'
       OnClick = MenuItemStayOnTopClick
     end
+    object MenuItemBackgroundColor: TMenuItem
+      Caption = 'Background Color'
+      object MenuItemBackgroundBlack: TMenuItem
+        Caption = 'Black'
+        OnClick = MenuItemBackgroundBlackClick
+      end
+      object MenuItemBackgroundWhite: TMenuItem
+        Caption = 'White'
+        OnClick = MenuItemBackgroundWhiteClick
+      end
+    end
     object MenuItemBo8: TMenuItem
       Caption = '-'
     end
@@ -10197,6 +10208,13 @@ object frmMain: TfrmMain
       Caption = 'Fullscreen Slideshow'
       ShortCut = 70
       OnClick = MenuItemSlideshowClick
+    end
+    object MenuItem2: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemAbout: TMenuItem
+      Caption = 'About'
+      OnClick = MenuItemAboutClick
     end
     object MenuItemBo9: TMenuItem
       Caption = '-'

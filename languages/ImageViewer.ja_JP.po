@@ -4,7 +4,7 @@ msgstr "Content-Type: text/plain; charset=UTF-8"
 #: umain.resstrabout
 msgctxt "umain.resstrabout"
 msgid "About"
-msgstr "詳細"
+msgstr "ImageViewerについて"
 
 #: umain.resstrclose
 msgctxt "umain.resstrclose"
@@ -136,6 +136,21 @@ msgstr "インフレーム・スライドショーの開始"
 msgctxt "umain.resstrstayontop"
 msgid "Stay on top"
 msgstr "最前面"
+
+#: umain.resstrbackground
+msgctxt "umain.background"
+msgid "Background Color"
+msgstr "背景色"
+
+#: umain.resstrbackgroundblack
+msgctxt "umain.backgroundblack"
+msgid "Black"
+msgstr "黒"
+
+#: umain.resstrbackgroundwhite
+msgctxt "umain.backgroundwhite"
+msgid "White"
+msgstr "白"
 
 #: umain.resstrstopfullscreenslideshow
 msgctxt "umain.resstrstopfullscreenslideshow"

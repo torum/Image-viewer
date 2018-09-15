@@ -36,10 +36,12 @@ begin
   //Debug Output: 'Lang is jp_JP FallbackLang is jp'
   // What??? It supporsed to be "ja_JP"!!
 
+  //Lang := FallbackLang+'_'+Country;
+
   //LazGetShortLanguageID(Lang);
   //OutputDebugString(PChar(TrimRight( 'Lang is '+ Lang )));
   //Debug Output: 'Lang is jp'
-  // What?
+  // What? not ja?
 
   if (Lang = 'en') or (Lang = 'en_US') or (Lang = 'us')
   or (FallbackLang = 'us') or (FallbackLang = 'US') or (FallbackLang = 'en') then

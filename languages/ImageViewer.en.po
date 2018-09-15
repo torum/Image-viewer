@@ -137,6 +137,21 @@ msgctxt "umain.resstrstayontop"
 msgid "Stay on top"
 msgstr ""
 
+#: umain.resstrbackground
+msgctxt "umain.background"
+msgid "Background Color"
+msgstr ""
+
+#: umain.resstrbackgroundblack
+msgctxt "umain.backgroundblack"
+msgid "Black"
+msgstr ""
+
+#: umain.resstrbackgroundwhite
+msgctxt "umain.backgroundwhite"
+msgid "White"
+msgstr ""
+
 #: umain.resstrstopfullscreenslideshow
 msgctxt "umain.resstrstopfullscreenslideshow"
 msgid "&Stop Fullscreen Slideshow"

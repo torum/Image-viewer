@@ -1,7 +1,7 @@
 object frmFullscreen: TfrmFullscreen
-  Left = 921
+  Left = 1373
   Height = 301
-  Top = 411
+  Top = 501
   Width = 400
   Align = alClient
   AlphaBlend = True
