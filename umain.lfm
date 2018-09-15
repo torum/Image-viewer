@@ -4,11 +4,11 @@ object frmMain: TfrmMain
   Top = 464
   Width = 400
   AlphaBlend = True
-  AlphaBlendValue = 0
+  AlphaBlendValue = 20
   Caption = 'Image Viewer Main'
   ClientHeight = 301
   ClientWidth = 400
-  Color = clBlack
+  Color = clSilver
   DesignTimePPI = 120
   OnActivate = FormActivate
   OnCloseQuery = FormCloseQuery

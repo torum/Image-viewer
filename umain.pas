@@ -148,6 +148,7 @@ type
     FOrigWndState: TWindowState;
     FiCurrentFileIndex:integer;
     FstrAppVer:string;
+    FstrInitialSelectedImageFile:string;
     procedure ShowFullScreen(blnOn: boolean);
     procedure SetFullScreen_Universal(blnOn: boolean);
     procedure SetFullScreen_Win32(blnOn: boolean);
@@ -250,14 +251,12 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.2';
+  FstrAppVer:='1.2.3';
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
   self.AlphaBlend:=true;
   self.AlphaBlendValue:=255;
-
-  self.Color:=clBlack;
 
   TimerEffectStart.Enabled:=false;
 
@@ -298,6 +297,7 @@ begin
   if Screen.MonitorCount < 1 then
     FOptIntMoniter:=0;
 
+  FstrInitialSelectedImageFile :='';
 
   // i18n
   MenuItemNext.Caption := resstrPlaybackNext;
@@ -557,6 +557,8 @@ begin
           if f >= (FOptMinimulFileSizeKiloByte * 1024) then
           begin
             FstFileList.Add(ParamStr(I));
+            //
+            FstrInitialSelectedImageFile := ParamStr(I);
           end;
         end;
       end else if (FstPlaylistExtList.IndexOf(LowerCase(ExtractFileExt(ParamStr(I)))) >= 0) then
@@ -621,7 +623,7 @@ begin
   // open the ploylist and add its contents to the filelist.
 
 
-  if (FstFileList.Count < 1) then
+  if ((FstFileList.Count < 1) and (FstrInitialSelectedImageFile = '')) then
   begin
     // No files are provided in the parameter string, so open "file open" dialog.
     OpenPictureDialog1.Title:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'')+' - ' + resstrOpenPictures;
@@ -638,6 +640,11 @@ begin
             // Check file size.
             if f >= (FOptMinimulFileSizeKiloByte * 1024) then
             begin
+              //FstFileList.Add(OpenPictureDialog1.Files[i]);
+              if (i=0) then
+              begin
+                FstrInitialSelectedImageFile:=OpenPictureDialog1.Files[i];
+              end;
               FstFileList.Add(OpenPictureDialog1.Files[i]);
             end;
           end;
@@ -656,9 +663,11 @@ begin
 
   // If only one image was selected, add all siblings automatically.
   // "send to" command-line parameters don't accept more than 255.
-  if FstFileList.Count = 1 then
+  //if FstFileList.Count = 1 then
+  if ((FstFileList.Count = 1) and (FstrInitialSelectedImageFile <> '')) then
   begin
     fileFolder:=ReplaceStr(FstFileList[0],ExtractFileName(FstFileList[0]),'');
+    //fileFolder:=ReplaceStr(FstrInitialSelectedImageFile,ExtractFileName(FstrInitialSelectedImageFile),'');
     // Create search mask
     fileSearchMask:='';
     for i:=0 to FstFileExtList.Count-1 do
@@ -686,12 +695,21 @@ begin
             begin
               FstFileList.Add(folderfiles[j]);
             end;
+          end else
+          begin
+            // remove firest selected and add to list so that file order is right.
+            FstFileList.Delete(0);
+            FstFileList.Add(folderfiles[j]);
           end;
         end;
       end;
     finally
       folderfiles.Free;
     end;
+
+    //if (FstFileList.count = 0) then
+    //   FstFileList.Add(FstrInitialSelectedImageFile);
+
     // Since automatically added, do not start slideshow at fullscreen later.
     FisSingleFileSelected:=true;
   end;
@@ -751,8 +769,17 @@ begin
     self.AlphaBlend:=true;
     self.AlphaBlendValue:=255;
     self.Image1.Visible:=true;
-    // Start with 0
-    FiCurrentFileIndex:=0;
+
+    if (FstFileList.indexOf(FstrInitialSelectedImageFile) > -1) then
+    begin
+      FiCurrentFileIndex:=FstFileList.indexof(FstrInitialSelectedImageFile);
+    end else
+    begin
+      // Start with 0
+      FiCurrentFileIndex:=0;
+    end;
+
+
     // Show.
     FisStartNormal := true;
     self.Show;
