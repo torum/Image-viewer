@@ -16,11 +16,7 @@ Compiled and tested on
  macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
 TODO:
- - priority 1 -
- UWP packaging.
- - priority 2 -
  load playlist.
- - priority 3 -
  more Command line options.
  file drop handling(win).
  preLoading image for slideshow.
@@ -251,7 +247,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.3';
+  FstrAppVer:='1.2.4';
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
