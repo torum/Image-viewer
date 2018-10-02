@@ -1,3 +1,8 @@
 
 ImageViewer.lps
 files/PackageFiles/AppxManifest.xml
+/*.exe
+/backup
+/lib
+backup
+*.lrj
