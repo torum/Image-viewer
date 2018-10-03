@@ -51,6 +51,10 @@ begin
   or (FallbackLang = 'jp') or (FallbackLang = 'JP') or (FallbackLang = 'ja') then
     Lang := 'ja_JP';
 
+  if (Lang = 'ru') or (Lang = 'ru_RU') or (Lang = 'RU')
+  or (FallbackLang = 'ru') or (FallbackLang = 'RU') then
+    Lang := 'ru_RU';
+
   SetDefaultLang(Lang,'',false);
 
 end;

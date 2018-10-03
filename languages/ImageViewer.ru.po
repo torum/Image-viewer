@@ -1,0 +1,184 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: umain.resstrabout
+msgctxt "umain.resstrabout"
+msgid "About"
+msgstr "О программе"
+
+#: umain.resstrclose
+msgctxt "umain.resstrclose"
+msgid "&Close"
+msgstr "Закрыть"
+
+#: umain.resstreffect
+msgctxt "umain.resstreffect"
+msgid "&Effect"
+msgstr "Эффект"
+
+#: umain.resstrfilter
+msgctxt "umain.resstrfilter"
+msgid "&Filter"
+msgstr "Фильтр"
+
+#: umain.resstrfilterfilesize
+msgctxt "umain.resstrfilterfilesize"
+msgid "File size"
+msgstr "Размер файла"
+
+#: umain.resstrfullscreenslideshow
+msgctxt "umain.resstrfullscreenslideshow"
+msgid "Fullscreen Slideshow"
+msgstr "Полноэкранное слайд-шоу"
+
+#: umain.resstrfullscreenview
+msgid "&Fullscreen View"
+msgstr "Полноэкранный просмотр"
+
+#: umain.resstrinframeslideshow
+msgctxt "umain.resstrinframeslideshow"
+msgid "InFrame Slideshow"
+msgstr "Слайд-шоу без рамок"
+
+#: umain.resstrinframeview
+msgid "&InFrame View"
+msgstr "Просмотр без рамок"
+
+#: umain.resstrinterval
+msgctxt "umain.resstrinterval"
+msgid "&Interval"
+msgstr "Интервал"
+
+#: umain.resstrleavefullscreen
+msgctxt "umain.resstrleavefullscreen"
+msgid "&Leave Fullscreen"
+msgstr "Выйти из полноэкранного просмотра"
+
+#: umain.resstrleaveinframe
+msgctxt "umain.resstrleaveinframe"
+msgid "&Leave InFrame"
+msgstr "Выйти из режима без рамок"
+
+#: umain.resstrminute
+msgctxt "umain.resstrminute"
+msgid "minute"
+msgstr "минута"
+
+#: umain.resstrminutes
+msgctxt "umain.resstrminutes"
+msgid "minutes"
+msgstr "минут"
+
+#: umain.resstrmoniter
+msgctxt "umain.resstrmoniter"
+msgid "Moniter"
+msgstr "Экран"
+
+#: umain.resstrmoniters
+msgctxt "umain.resstrmoniters"
+msgid "&Moniters"
+msgstr "Экраны"
+
+#: umain.resstrplayback
+msgctxt "umain.resstrplayback"
+msgid "&Playback"
+msgstr "Воспроизвести"
+
+#: umain.resstrplaybacknext
+msgctxt "umain.resstrplaybacknext"
+msgid "&Next"
+msgstr "Следующее"
+
+#: umain.resstrplaybackpause
+msgctxt "umain.resstrplaybackpause"
+msgid "Pau&se"
+msgstr "Пауза"
+
+#: umain.resstrplaybackprevious
+msgctxt "umain.resstrplaybackprevious"
+msgid "&Back"
+msgstr "Предыдущее"
+
+#: umain.resstrquit
+msgctxt "umain.resstrquit"
+msgid "&Quit"
+msgstr "Выход"
+
+#: umain.resstrrandom
+msgctxt "umain.resstrrandom"
+msgid "Ran&dom"
+msgstr "Случайное"
+
+#: umain.resstrrepeat
+msgctxt "umain.resstrrepeat"
+msgid "Repe&at"
+msgstr "Повторить"
+
+#: umain.resstrsecond
+msgctxt "umain.resstrsecond"
+msgid "second"
+msgstr "секунда"
+
+#: umain.resstrseconds
+msgctxt "umain.resstrseconds"
+msgid "seconds"
+msgstr "секунд"
+
+#: umain.resstrstartfullscreenslideshow
+msgid "Start &Fullscreen Slideshow"
+msgstr "Начать полноэкранное слайд-шоу"
+
+#: umain.resstrstartinframeslideshow
+msgid "Start &InFrame Slideshow"
+msgstr "Начать слайд-шоу в режиме без рамок"
+
+#: umain.resstrstayontop
+msgctxt "umain.resstrstayontop"
+msgid "Stay on top"
+msgstr "Оставаться на переднем плане"
+
+#: umain.resstrbackground
+msgctxt "umain.background"
+msgid "Background Color"
+msgstr "Цвет фона"
+
+#: umain.resstrbackgroundblack
+msgctxt "umain.backgroundblack"
+msgid "Black"
+msgstr "Черный"
+
+#: umain.resstrbackgroundwhite
+msgctxt "umain.backgroundwhite"
+msgid "White"
+msgstr "Белый"
+
+#: umain.resstrstopfullscreenslideshow
+msgctxt "umain.resstrstopfullscreenslideshow"
+msgid "&Stop Fullscreen Slideshow"
+msgstr "Остановить слайд-шоу"
+
+#: umain.resstrstopinframeslideshow
+msgctxt "umain.resstrstopinframeslideshow"
+msgid "&Stop InFrame Slideshow"
+msgstr "Остановить слайд-шоу"
+
+#: umain.resstrstretch
+msgctxt "umain.resstrstretch"
+msgid "Stretch"
+msgstr "Растянуть"
+
+#: umain.resstrstretchin
+msgctxt "umain.resstrstretchin"
+msgid "In (big->screen)"
+msgstr "Вписать изображение в окно (уменьшить)"
+
+#: umain.resstrstretchout
+msgctxt "umain.resstrstretchout"
+msgid "Out (small->screen)"
+msgstr "Вписать изображение в окно (увеличить)"
+
+#: umain.resstropenpictures
+msgctxt "umain.resstropenpictures"
+msgid "Open picture(s)"
+msgstr "Открыть изображения"
+
