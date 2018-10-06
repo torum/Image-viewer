@@ -71,3 +71,8 @@ Image Viewer can be launched via command-line, and applications or scripts can a
 * Ubuntu 16.04 LTS (64bit): Lazarus 1.9.0 trunk, FPC 3.0.4
 * macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
 * macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
+
+
+#### Contributers
+Russian translation (Nemo08)
+https://github.com/Nemo08
