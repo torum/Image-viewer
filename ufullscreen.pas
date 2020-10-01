@@ -391,6 +391,11 @@ begin
     frmMain.DoneFullscreen(FstrCurr);
   end;
 
+  // Re-enabling the Screensaver
+  {$IFDEF Windows}
+  SetThreadExecutionState(ES_CONTINUOUS);
+  {$ENDIF}
+
   //ShowFullScreen(false);
 end;
 

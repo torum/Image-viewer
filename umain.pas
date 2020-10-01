@@ -245,7 +245,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.7';
+  FstrAppVer:='1.2.9';
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
