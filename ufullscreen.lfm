@@ -24,7 +24,7 @@ object frmFullscreen: TfrmFullscreen
   OnShow = FormShow
   PopupMenu = PopupMenu1
   Position = poOwnerFormCenter
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object Image1: TImage
     Left = 0
     Height = 301

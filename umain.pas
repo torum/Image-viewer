@@ -188,8 +188,6 @@ var
   frmMain: TfrmMain;
 
 resourcestring
-
-
   resstrStretch = 'Stretch';
   resstrStretchIn = 'In (big->screen)';
   resstrStretchOut = 'Out (small->screen)';
@@ -247,7 +245,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.4';
+  FstrAppVer:='1.2.7';
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
@@ -944,6 +942,9 @@ begin
     // Show full screen.
     frmFullscreen.ShowModal;
 
+    if (self.top < 0) then self.top := 0;
+    if (self.left < 0) then self.left := 0;
+
     // Returned from fullscreen
     if FisStartNormal then
     begin
@@ -1154,6 +1155,8 @@ begin
       Image1.Visible:=true;
       ShowFullScreen(false);
       Screen.Cursor:=crDefault;
+      if (self.top < 0) then self.top := 0;
+      if (self.left < 0) then self.left := 0;
     end;
 
   end;
@@ -1233,7 +1236,7 @@ begin
     // Restore main form popup.
     self.PopupMenu:= PopupMenuMain;
 
-   // Must be here. Otherwise one pic fullscreen hangs.
+    // Must be here. Otherwise one pic fullscreen hangs.
     if FileList.Count <= 1 then exit;
     if strCurr <> '' then
     begin
@@ -1245,12 +1248,20 @@ begin
       end;
     end;
     Screen.Cursor:=crDefault; //again
+
+    if (self.top < 0) then self.top := 0;
+    if (self.left < 0) then self.left := 0;
   end;
 end;
 
 procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
-{$ifdef windows}{$else}var
-  Form: TForm;{$endif}
+{$ifdef windows}
+var
+  titlebarheight:integer;
+{$else}
+var
+  Form: TForm;
+{$endif}
 begin
   if Fisfullscreen then exit;
   //if FileList.Count <= 1 then exit;
@@ -1274,6 +1285,8 @@ begin
     FOrigBounds:= BoundsRect;
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
+    titlebarheight:=GetSystemMetrics(SM_CYCAPTION);
+    self.height := self.height + titlebarheight;
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
       self.BorderStyle:=bsNone;
@@ -1305,8 +1318,11 @@ begin
 end;
 
 procedure TfrmMain.DoneInFrame(strCurr :string);
-var{$ifdef windows}{$else}
-  Form: TForm;{$endif}
+var
+  {$ifdef windows}
+  {$else}
+  Form: TForm;
+  {$endif}
   i:integer;
 begin
   FisInFrame:=false;
@@ -1317,6 +1333,8 @@ begin
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
+  if (self.top <= 0) then self.top := 0;
+  if (self.left <= 0) then self.left := 0;
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsSizeable;
@@ -1347,6 +1365,8 @@ begin
   Image1.Refresh;
   Image1.BringToFront;
   screen.Cursor:=crDefault;
+  if (self.top < 0) then self.top := 0;
+  if (self.left < 0) then self.left := 0;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);

@@ -159,6 +159,10 @@ type
     property StartWith: integer write FiStartWith;
   end;
 
+  {$ifdef windows}
+  function SetThreadExecutionState(esFlags: DWORD): DWORD; stdcall external 'kernel32.dll';
+  {$endif}
+
 var
   frmFullscreen: TfrmFullscreen;
 
@@ -168,6 +172,10 @@ uses UMain;
 
 {$R *.lfm}
 
+const
+  ES_SYSTEM_REQUIRED  = $00000001;
+  ES_DISPLAY_REQUIRED = $00000002;
+  ES_CONTINUOUS       = $80000000;
 
 procedure TfrmFullscreen.FormCreate(Sender: TObject);
 var
@@ -434,14 +442,18 @@ procedure TfrmFullscreen.PlaybackPlay(preLoad:boolean);
 var
   i,iNext:integer;
 begin
-
-  //TODO if preLoad,
-
-  TimerInterval.Enabled:=false; //just in case.
+  // TODO preLoading...
 
   {$ifdef Mydebug}
   OutputDebugString(PChar(TrimRight( 'PlaybackPlay:id '+ intToStr(TimerInterval.Tag) )));
   {$endif}
+
+  // Disabling the Screensaver
+  {$IFDEF Windows}
+  SetThreadExecutionState(ES_DISPLAY_REQUIRED or ES_SYSTEM_REQUIRED or ES_CONTINUOUS);
+  {$ENDIF}
+
+  TimerInterval.Enabled:=false; //just in case.
 
   i:=TimerInterval.Tag;
   if ValidateFileIndex(i) then
@@ -568,6 +580,11 @@ procedure TfrmFullscreen.PlaybackPause();
 begin
   // Toggle playback pause/start
   if FIsSlideshowPlaying then begin
+
+    // Re-enabling the Screensaver
+    {$IFDEF Windows}
+    SetThreadExecutionState(ES_CONTINUOUS);
+    {$ENDIF}
 
     if FManualTransition then
     begin
@@ -819,7 +836,6 @@ begin
   end;
 end;
 
-
 procedure TfrmFullscreen.DisplayError(id:integer;message:string);
 var
   strFilePath:string;
@@ -934,7 +950,6 @@ begin
     PlaybackPlay(false);
   end;
 end;
-
 
 procedure TfrmFullscreen.TimerFadeOutTimer(Sender: TObject);
 begin
@@ -1605,7 +1620,6 @@ begin
   }
 end;
 
-
 procedure TfrmFullscreen.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
@@ -1645,6 +1659,9 @@ begin
   begin
     self.BoundsRect := self.Parent.ClientRect;
   end;
+
+  if (self.top < 0) then self.top := 0;
+  if (self.left < 0) then self.left := 0;
 end;
 
 procedure TfrmFullscreen.ShowFullScreen(blnOn: boolean);
