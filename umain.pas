@@ -245,7 +245,8 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.9';
+  FstrAppVer:='1.2.10';
+
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
   self.Visible:=false;
@@ -268,7 +269,7 @@ begin
   FOptIntervalIntSeconds:=4;
   FOptRandom:=true;
   FOptRepeat:=true;
-  FOptFileExts:='.jpg;.jpeg;.jpe;.png;.gif';
+  FOptFileExts:='.jpg;.jpeg;.png;.gif'; //'.jpg;.jpeg;.jpe;.png;.gif';
   FOptPlaylistExts:='.m3u;.xspf';
   FOptIncludeSubFolders:=true;
   // Be carefull when settings this. If the size is too large, the list will be empty.
@@ -351,13 +352,15 @@ begin
   if Application.HasOption('h', 'help') then
   begin
     // -h is a short option. The long form is the --help
-    frmAbout := TfrmAbout.Create(self);
-    frmAbout.Caption:=' '+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
-    frmAbout.StaticTextAppsVer.Caption := 'Image Viewer' + ' - ' + FstrAppVer;
-    frmAbout.StaticTextWho.Caption := 'by torum';
-    frmAbout.StaticTextWebSite.Caption:='https://torum.github.io/Image-viewer/';
-    frmAbout.ShowModal;
-    Halt;
+
+    // handled at .lpr
+    //frmAbout := TfrmAbout.Create(self);
+    //frmAbout.Caption:=' '+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
+    //frmAbout.StaticTextAppsVer.Caption := 'Image Viewer' + ' - ' + FstrAppVer;
+    //frmAbout.StaticTextWho.Caption := 'by torum';
+    //frmAbout.StaticTextWebSite.Caption:='https://torum.github.io/Image-viewer/';
+    //frmAbout.ShowModal;
+    //Halt;
   end;
   // "-o off" or "--option=off" on/off for a boolean value.
   if Application.HasOption('i', 'interval') then
@@ -410,12 +413,12 @@ begin
       FOptTransitEffect:=false;
     end;
   end;
-  if Application.HasOption('i', 'stretchIn') then
+  if Application.HasOption('n', 'stretchIn') then
   begin
-    if (LowerCase(Application.GetOptionValue('i', 'stretchIn')) = 'on') then
+    if (LowerCase(Application.GetOptionValue('n', 'stretchIn')) = 'on') then
     begin
       FOptFit:=true;
-    end else if (LowerCase(Application.GetOptionValue('i', 'stretchIn')) = 'off') then
+    end else if (LowerCase(Application.GetOptionValue('n', 'stretchIn')) = 'off') then
     begin
       FOptFit:=false;
     end;

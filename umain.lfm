@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 1376
+  Left = 2244
   Height = 301
-  Top = 464
+  Top = 1136
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 20
@@ -19,7 +19,7 @@ object frmMain: TfrmMain
   OnShow = FormShow
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.0.10.0'
   object Image1: TImage
     Left = 0
     Height = 301
@@ -40,8 +40,8 @@ object frmMain: TfrmMain
     Enabled = False
     Interval = 1
     OnTimer = TimerEffectStartTimer
-    left = 176
-    top = 128
+    Left = 176
+    Top = 128
   end
   object TrayIcon1: TTrayIcon
     PopUpMenu = PopupMenuSystem
@@ -9412,13 +9412,13 @@ object frmMain: TfrmMain
       426082
     }
     OnDblClick = TrayIcon1DblClick
-    left = 353
-    top = 248
+    Left = 353
+    Top = 248
   end
   object PopupMenuMain: TPopupMenu
     OnPopup = PopupMenuMainPopup
-    left = 248
-    top = 128
+    Left = 248
+    Top = 128
     object MenuItemNext: TMenuItem
       Caption = 'Next'
       ShortCut = 39
@@ -9496,27 +9496,27 @@ object frmMain: TfrmMain
     ExceptionDialog = aedOkMessageBox
     ShowMainForm = False
     OnException = ApplicationProperties1Exception
-    left = 353
-    top = 16
+    Left = 353
+    Top = 16
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Title = 'Open picture(s)'
     Filter = 'Graphic (*.jpeg;*.jpg;*.jpe;*.png;*.gif)|*.jpeg;*.jpg;*.jpe;*.png;*.gif|Portable Network Graphic (*.png)|*.png|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Graphics Interchange Format (*.gif)|*.gif'
     Options = [ofAllowMultiSelect, ofFileMustExist, ofNoTestFileCreate, ofEnableSizing, ofDontAddToRecent, ofAutoPreview]
-    left = 64
-    top = 24
+    Left = 64
+    Top = 24
   end
   object XMLConfig: TXMLConfig
     StartEmpty = False
     RootName = 'Application'
     ReadOnly = False
-    left = 105
-    top = 208
+    Left = 105
+    Top = 208
   end
   object PopupMenuSystem: TPopupMenu
     OnPopup = PopupMenuSystemPopup
-    left = 288
-    top = 248
+    Left = 288
+    Top = 248
     object MenuItemSysAbout: TMenuItem
       Caption = 'About'
       OnClick = MenuItemSysAboutClick
