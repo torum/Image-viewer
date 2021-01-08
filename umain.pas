@@ -16,10 +16,10 @@ Compiled and tested on
  macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
 TODO:
+ preLoading image for slideshow.
  load playlist.
  more Command line options.
  file drop handling(win).
- preLoading image for slideshow.
  OS's power-save event aware.
  Modal dialog with options and playlist edit tab (drag & drop files).
 
@@ -41,7 +41,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
-  strutils, Types, XMLConf{$ifdef windows}, Windows{$endif};
+  strutils, Types, XMLConf{$ifdef windows}, windirs, Windows{$endif};
 
 type
 
@@ -145,6 +145,7 @@ type
     FiCurrentFileIndex:integer;
     FstrAppVer:string;
     FstrInitialSelectedImageFile:string;
+    FstrInitialDir:string;
     procedure ShowFullScreen(blnOn: boolean);
     procedure SetFullScreen_Universal(blnOn: boolean);
     procedure SetFullScreen_Win32(blnOn: boolean);
@@ -245,7 +246,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.10';
+  FstrAppVer:='1.2.12';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -269,7 +270,7 @@ begin
   FOptIntervalIntSeconds:=4;
   FOptRandom:=true;
   FOptRepeat:=true;
-  FOptFileExts:='.jpg;.jpeg;.png;.gif'; //'.jpg;.jpeg;.jpe;.png;.gif';
+  FOptFileExts:='.jpg;.jpeg;.jpe;.png;.gif'; //'.jpg;.jpeg;.jpe;.png;.gif';
   FOptPlaylistExts:='.m3u;.xspf';
   FOptIncludeSubFolders:=true;
   // Be carefull when settings this. If the size is too large, the list will be empty.
@@ -294,6 +295,13 @@ begin
 
   FstrInitialSelectedImageFile :='';
 
+  {$ifdef windows}
+  FstrInitialDir := GetWindowsSpecialDir(CSIDL_MYPICTURES);
+  {$else}
+  // TODO:
+  FstrInitialDir := '';
+  {$endif}
+
   // i18n
   MenuItemNext.Caption := resstrPlaybackNext;
   MenuItemBack.Caption := resstrPlaybackPrevious;
@@ -313,7 +321,6 @@ begin
   MenuItemBackgroundColor.Caption:=resstrBackground;
   MenuItemBackgroundBlack.Caption:=resstrBackgroundBlack;
   MenuItemBackgroundWhite.Caption:=resstrBackgroundWhite;
-
 
   // Load settings
   if ForceDirectories(GetAppConfigDir(false)) then
@@ -347,6 +354,8 @@ begin
   FOptFileExts := string(XMLConfig.GetValue('/Opts/FileExts',widestring(FOptFileExts)));
   FOptPlaylistExts := string(XMLConfig.GetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts)));
   FOptIntervalIntSeconds := XMLConfig.GetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
+
+  FstrInitialDir := string(XMLConfig.GetValue('/InitDir/Path',widestring(FstrInitialDir)));
 
   // Command line parameters
   if Application.HasOption('h', 'help') then
@@ -551,7 +560,7 @@ begin
         begin
           f:= FileSize(ParamStr(I));
           // Check file size.
-          if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+          if f >= (FOptMinimulFileSizeKiloByte) then
           begin
             FstFileList.Add(ParamStr(I));
             //
@@ -603,7 +612,7 @@ begin
           begin
             f:= FileSize(folderfiles[j]);
             // Check file size.
-            if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+            if f >= (FOptMinimulFileSizeKiloByte) then
             begin
               FstFileList.Add(folderfiles[j]);
             end;
@@ -623,7 +632,12 @@ begin
   if ((FstFileList.Count < 1) and (FstrInitialSelectedImageFile = '')) then
   begin
     // No files are provided in the parameter string, so open "file open" dialog.
+
+    // Sets default dir
+    OpenPictureDialog1.InitialDir:=FstrInitialDir;
+    // Sets title
     OpenPictureDialog1.Title:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'')+' - ' + resstrOpenPictures;
+    // Open dialog
     if OpenPictureDialog1.Execute then
     begin
       for i:=0 to OpenPictureDialog1.Files.Count -1 do
@@ -635,12 +649,14 @@ begin
           begin
             f:= FileSize(OpenPictureDialog1.Files[i]);
             // Check file size.
-            if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+            if f >= (FOptMinimulFileSizeKiloByte) then
             begin
               //FstFileList.Add(OpenPictureDialog1.Files[i]);
               if (i=0) then
               begin
                 FstrInitialSelectedImageFile:=OpenPictureDialog1.Files[i];
+                // sets init dir for next time.
+                FstrInitialDir := ExtractFilePath(OpenPictureDialog1.Files[i]);
               end;
               FstFileList.Add(OpenPictureDialog1.Files[i]);
             end;
@@ -665,6 +681,10 @@ begin
   begin
     fileFolder:=ReplaceStr(FstFileList[0],ExtractFileName(FstFileList[0]),'');
     //fileFolder:=ReplaceStr(FstrInitialSelectedImageFile,ExtractFileName(FstrInitialSelectedImageFile),'');
+
+    // sets init dir for next time.
+    FstrInitialDir := ExtractFilePath(FstFileList[0]);
+
     // Create search mask
     fileSearchMask:='';
     for i:=0 to FstFileExtList.Count-1 do
@@ -688,7 +708,7 @@ begin
           begin
             f:= FileSize(folderfiles[j]);
             // Check file size.
-            if f >= (FOptMinimulFileSizeKiloByte * 1024) then
+            if f >= (FOptMinimulFileSizeKiloByte) then
             begin
               FstFileList.Add(folderfiles[j]);
             end;
@@ -902,6 +922,9 @@ begin
     XMLConfig.SetValue('/Opts/FileExts',widestring(FOptFileExts));
     XMLConfig.SetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts));
     XMLConfig.SetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
+
+    XMLConfig.SetValue('/InitDir/Path',widestring(FstrInitialDir));
+
   end;
 end;
 
@@ -1288,7 +1311,7 @@ begin
     FOrigBounds:= BoundsRect;
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
-    titlebarheight:=GetSystemMetrics(SM_CYCAPTION);
+    titlebarheight:=GetSystemMetrics(SM_CYCAPTION) + 9;
     self.height := self.height + titlebarheight;
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0

@@ -12,6 +12,9 @@ uses
 
 {$R *.res}
 
+var
+  ShowHelp:boolean;
+
 procedure TranslateLCL;
 var
   Lang,FallbackLang: String;
@@ -59,18 +62,27 @@ begin
 
 end;
 
+procedure CheckAppParam;
+begin
+  if (ParamCount > 0) then
+  begin
+    if ((ParamStr(1) = '-h') or (ParamStr(1) = '--help') or (ParamStr(1) = '/?')) then
+    begin
+       ShowHelp := true;
+    end;
+  end;
+end;
+
 
 begin
+  CheckAppParam;
 
-  if (Application.ParamCount > 0) then
+  if (ShowHelp) then
   begin
-    if ((Application.Params[0] = '-h') or (Application.Params[0] = '--help') or (Application.Params[0] = '/?')) then
-    begin
-
       // This creates a NEW console window.
       // In order to write to original cosole is to compile as a console application
       // using ($APPTYPE CONSOLE) or -WG compile/linking option.
-      // However, if you do, you get a console window with a normal form window when execute...
+      // However, if you do, you get a console window WITH a normal form window ...
       {$ifdef windows}
       AllocConsole;      // in Windows unit
       {$endif}
@@ -102,10 +114,9 @@ begin
       Application.ShowMainForm := False;
       Application.Run;
 
-    end;
-
   end else
   begin
+
     TranslateLCL;
     Application.Scaled:=True;
     RequireDerivedFormResource:=True;
@@ -113,6 +124,7 @@ begin
     Application.ShowMainForm := False;
     Application.CreateForm(TfrmMain, frmMain);
     Application.Run;
+
   end;
 
 end.
