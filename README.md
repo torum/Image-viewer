@@ -37,8 +37,8 @@ Image Viewer can be launched via command-line, and applications or scripts can a
 `-t off`  or  `--effect=off`   
   
 - Picture stretch In (fit to window/screen when the size is bigger than window/screen. default on):  
-`-i on`  or  `--stretchIn=on`   
-`-i off`  or  `--stretchIn=off`   
+`-n on`  or  `--stretchIn=on`   
+`-n off`  or  `--stretchIn=off`   
   
 - Picture stretch Out (fit to window/screen when the size is smaller than window/screen. default off):  
 `-o on`  or  `--stretchOut=on`   
