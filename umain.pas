@@ -246,7 +246,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.13';
+  FstrAppVer:='1.2.14';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -637,7 +637,12 @@ begin
   if ((FstFileList.Count < 1) and (FstrInitialSelectedImageFile = '')) then
   begin
     // No files are provided in the parameter string, so open "file open" dialog.
-
+    {$ifdef windows}
+    if not (DirectoryExists(FstrInitialDir)) then
+    begin
+         FstrInitialDir := GetWindowsSpecialDir(CSIDL_MYPICTURES);
+    end;
+    {$endif}
     // Sets default dir
     OpenPictureDialog1.InitialDir:=FstrInitialDir;
     // Sets title
@@ -1292,10 +1297,10 @@ begin
       end;
     end;
     Screen.Cursor:=crDefault; //again
-
-    if (self.top < 0) then self.top := 0;
-    if (self.left < 0) then self.left := 0;
   end;
+
+  if (self.top < 0) then self.top := 0;
+  if (self.left < 0) then self.left := 0;
 end;
 
 procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
@@ -1878,6 +1883,9 @@ begin
         GetValue('NormalTop', Top),
         GetValue('NormalWidth', Width),
         GetValue('NormalHeight', Height));
+
+        if (self.top < 0) then self.top := 0;
+        if (self.left < 0) then self.left := 0;
     end;
   end;
 
