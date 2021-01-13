@@ -41,7 +41,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
-  strutils, Types, XMLConf{$ifdef windows}, windirs, Windows{$endif};
+  strutils, Types, FileCtrl, XMLConf{$ifdef windows}, windirs, Windows{$endif};
 
 type
 
@@ -246,7 +246,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.12';
+  FstrAppVer:='1.2.13';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -535,7 +535,6 @@ begin
     if (AnsiStartsStr('-',ParamStr(I))) then
     begin
       // Options. has been taken cared of already above.
-
     end else if (FileExists(ParamStr(I))) then
     begin
       // Found a file
@@ -551,7 +550,6 @@ begin
         Continue;
       end;
       {$endif}
-
       if (FstFileExtList.IndexOf(LowerCase(ExtractFileExt(ParamStr(I)))) >= 0) then
       begin
         // Is a picture file.
@@ -572,7 +570,6 @@ begin
         // Found a playlist
         FstPlaylistList.Add(ParamStr(I));
       end;
-
     {$ifdef windows}
     end else if (DirectoryExists(ParamStr(I))) then
     begin
@@ -581,6 +578,14 @@ begin
       if not (AnsiStartsStr('.',ExtractFilename(ParamStr(I)))) then
       begin
         FstDirectoryList.Add(ParamStr(I));
+      end;
+    end else if (ParamStr(I) = '*') then
+    begin
+      // * option. Pretty much the same as "./"
+      // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+      if not (AnsiStartsStr('.',ExtractFilename(GetCurrentDir))) then
+      begin
+        FstDirectoryList.Add(GetCurrentDir);
       end;
     {$endif}
     end;
@@ -1036,15 +1041,22 @@ begin
 end;
 
 procedure TfrmMain.LoadImage;
+var
+  strPath:string;
 begin
   if FileList.Count > 0 then
   begin
+
+    strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+
     if (FileList.Count = 1) then
     begin
-      Self.Caption:=FileList[FiCurrentFileIndex];
+      //Self.Caption:=FileList[FiCurrentFileIndex];
+      Self.Caption:=strPath;
     end else
     begin
-      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+      //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
     end;
 
     DispayImage(FileList[FiCurrentFileIndex]);
@@ -1190,17 +1202,19 @@ end;
 
 procedure TfrmMain.Image1MouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
+var
+  strPath:string;
 begin
   if (not FisFullscreen) and (not FisInFrame) then
   begin
     if FiCurrentFileIndex < FileList.Count -1 then
     begin
      screen.Cursor:=crHourGlass;
-
      DispayImage(FileList[FiCurrentFileIndex+1]);
-
      FiCurrentFileIndex:=FiCurrentFileIndex+1;
-     Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+     //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+     strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+     Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
      screen.Cursor:=crDefault;
      //Handled:=true;
     end;
@@ -1209,6 +1223,8 @@ end;
 
 procedure TfrmMain.Image1MouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
+var
+  strPath:string;
 begin
   if (not FisFullscreen) and (not FisInFrame) then
   begin
@@ -1217,7 +1233,9 @@ begin
       screen.Cursor:=crHourGlass;
       DispayImage(FileList[FiCurrentFileIndex-1]);
       FiCurrentFileIndex:=FiCurrentFileIndex-1;
-      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+      //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+      strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
       screen.Cursor:=crDefault;
       //Handled:=true;
     end;
@@ -1311,7 +1329,7 @@ begin
     FOrigBounds:= BoundsRect;
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
-    titlebarheight:=GetSystemMetrics(SM_CYCAPTION) + 9;
+    titlebarheight:=GetSystemMetrics(SM_CYCAPTION) + 10;
     self.height := self.height + titlebarheight;
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
