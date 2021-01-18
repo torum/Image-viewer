@@ -1090,6 +1090,7 @@ end;
 procedure TfrmFullscreen.Image1DblClick(Sender: TObject);
 begin
   //ShowFullScreen(false);
+  FisMoving:=false; // finally.. figured out why frmMain Window go negative pos.
   close;
 end;
 
@@ -1110,8 +1111,11 @@ begin
   Screen.Cursor:= crDefault;
   if FisInFrame then
   begin
-    If FisMoving then frmMain.Left:=frmMain.Left+X-FXPos;
-    If FisMoving then frmMain.Top:=frmMain.Top+Y-FYPos;
+    If FisMoving then
+    begin
+      frmMain.Left:=frmMain.Left+X-FXPos;
+      frmMain.Top:=frmMain.Top+Y-FYPos;
+    end;
   end;
 end;
 

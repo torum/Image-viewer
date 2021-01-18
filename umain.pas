@@ -246,7 +246,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.14';
+  FstrAppVer:='1.2.15';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -904,6 +904,10 @@ begin
       FisFullscreen:=false;
     end;
   end;
+
+  if (self.top < 0) then self.top := 0;
+  if (self.left < 0) then self.left := 0;
+
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1334,7 +1338,7 @@ begin
     FOrigBounds:= BoundsRect;
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
-    titlebarheight:=GetSystemMetrics(SM_CYCAPTION) + 10;
+    titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     self.height := self.height + titlebarheight;
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
