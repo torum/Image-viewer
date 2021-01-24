@@ -246,7 +246,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.15';
+  FstrAppVer:='1.2.16';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -1252,25 +1252,31 @@ begin
 end;
 
 procedure TfrmMain.MenuItemNextClick(Sender: TObject);
+var
+  strPath:string;
 begin
   if FiCurrentFileIndex < FileList.Count -1 then
   begin
     screen.Cursor:=crHourGlass;
     DispayImage(FileList[FiCurrentFileIndex+1]);
     FiCurrentFileIndex:=FiCurrentFileIndex+1;
-    Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+    strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+    Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
     screen.Cursor:=crDefault;
   end;
 end;
 
 procedure TfrmMain.MenuItemBackClick(Sender: TObject);
+var
+  strPath:string;
 begin
   if FiCurrentFileIndex > 0 then
   begin
     screen.Cursor:=crHourGlass;
     DispayImage(FileList[FiCurrentFileIndex-1]);
     FiCurrentFileIndex:=FiCurrentFileIndex-1;
-    Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+    strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+    Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
     screen.Cursor:=crDefault;
   end;
 end;
