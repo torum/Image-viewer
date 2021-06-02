@@ -72,8 +72,10 @@ type
     MenuItemSlideshowInFrame: TMenuItem;
     MenuItemQuit: TMenuItem;
     OpenPictureDialog1: TOpenPictureDialog;
+    PaintBox1: TPaintBox;
     PopupMenuSystem: TPopupMenu;
     PopupMenuMain: TPopupMenu;
+    ScrollBox1: TScrollBox;
     TimerEffectStart: TTimer;
     TrayIcon1: TTrayIcon;
     XMLConfig: TXMLConfig;
@@ -83,6 +85,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
@@ -104,8 +107,13 @@ type
     procedure MenuItemStretchOutClick(Sender: TObject);
     procedure MenuItemSysAboutClick(Sender: TObject);
     procedure MenuItemSysQuitClick(Sender: TObject);
+    procedure PaintBox1Paint(Sender: TObject);
     procedure PopupMenuMainPopup(Sender: TObject);
     procedure PopupMenuSystemPopup(Sender: TObject);
+    procedure ScrollBox1MouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure ScrollBox1MouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
     procedure TimerEffectStartTimer(Sender: TObject);
     procedure TrayIcon1DblClick(Sender: TObject);
 
@@ -146,6 +154,7 @@ type
     FstrAppVer:string;
     FstrInitialSelectedImageFile:string;
     FstrInitialDir:string;
+    FintZoomingScaleFactor:integer;
     procedure ShowFullScreen(blnOn: boolean);
     procedure SetFullScreen_Universal(blnOn: boolean);
     procedure SetFullScreen_Win32(blnOn: boolean);
@@ -157,6 +166,7 @@ type
     procedure StoreFormState;
     procedure LoadImage;
     function DispayImage(filename:string):boolean;
+    procedure DrawImage;
   public
     property FileList: TStringList read FstFileList;
     // User options. Read/Write.
@@ -246,7 +256,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.16';
+  FstrAppVer:='1.2.17';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -294,6 +304,8 @@ begin
     FOptIntMoniter:=0;
 
   FstrInitialSelectedImageFile :='';
+
+  FintZoomingScaleFactor := 1;
 
   {$ifdef windows}
   FstrInitialDir := GetWindowsSpecialDir(CSIDL_MYPICTURES);
@@ -1212,20 +1224,30 @@ end;
 procedure TfrmMain.Image1MouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 var
+    currentShiftState: TShiftState;
   strPath:string;
 begin
   if (not FisFullscreen) and (not FisInFrame) then
   begin
-    if FiCurrentFileIndex < FileList.Count -1 then
+    // check if Ctrl is pressed
+    currentShiftState:=GetKeyShiftState;
+    if ssCtrl in currentShiftState then
     begin
-     screen.Cursor:=crHourGlass;
-     DispayImage(FileList[FiCurrentFileIndex+1]);
-     FiCurrentFileIndex:=FiCurrentFileIndex+1;
-     //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
-     strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
-     Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
-     screen.Cursor:=crDefault;
-     //Handled:=true;
+    // Do nothing. Ctrl key down should trigger a zooming in the ScrollBox.
+
+    end else
+    begin
+      if FiCurrentFileIndex < FileList.Count -1 then
+      begin
+       screen.Cursor:=crHourGlass;
+       DispayImage(FileList[FiCurrentFileIndex+1]);
+       FiCurrentFileIndex:=FiCurrentFileIndex+1;
+       //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+       strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
+       screen.Cursor:=crDefault;
+       //Handled:=true;
+      end;
     end;
   end;
 end;
@@ -1233,22 +1255,68 @@ end;
 procedure TfrmMain.Image1MouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 var
+  currentShiftState: TShiftState;
   strPath:string;
 begin
   if (not FisFullscreen) and (not FisInFrame) then
   begin
-    if FiCurrentFileIndex > 0 then
+    // check if Ctrl is pressed
+    currentShiftState:=GetKeyShiftState;
+    if ssCtrl in currentShiftState then
     begin
-      screen.Cursor:=crHourGlass;
-      DispayImage(FileList[FiCurrentFileIndex-1]);
-      FiCurrentFileIndex:=FiCurrentFileIndex-1;
-      //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
-      strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
-      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
-      screen.Cursor:=crDefault;
-      //Handled:=true;
+    // Do nothing. Ctrl key down should trigger a zooming in the ScrollBox.
+
+    end else
+    begin
+      // go previouse image
+      if FiCurrentFileIndex > 0 then
+      begin
+        screen.Cursor:=crHourGlass;
+        DispayImage(FileList[FiCurrentFileIndex-1]);
+        FiCurrentFileIndex:=FiCurrentFileIndex-1;
+        //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
+        strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+        Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
+        screen.Cursor:=crDefault;
+        //Handled:=true;
+      end;
     end;
   end;
+end;
+
+procedure TfrmMain.ScrollBox1MouseWheelUp(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+  if FintZoomingScaleFactor < 50 then begin
+     FintZoomingScaleFactor:=FintZoomingScaleFactor+1;
+     DrawImage;
+  end;
+end;
+
+procedure TfrmMain.ScrollBox1MouseWheelDown(Sender: TObject;
+  Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
+begin
+  if FintZoomingScaleFactor > 1 then begin
+     FintZoomingScaleFactor:=FintZoomingScaleFactor-1;
+     DrawImage;
+  end;
+end;
+
+procedure TfrmMain.DrawImage;
+var
+  ImageRect: TRect;
+begin
+  //ImageRect := Rect(0,0,(Image1.Picture.Width * FintZoomingScaleFactor),(Image1.Picture.Height * FintZoomingScaleFactor));
+  SetRect(ImageRect,0,0,(Image1.Picture.Width * FintZoomingScaleFactor),(Image1.Picture.Height * FintZoomingScaleFactor));
+
+  PaintBox1.Width := ImageRect.Right;
+  PaintBox1.Height := ImageRect.Bottom;
+  PaintBox1.Canvas.StretchDraw(ImageRect, image1.Picture.Bitmap);
+end;
+
+procedure TfrmMain.PaintBox1Paint(Sender: TObject);
+begin
+  DrawImage;
 end;
 
 procedure TfrmMain.MenuItemNextClick(Sender: TObject);
@@ -1344,6 +1412,8 @@ begin
     FOrigBounds:= BoundsRect;
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
+
+    self.left := self.left + 10; // added in v1.2.17
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     self.height := self.height + titlebarheight;
     {$else}
@@ -1429,12 +1499,30 @@ begin
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
+var
+  strPath:string;
 begin
   if FisInFrame then
   begin
     if assigned(frmFullscreen) and frmFullscreen.Visible then
     begin
       frmFullscreen.FormResize(self);
+    end;
+  end else
+  begin
+    if FileList.Count > 0 then
+    begin
+
+      strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+
+      if (FileList.Count = 1) then
+      begin
+        Self.Caption:=strPath;
+      end else
+      begin
+        Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
+      end;
+
     end;
   end;
 end;
@@ -1566,14 +1654,19 @@ begin
       begin
         close;
       end;
-    end;
-
-    // Fullscreen slideshow
+    end else
     if ((Key = VK_F11)) then
     begin
+      // Fullscreen slideshow
       MenuItemSlideshowClick(nil);
+    end else
+    begin
+      if (ssCtrl in Shift) then
+      begin
+        // picture zoom
+        ScrollBox1.Visible := true;
+      end;
     end;
-
     {
     // Since form steals Image menu... and we have the problem assigning menu for form.
 
@@ -1615,6 +1708,17 @@ begin
       //self.PopupMenu.PopUp(self.top,self.left);
     end;
     }
+  end;
+end;
+
+procedure TfrmMain.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState
+  );
+begin
+  if (not (ssCtrl in Shift)) then
+  begin
+    // picture zoom
+    ScrollBox1.Visible := false;
+    FintZoomingScaleFactor := 1;
   end;
 end;
 

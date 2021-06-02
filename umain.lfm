@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
-  Left = 2244
+  Left = 977
   Height = 301
-  Top = 1136
+  Top = 765
   Width = 400
   AlphaBlend = True
   AlphaBlendValue = 20
@@ -15,6 +15,7 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnKeyUp = FormKeyUp
   OnResize = FormResize
   OnShow = FormShow
   PopupMode = pmAuto
@@ -35,6 +36,31 @@ object frmMain: TfrmMain
     Proportional = True
     Stretch = True
     StretchOutEnabled = False
+  end
+  object ScrollBox1: TScrollBox
+    Left = 0
+    Height = 301
+    Top = 0
+    Width = 400
+    HorzScrollBar.Page = 131
+    HorzScrollBar.Tracking = True
+    VertScrollBar.Page = 131
+    VertScrollBar.Tracking = True
+    Align = alClient
+    BorderStyle = bsNone
+    ClientHeight = 301
+    ClientWidth = 400
+    TabOrder = 0
+    Visible = False
+    OnMouseWheelDown = ScrollBox1MouseWheelDown
+    OnMouseWheelUp = ScrollBox1MouseWheelUp
+    object PaintBox1: TPaintBox
+      Left = 0
+      Height = 301
+      Top = 0
+      Width = 400
+      OnPaint = PaintBox1Paint
+    end
   end
   object TimerEffectStart: TTimer
     Enabled = False
