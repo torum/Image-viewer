@@ -9,7 +9,9 @@ Source:
 No extra components required.
 
 Compiled and tested on
- Windows 10 (64bit): Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
+ Windows 11: Lazarus 2.2.2 FPC 3.2.2 x86_64-win64-win32/win64
+ Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
+ Ubuntu 22.04.1 LTS: Lazarus 2.2.0 FPC 3.2.2 x86_64-linux-gtk2
  Ubuntu 17.10 (64bit): Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
  Ubuntu 16.04 LTS (64bit): Lazarus 1.9.0 trunk, FPC 3.0.4
  macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
@@ -238,8 +240,8 @@ resourcestring
   resstrOpenPictures = 'Open picture(s)';
 
   resstrBackground = 'Background Color';
-  resstrBackgroundBlack = 'White';
-  resstrBackgroundWhite = 'Black';
+  resstrBackgroundBlack = 'Black';
+  resstrBackgroundWhite = 'White';
 
 implementation
 
@@ -256,7 +258,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.17';
+  FstrAppVer:='1.2.18';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -918,7 +920,7 @@ begin
   end;
 
   if (self.top < 0) then self.top := 0;
-  if (self.left < 0) then self.left := 0;
+  if (self.left < -100) then self.left := 0;
 
 end;
 
@@ -995,7 +997,7 @@ begin
     frmFullscreen.ShowModal;
 
     if (self.top < 0) then self.top := 0;
-    if (self.left < 0) then self.left := 0;
+    if (self.left < -100) then self.left := 0;
 
     // Returned from fullscreen
     if FisStartNormal then
@@ -1215,7 +1217,7 @@ begin
       ShowFullScreen(false);
       Screen.Cursor:=crDefault;
       if (self.top < 0) then self.top := 0;
-      if (self.left < 0) then self.left := 0;
+      if (self.left < -100) then self.left := 0;
     end;
 
   end;
@@ -1378,7 +1380,7 @@ begin
   end;
 
   if (self.top < 0) then self.top := 0;
-  if (self.left < 0) then self.left := 0;
+  if (self.left < -100) then self.left := 0;
 end;
 
 procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
@@ -1413,12 +1415,16 @@ begin
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
 
-    self.left := self.left + 10; // added in v1.2.17
+    self.left := self.left + GetSystemMetrics(SM_CYFRAME); // added in v1.2.18
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     self.height := self.height + titlebarheight;
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+      FOrigBounds:= BoundsRect;
+      Hide;
       self.BorderStyle:=bsNone;
+      Show;
+
       Form := TForm.Create(nil);
       try
         Parent := Form;
@@ -1426,6 +1432,8 @@ begin
       finally
         Form.Free;
       end;
+
+      BoundsRect := FOrigBounds;
     {$endif}
 
     FisInFrame:=true;
@@ -1450,7 +1458,7 @@ procedure TfrmMain.DoneInFrame(strCurr :string);
 var
   {$ifdef windows}
   {$else}
-  Form: TForm;
+  //Form: TForm;
   {$endif}
   i:integer;
 begin
@@ -1462,18 +1470,23 @@ begin
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
-  if (self.top <= 0) then self.top := 0;
-  if (self.left <= 0) then self.left := 0;
+
+  if (self.top < 0) then self.top := 0;
+  if (self.left < -100) then self.left := 0;
+
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsSizeable;
-    Form := TForm.Create(nil);
-    try
-      Parent := Form;
-      Parent := nil;
-    finally
-      Form.Free;
-    end;
+
+    //Form := TForm.Create(nil);
+    //try
+    //  Parent := Form;
+    //  Parent := nil;
+    //finally
+    //  Form.Free;
+    //end;
+
+    BoundsRect:= FOrigBounds;
   {$endif}
 
   Image1.BringToFront;
@@ -1495,7 +1508,7 @@ begin
   Image1.BringToFront;
   screen.Cursor:=crDefault;
   if (self.top < 0) then self.top := 0;
-  if (self.left < 0) then self.left := 0;
+  if (self.left < -100) then self.left := 0;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
@@ -1999,7 +2012,7 @@ begin
         GetValue('NormalHeight', Height));
 
         if (self.top < 0) then self.top := 0;
-        if (self.left < 0) then self.left := 0;
+        if (self.left < -100) then self.left := 0;
     end;
   end;
 

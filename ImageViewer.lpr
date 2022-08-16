@@ -58,7 +58,7 @@ begin
   or (FallbackLang = 'ru') or (FallbackLang = 'RU') then
     Lang := 'ru_RU';
 
-  SetDefaultLang(Lang,'',false);
+  SetDefaultLang(Lang,'','',false);
 
 end;
 

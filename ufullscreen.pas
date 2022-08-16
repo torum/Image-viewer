@@ -375,6 +375,7 @@ begin
 
   IdleTimerMouseHide.Enabled:=false;
   Screen.Cursor:=crDefault;
+  Self.Cursor:=crDefault;
 
   // Apply chagens in options.
   frmMain.OptTransitEffect := FEffect;
@@ -1109,6 +1110,7 @@ procedure TfrmFullscreen.Image1MouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 begin
   Screen.Cursor:= crDefault;
+  Self.Cursor:=crDefault;
   if FisInFrame then
   begin
     If FisMoving then
@@ -1633,6 +1635,7 @@ procedure TfrmFullscreen.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
   Screen.Cursor:= crDefault;
+  Self.Cursor:=crDefault;
   // Do the same at Image1.
 end;
 
@@ -1659,6 +1662,7 @@ begin
   if not FisPopupMenuShowing then
   begin
     Screen.Cursor:= crNone;
+    Self.Cursor:=crNone;
   end;
 end;
 
