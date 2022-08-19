@@ -157,7 +157,7 @@ object frmFullscreen: TfrmFullscreen
   end
   object IdleTimerMouseHide: TIdleTimer
     AutoEnabled = True
-    Interval = 2000
+    Interval = 1500
     OnTimer = IdleTimerMouseHideTimer
     Left = 18
     Top = 204

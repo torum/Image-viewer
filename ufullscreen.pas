@@ -461,6 +461,8 @@ begin
   {$IFDEF Windows}
   SetThreadExecutionState(ES_DISPLAY_REQUIRED or ES_SYSTEM_REQUIRED or ES_CONTINUOUS);
   {$ELSE}
+  // Couldn't find a better way.
+  // https://forum.lazarus.freepascal.org/index.php/topic,56671.0.html
   MPos:=Mouse.CursorPos;
   Mouse.CursorPos:=MPos;
   {$ENDIF}
@@ -548,7 +550,6 @@ end;
 
 procedure TfrmFullscreen.PlaybackRepeatStart();
 begin
-
   {$ifdef Mydebug}
   OutputDebugString(PChar(TrimRight( 'PlaybackRepeatStart ')));
   {$endif}
@@ -1034,9 +1035,19 @@ end;
 procedure TfrmFullscreen.Image1MouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 begin
+  {$ifdef windows}
   Screen.Cursor:= crDefault;
   Self.Cursor:=crDefault;
   Image1.Cursor:=crDefault;
+  {$else}
+  if FIsSlideshowPlaying and (not TimerInterval.Enabled) and (not TimerFadeIn.Enabled) and
+    (not TimerFadeOut.Enabled) then
+  begin
+    Screen.Cursor:= crDefault;
+    Self.Cursor:=crDefault;
+    Image1.Cursor:=crDefault;
+  end;
+  {$endif}
 
   if FisInFrame then
   begin
@@ -1537,9 +1548,19 @@ end;
 procedure TfrmFullscreen.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
   Y: Integer);
 begin
+  {$ifdef windows}
   Screen.Cursor:= crDefault;
   Self.Cursor:=crDefault;
   Image1.Cursor:=crDefault;
+  {$else}
+  if FIsSlideshowPlaying and (not TimerInterval.Enabled) and (not TimerFadeIn.Enabled) and
+    (not TimerFadeOut.Enabled) then
+  begin
+    Screen.Cursor:= crDefault;
+    Self.Cursor:=crDefault;
+    Image1.Cursor:=crDefault;
+  end;
+ {$endif}
   // Do the same at Image1.
 end;
 
