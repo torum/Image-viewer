@@ -42,6 +42,7 @@ type
     MenuItemEffect: TMenuItem;
     MenuItemStretch: TMenuItem;
     PopupMenu1: TPopupMenu;
+    Separator1: TMenuItem;
     TimerInterval: TTimer;
     TimerFadeIn: TTimer;
     TimerFadeOut: TTimer;
@@ -85,8 +86,6 @@ type
 
   private
     FFileList:TStringlist;
-    FFileListHistory:TStringlist;
-    FFileListRemaining:TStringList;
     FiCurr:integer;
     FstrCurr:string;
     FInterval:integer;
@@ -134,11 +133,6 @@ type
       }
     function GetNextImageIndex(id:integer):integer;
       {Takes current index, and returns next index of the playback list.
-        Returns -1 if there is no next or reached at the end of the list.
-      }
-    function GetNextRandomImageIndex():integer;
-      {Takes current index, and returns next Random index of the playback list
-        which does not exists in history list.
         Returns -1 if there is no next or reached at the end of the list.
       }
     function GetPreviousImageIndex(id:integer):integer;
@@ -194,8 +188,6 @@ begin
 
   FFileList:=TStringlist.Create;
   FFileList.Assign(frmMain.FileList);
-  FFileListHistory:=TStringList.Create;
-  FFileListRemaining:=TStringlist.Create;
 
   FInterval:= frmMain.OptIntervalIntSeconds*1000;
   TimerInterval.Interval:=FInterval;
@@ -327,6 +319,14 @@ begin
   Randomize;
 end;
 
+procedure Shuffle(Strings: TStringList);
+var
+  i: Integer;
+begin
+  for i := Strings.Count-1 downto 1 do
+    Strings.Exchange(i, Random(i+1));
+end;
+
 procedure TfrmFullscreen.FormShow(Sender: TObject);
 begin
   // Changing moniter (show) cause slideshow to star over, so...
@@ -351,6 +351,9 @@ begin
     // No files are selected or to open. List empty.
     // This should not happen.
   end;
+
+  IdleTimerMouseHide.Enabled:=true;
+
 end;
 
 procedure TfrmFullscreen.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -376,6 +379,7 @@ begin
   IdleTimerMouseHide.Enabled:=false;
   Screen.Cursor:=crDefault;
   Self.Cursor:=crDefault;
+  Image1.Cursor:=crDefault;
 
   // Apply chagens in options.
   frmMain.OptTransitEffect := FEffect;
@@ -403,30 +407,27 @@ end;
 procedure TfrmFullscreen.FormDestroy(Sender: TObject);
 begin
   FFileList.Free;
-  FFileListHistory.Free;
-  FFileListRemaining.Free;
 end;
 
 procedure TfrmFullscreen.StartSlideshow(startIndex:integer);
 begin
-  // Reset
-  FFileListHistory.Clear;
-  FFileListRemaining.Clear;
-  FFileListRemaining.Assign(FFileList);
-
   FIsSlideshowPlaying:=true;
 
-  // Specify index to display.
   if FRandom then begin
     if startIndex > -1 then
     begin
-      TimerInterval.tag:= startIndex;
+      FstrCurr:= FFileList[startIndex];
+      // Randomize the file list.
+      Shuffle(FFileList);
+      // Specify index for display.
+      TimerInterval.tag:= FFileList.IndexOf(FstrCurr);
     end else
     begin
-      TimerInterval.tag:=GetNextRandomImageIndex();
+      TimerInterval.tag:=0;
     end;
   end else
   begin
+    // Specify index for display.
     TimerInterval.tag:=startIndex;
   end;
 
@@ -447,9 +448,11 @@ end;
 procedure TfrmFullscreen.PlaybackPlay(preLoad:boolean);
 var
   i,iNext:integer;
+  {$ifdef windows}
+  {$else}
+  MPos: TPoint;
+  {$endif}
 begin
-  // TODO preLoading...
-
   {$ifdef Mydebug}
   OutputDebugString(PChar(TrimRight( 'PlaybackPlay:id '+ intToStr(TimerInterval.Tag) )));
   {$endif}
@@ -457,6 +460,9 @@ begin
   // Disabling the Screensaver
   {$IFDEF Windows}
   SetThreadExecutionState(ES_DISPLAY_REQUIRED or ES_SYSTEM_REQUIRED or ES_CONTINUOUS);
+  {$ELSE}
+  MPos:=Mouse.CursorPos;
+  Mouse.CursorPos:=MPos;
   {$ENDIF}
 
   TimerInterval.Enabled:=false; //just in case.
@@ -504,11 +510,7 @@ begin
   begin
 
     // Tell Timer what to play.
-    if FRandom then begin
-      iNext:=GetNextRandomImageIndex();
-    end else begin
-      iNext:=GetNextImageIndex(Current);
-    end;
+    iNext:=GetNextImageIndex(Current);
 
     if (iNext > -1) then
     begin
@@ -538,7 +540,7 @@ begin
 
       end else begin
         // Checking repeat option.
-        PlaybackRepeatStart();
+        //PlaybackRepeatStart();  // Don't...?
       end;
     end;
   end;
@@ -555,17 +557,19 @@ begin
     // Start from beggining.
 
     // Clear
-    FFileListRemaining.Clear;
-    FFileListRemaining.Assign(FFileList);
+    //FFileListRemaining.Clear;
+    //FFileListRemaining.Assign(FFileList);
 
     // Reset next
-    if FRandom then begin
-      FiCurr:=-1;
-      TimerInterval.tag:=GetNextRandomImageIndex();
-    end else begin
-      FiCurr:=0;
-      TimerInterval.tag:=0;
-    end;
+    //if FRandom then begin
+    //  FiCurr:=-1;
+    //  TimerInterval.tag:=GetNextRandomImageIndex();
+    //end else begin
+    //  FiCurr:=0;
+    //  TimerInterval.tag:=0;
+    //end;
+    FiCurr:=0;
+    TimerInterval.tag:=0;
 
     {$ifdef Mydebug}
     OutputDebugString(PChar(TrimRight( 'PlaybackRepeatStart '+ intToStr(TimerInterval.tag) )));
@@ -659,7 +663,6 @@ var
   iPrev:integer;
 begin
   if FFileList.Count > 1 then begin
-    //TODO: when you go back, put current to remaining?
 
     iPrev:=GetPreviousImageIndex(Current);
 
@@ -675,7 +678,6 @@ begin
           PlaybackPlay(false);
         end else if TimerFadeOut.Enabled then
         begin
-          // Let's just go back to the picture we are watching.
           TimerFadeOut.Enabled:=false;
           TimerInterval.Enabled:=false;
           alphablendvalue:=255;
@@ -689,14 +691,15 @@ begin
           TimerInterval.Enabled:=false;
           PlaybackPlay(false);
         end;
-
       end else begin
         TimerInterval.Enabled:=false;
         TimerInterval.Tag := iPrev;
         PlaybackPlay(false);
       end;
-    end;
+    end else
+    begin
 
+    end;
   end;
 end;
 
@@ -708,6 +711,7 @@ begin
   end else
   begin
     result := false;
+    //OutputDebugString(PChar(TrimRight( 'ValidateFileIndex '+ intToStr(id) )));
   end;
 end;
 
@@ -764,17 +768,6 @@ begin
     Image1.Picture.Clear;
     Image1.Stretch:=false;
     Image1.StretchInEnabled:=false;
-    {
-    if FisInFrame then
-    begin
-      curWidth := self.Parent.ClientWidth;
-      curHeight:= self.Parent.ClientHeight;
-    end else
-    begin
-      curWidth := screen.Monitors[FOptIntMoniter].Width;
-      curHeight:= screen.Monitors[FOptIntMoniter].Height;
-    end;
-    }
 
     try
       Image1.Picture.LoadFromFile(FFileList[id]);
@@ -782,16 +775,9 @@ begin
       ResizeImage();
 
       Image1.Refresh;
-      FFileListHistory.Add(FFileList[id]);
       result:=id;
-      {$ifdef Mydebug}
-      OutputDebugString(PChar(TrimRight( 'DisplayImage:id '+ intToStr(id) )));
-      {$endif}
     except
       On E :Exception do begin
-        {$ifdef Mydebug}
-        OutputDebugString(PChar(TrimRight( 'Exception@DisplayImage_LoadFromFile:id '+ intToStr(id)+':'+E.Message )));
-        {$endif}
         Image1.Picture.Clear;
         DisplayError(id,'DisplayImage@LoadFromFile - '+E.ClassName+' - '+E.Message);
 
@@ -816,9 +802,6 @@ begin
       end;
       Image1.Update;
       result:=id;
-      {$ifdef Mydebug}
-      OutputDebugString(PChar(TrimRight( 'DisplayImage FileNotFound:id '+ intToStr(id) )));
-      {$endif}
     end else begin
       // File size just too small. File size became smaller during the slideshow.
       self.AlphaBlendValue:=255;
@@ -835,10 +818,6 @@ begin
       //TODO: getNext and continue?
       //result:=-1;
     end;
-  end;
-
-  if (FFileListRemaining.IndexOf(FFileList[id]) > -1) then begin
-     FFileListRemaining.Delete(FFileListRemaining.IndexOf(FFileList[id]));
   end;
 end;
 
@@ -919,26 +898,13 @@ begin
 
     TimerFadeIn.Enabled:=false;
 
-    {$ifdef Mydebug}
-    OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer' )));
-    {$endif}
-
-    // Start timer or repeat check.
-    if FRandom then begin
-      iNext:=GetNextRandomImageIndex();
-    end else begin
-      iNext:=GetNextImageIndex(Current);
-    end;
-
+    iNext:=GetNextImageIndex(Current);
     if (iNext > -1) then begin
       // Start interval timer
       TimerInterval.Enabled:=true;
-      //TODO: preLoading.
-
     end else begin
       PlaybackRepeatStart();
     end;
-
   end;
 end;
 
@@ -988,15 +954,7 @@ begin
     end;
   end else begin
     TimerFadeOut.Enabled:=false;
-    // Display.
-    {$ifdef Mydebug}
-    OutputDebugString(PChar(TrimRight( 'TimerFadeOutTimer: ->PlaybackPlay' )));
-    {$endif}
     PlaybackPlay(false);
-    {$ifdef Mydebug}
-    OutputDebugString(PChar(TrimRight( 'TimerFadeOutTimer: ->(PlaybackPlay)TimerFadeIn' )));
-    {$endif}
-
   end;
 end;
 
@@ -1006,7 +964,12 @@ begin
     if (id = (FFileList.Count-1)) then
     begin
       // End of the list. There is no NEXT.
-      result:=-1;
+      if FRepeat then
+      begin
+        result:=0;
+      end else begin
+        result:=-1;
+      end;
     end else if (id > (FFileList.Count-1)) then
     begin
       //TODO: close? or ...
@@ -1023,68 +986,30 @@ begin
   end;
 end;
 
-function TfrmFullscreen.GetNextRandomImageIndex():integer;
-var
-  r:integer;
-begin
-  result:=-1;
-  if FFileList.Count = 0 then begin
-    exit;
-  end;
-  if (FFileListRemaining.Count = 0) then
-  begin
-    exit;
-  end;
-  if FFileListRemaining.Count = 1 then
-  begin
-    result:=FFileList.IndexOf(FFileListRemaining[0]);
-    exit;
-  end;
-  r:= Random(FFileListRemaining.Count-1);
-  result:=FFileList.IndexOf(FFileListRemaining[r]);
-end;
-
 function TfrmFullscreen.GetPreviousImageIndex(id:integer):integer;
 begin
-  if FRandom then
-  begin
-    if FFileListHistory.Count > 0 then begin
+  if ValidateFileIndex(id) then begin
+    if (id <= 0) then
+    begin
+      // Beginning of the list. There is no PREVIOUS.
 
-      //TODO: check. when you go back, put current to remaining,
-
-      // Saving for the "next"
-      FFileListRemaining.Insert(0,FFileListHistory[FFileListHistory.Count-1]);
-      // Delete current?
-      if ((FFileListHistory.Count-1) > 0) then
+      if FRepeat then
       begin
-        FFileListHistory.Delete(FFileListHistory.Count-1);
-      end;
-      result := FFileList.IndexOf(FFileListHistory[FFileListHistory.Count-1]);
-      // Delete for the future?
-      if ((FFileListHistory.Count-1) > 0) then
-      begin
-        FFileListHistory.Delete(FFileListHistory.Count-1);
-      end;
-    end else begin
-      result:=id;
-    end;
-  end else
-  begin
-    if ValidateFileIndex(id) then begin
-      if (id <= 0) then
-      begin
-        // Beginning of the list. There is no PREVIOUS.
-        result:=-1;
+        result:=FFileList.Count-1;
+        //OutputDebugString(PChar(TrimRight('GetPreviousImageIndex:(id): '+intToStr(id))));
       end else
       begin
-        result:=id-1;
+        result:=-1;
       end;
     end else
     begin
-      // Something went wrong.
-      //OutputDebugString(PChar(TrimRight('GetNextImageIndex:(id): VALIDATE: '+intToStr(id))));
-      result:=-1;
+      result:=id-1;
     end;
+  end else
+  begin
+    // Something went wrong.
+    //OutputDebugString(PChar(TrimRight('GetPreviousImageIndex:(id): VALIDATE: '+intToStr(id))));
+    result:=-1;
   end;
 end;
 
@@ -1111,6 +1036,8 @@ procedure TfrmFullscreen.Image1MouseMove(Sender: TObject; Shift: TShiftState;
 begin
   Screen.Cursor:= crDefault;
   Self.Cursor:=crDefault;
+  Image1.Cursor:=crDefault;
+
   if FisInFrame then
   begin
     If FisMoving then
@@ -1246,11 +1173,19 @@ begin
   if FRandom then
   begin
     FRandom:=false;
+
+    // Clear and reload the list.
+    FFileList.Clear;
+    FFileList.Assign(frmMain.FileList);
+
     // Play first image.
     TimerInterval.tag:=0;
   end else
   begin
     FRandom:=true;
+
+    // Randomize the file list.
+    Shuffle(FFileList);
   end;
 end;
 
@@ -1511,17 +1446,6 @@ begin
     if FileSize(frmMain.FileList[i]) >= (FMinimulFileSizeKiloByte * 1024) then
     begin
       FFilelist.Add(frmMain.FileList[i]);
-    end else
-    begin
-      // remove it from history and remainings.
-      if FFileListRemaining.IndexOf(frmMain.FileList[i]) > -1 then
-      begin
-        FFileListRemaining.Delete(FFileListRemaining.IndexOf(frmMain.FileList[i]));
-      end;
-      if FFileListHistory.IndexOf(frmMain.FileList[i]) > -1 then
-      begin
-        FFileListHistory.Delete(FFileListHistory.IndexOf(frmMain.FileList[i]));
-      end;
     end;
   end;
 
@@ -1544,25 +1468,8 @@ begin
   begin
 
     // Set next index correctly.
-    if FRandom then begin
-      FiCurr:=-1;
-      i:=GetNextRandomImageIndex();
-      if (i > -1) then
-      begin
-        //FiCurr:=i;
-        TimerInterval.tag:=i;
-      end else
-      begin
-        FFileListRemaining.Assign(FFileList);
-        FiCurr:=-1;
-        i:=GetNextRandomImageIndex();
-        TimerInterval.tag:=i;
-      end;
-    end else
-    begin
-      FiCurr:=0;
-      TimerInterval.tag:=0;
-    end;
+    FiCurr:=0;
+    TimerInterval.tag:=0;
 
     // Start
     if FManualTransition then
@@ -1590,8 +1497,6 @@ begin
 
     end;
   end;
-
-
 end;
 
 procedure TfrmFullscreen.FormKeyDown(Sender: TObject; var Key: Word;
@@ -1602,12 +1507,10 @@ begin
     //close;
   end;
 
-
   if ((Key = VK_RMENU) or (Key = VK_LMENU) or (Key = VK_MENU)) then
   begin
     //self.PopupMenu1.PopUp(0,0);
   end;
-
 
   // Assigned in popupmenu shortcuts
   {
@@ -1636,33 +1539,31 @@ procedure TfrmFullscreen.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
 begin
   Screen.Cursor:= crDefault;
   Self.Cursor:=crDefault;
+  Image1.Cursor:=crDefault;
   // Do the same at Image1.
 end;
 
 procedure TfrmFullscreen.FormMouseWheelDown(Sender: TObject;
   Shift: TShiftState; MousePos: TPoint; var Handled: Boolean);
 begin
-
   PlaybackNext();
   //Handled:=true;
-
 end;
 
 procedure TfrmFullscreen.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
-
   PlaybackBack();
   //Handled:=true;
-
 end;
 
 procedure TfrmFullscreen.IdleTimerMouseHideTimer(Sender: TObject);
 begin
   if not FisPopupMenuShowing then
   begin
-    Screen.Cursor:= crNone;
+    Screen.Cursor:= crNone;  
     Self.Cursor:=crNone;
+    Image1.Cursor:=crNone;
   end;
 end;
 

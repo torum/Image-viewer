@@ -9470,13 +9470,6 @@ object frmMain: TfrmMain
         OnClick = MenuItemStretchOutClick
       end
     end
-    object MenuItemBo7: TMenuItem
-      Caption = '-'
-    end
-    object MenuItemStayOnTop: TMenuItem
-      Caption = 'Stay on top'
-      OnClick = MenuItemStayOnTopClick
-    end
     object MenuItemBackgroundColor: TMenuItem
       Caption = 'Background Color'
       object MenuItemBackgroundBlack: TMenuItem
@@ -9500,6 +9493,13 @@ object frmMain: TfrmMain
       Caption = 'Fullscreen Slideshow'
       ShortCut = 70
       OnClick = MenuItemSlideshowClick
+    end
+    object MenuItemBo7: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemStayOnTop: TMenuItem
+      Caption = 'Stay on top'
+      OnClick = MenuItemStayOnTopClick
     end
     object MenuItem2: TMenuItem
       Caption = '-'

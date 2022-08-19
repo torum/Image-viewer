@@ -17,6 +17,18 @@ Compiled and tested on
  macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
  macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
+Known issues and bugs:
+ On Windows, inFrame "window" does not have shaddow.
+ On Windows, PNG (depth 24) antialising isn't working when stretch.
+  https://forum.lazarus.freepascal.org/index.php?topic=24408.0
+  http://forum.lazarus.freepascal.org/index.php?topic=19542.0
+ On Ubuntu, inFrame transit effect doesn't seem to be working..
+ On macOS, inFrame transit effect won't work?
+ On macOS El Capitan, the top bar won't hide. It's fine on High Sierra.
+ On macOS, trayicon won't show up correctly. Black filled.->disabled
+ On macOS, awaking from sleep >blank screen?
+ Cocoa based 64bit apps for macOS may not be ready some time soon...
+
 TODO:
  preLoading image for slideshow.
  load playlist.
@@ -24,18 +36,6 @@ TODO:
  file drop handling(win).
  OS's power-save event aware.
  Modal dialog with options and playlist edit tab (drag & drop files).
-
-Known issues and bugs:
- On Windows, PNG (depth 24) antialising isn't working when stretch.
-  https://forum.lazarus.freepascal.org/index.php?topic=24408.0
-  http://forum.lazarus.freepascal.org/index.php?topic=19542.0
- On Windows, inFrame "window" does not have shaddow.
- On Ubuntu, inFrame transit effect doesn't seem to be working..
- On macOS, inFrame transit effect won't work?
- On macOS El Capitan, the top bar won't hide. It's fine on High Sierra.
- On macOS, trayicon won't show up correctly. Black filled.->disabled
- On macOS, awaking from sleep >blank screen?
- Cocoa based 64bit apps for macOS may not be ready some time soon...
 }
 
 interface
@@ -258,7 +258,7 @@ var
   folderfiles:TStringlist;
   fileSearchMask,fileFolder:string;
 begin
-  FstrAppVer:='1.2.18';
+  FstrAppVer:='1.3.0';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -764,14 +764,14 @@ begin
 
   if FoptBackgroundBlack then
   begin
-       self.Color:=clBlack;
-       MenuItemBackgroundBlack.Checked:=true;
-       MenuItemBackgroundWhite.Checked:=false;
+    self.Color:=clBlack;
+    MenuItemBackgroundBlack.Checked:=true;
+    MenuItemBackgroundWhite.Checked:=false;
   end else
   begin
-       self.color:=clWhite;  
-       MenuItemBackgroundBlack.Checked:=false;
-       MenuItemBackgroundWhite.Checked:=true;
+    self.color:=clWhite;
+    MenuItemBackgroundBlack.Checked:=false;
+    MenuItemBackgroundWhite.Checked:=true;
   end;
 
   {$ifdef windows}

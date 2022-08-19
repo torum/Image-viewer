@@ -23,7 +23,7 @@ object frmFullscreen: TfrmFullscreen
   OnShow = FormShow
   PopupMenu = PopupMenu1
   Position = poOwnerFormCenter
-  LCLVersion = '2.2.0.4'
+  LCLVersion = '2.2.2.0'
   object Image1: TImage
     Left = 0
     Height = 241
@@ -87,21 +87,6 @@ object frmFullscreen: TfrmFullscreen
     object MenuItemInterval: TMenuItem
       Caption = '&Interval'
     end
-    object MenuItemRandom: TMenuItem
-      Caption = 'Ran&dom'
-      ShortCut = 78
-      OnClick = MenuItemRandomClick
-    end
-    object MenuItemRepeat: TMenuItem
-      Caption = 'Repe&at'
-      ShortCut = 82
-      OnClick = MenuItemRepeatClick
-    end
-    object MenuItemEffect: TMenuItem
-      Caption = '&Effect'
-      ShortCut = 69
-      OnClick = MenuItemEffectClick
-    end
     object MenuItemStretch: TMenuItem
       Caption = '&Stretch'
       object MenuItemFit: TMenuItem
@@ -129,6 +114,24 @@ object frmFullscreen: TfrmFullscreen
     object MenuItemMoniters: TMenuItem
       Caption = '&Moniters'
     end
+    object Separator1: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemRandom: TMenuItem
+      Caption = 'Ran&dom'
+      ShortCut = 78
+      OnClick = MenuItemRandomClick
+    end
+    object MenuItemRepeat: TMenuItem
+      Caption = 'Repe&at'
+      ShortCut = 82
+      OnClick = MenuItemRepeatClick
+    end
+    object MenuItemEffect: TMenuItem
+      Caption = '&Effect'
+      ShortCut = 69
+      OnClick = MenuItemEffectClick
+    end
     object MenuItemBorderForSOT: TMenuItem
       Caption = '-'
     end
@@ -154,6 +157,7 @@ object frmFullscreen: TfrmFullscreen
   end
   object IdleTimerMouseHide: TIdleTimer
     AutoEnabled = True
+    Interval = 2000
     OnTimer = IdleTimerMouseHideTimer
     Left = 18
     Top = 204
