@@ -26,3 +26,5 @@ lib/i386-win32/umain.o
 lib/i386-win32/umain.ppu
 lib/i386-win32/umain.rsj
 po_files/ImageViewer.pot
+backup/ufullscreen.pas
+backup/ufullscreen.lfm
