@@ -67,7 +67,7 @@ Image Viewer can be launched via command-line, and applications or scripts can a
 You can download the Lazarus IDE and FPC(compiler) from here.
 https://www.lazarus-ide.org/index.php?page=downloads
 
-Or `sudo apt install lazarus-ide`
+Or `sudo apt install lazarus` on Ubuntu.
 
 Once you download and install the IDE, just open the project file "ImageViewer.lpr".
 When the project is opened, just hit F9 and run.
