@@ -86,6 +86,7 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormResize(Sender: TObject);
@@ -169,6 +170,8 @@ type
     procedure LoadImage;
     function DispayImage(filename:string):boolean;
     procedure DrawImage;
+    procedure LoadDirectories(const Dirs: TStringList; FList: TStringList);
+    procedure LoadSiblings(const FName: string; FList: TStringList);
   public
     property FileList: TStringList read FstFileList;
     // User options. Read/Write.
@@ -251,12 +254,106 @@ uses UFullscreen, UAbout;
 
 { TfrmMain }
 
+procedure TfrmMain.LoadDirectories(const Dirs: TStringList; FList: TStringList);
+var
+  i,j,f:integer;
+  fileSearchMask:string;
+  folderfiles:TStringlist;
+begin
+  if Dirs.Count > 0 then
+  begin
+    // Create search mask
+    fileSearchMask:='';
+    for i:=0 to FstFileExtList.Count-1 do
+    begin
+      if trim(FstFileExtList[i]) <> '' then
+      begin
+         fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
+      end;
+    end;
+    // Loop directories and FindAllFiles.
+    for i:=0 to Dirs.Count -1 do
+    begin
+      try
+        // Recursively search files
+        folderfiles := FindAllFiles(Dirs[i], fileSearchMask, FOptIncludeSubFolders);
+        for j:=0 to folderfiles.Count - 1 do
+        begin
+          // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+          if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
+          begin
+            f:= FileSize(folderfiles[j]);
+            // Check file size.
+            if f >= (FOptMinimulFileSizeKiloByte) then
+            begin
+              FList.Add(folderfiles[j]);
+            end;
+          end;
+        end;
+      finally
+        folderfiles.Free;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.LoadSiblings(const FName: string; FList: TStringList);
+var
+  i,j,f:integer;
+  fileSearchMask, fileFolder:string;
+  folderfiles:TStringlist;
+begin
+  fileFolder:=ReplaceStr(FName,ExtractFileName(FName),'');
+  //fileFolder:=ReplaceStr(FstrInitialSelectedImageFile,ExtractFileName(FstrInitialSelectedImageFile),'');
+
+  // sets init dir for next time.
+  FstrInitialDir := ExtractFilePath(FName);
+
+  // Create search mask
+  fileSearchMask:='';
+  for i:=0 to FstFileExtList.Count-1 do
+  begin
+    if trim(FstFileExtList[i]) <> '' then
+    begin
+       fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
+    end;
+  end;
+
+  try
+    // Find siblings.
+    folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
+    for j:=0 to folderfiles.Count - 1 do
+    begin
+      // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+      if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
+      begin
+        // Ignore first selected image.
+        if (folderfiles[j] <> FName) then
+        begin
+          f:= FileSize(folderfiles[j]);
+          // Check file size.
+          if f >= (FOptMinimulFileSizeKiloByte) then
+          begin
+            FList.Add(folderfiles[j]);
+          end;
+        end else
+        begin
+          // remove firest selected and add to list so that file order is right.
+          FList.Delete(0);
+          FList.Add(folderfiles[j]);
+        end;
+      end;
+    end;
+  finally
+    folderfiles.Free;
+  end;
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
   s:string;
-  i,j,f:integer;
-  folderfiles:TStringlist;
-  fileSearchMask,fileFolder:string;
+  i,f:integer;
+  configFile:string;
 begin
   FstrAppVer:='1.3.0';
 
@@ -274,6 +371,7 @@ begin
   FstPlaylistList:=TstringList.Create;
 
   // Set defaults for user options.
+  FoptBackgroundBlack:=true;
   FOptFullscreen:=false;
   FOptTransitEffect:=true;
   FOptExpand:=false;
@@ -282,9 +380,15 @@ begin
   FOptIntervalIntSeconds:=4;
   FOptRandom:=true;
   FOptRepeat:=true;
-  FOptFileExts:='.jpg;.jpeg;.jpe;.png;.gif'; //'.jpg;.jpeg;.jpe;.png;.gif';
+  {$ifdef windows}
+  FOptFileExts:='.jpg;.jpeg;.jpe;.jfif;.png;.gif;.bmp;.ico';
+  OpenPictureDialog1.Filter:='All (*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico)|*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Portable Network Graphics (*.png)|*.png|Graphics Interchange Format (*.gif)|*.gif|Bitmap (*.bmp)|*.bmp|Icon (*.ico)|*.ico';
+  {$else}
+  FOptFileExts:='.jpg;.jpeg;.jpe;.png;.gif';
+  {$endif}
   FOptPlaylistExts:='.m3u;.xspf';
   FOptIncludeSubFolders:=true;
+  FoptStayOnTop:=false;
   // Be carefull when settings this. If the size is too large, the list will be empty.
   FOptMinimulFileSizeKiloByte:=1;
 
@@ -337,17 +441,18 @@ begin
   MenuItemBackgroundWhite.Caption:=resstrBackgroundWhite;
 
   // Load settings
-  if ForceDirectories(GetAppConfigDir(false)) then
+  configFile := ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
+  if (not FileExists(ExtractFilePath(Application.ExeName)+configFile)) and ForceDirectories(GetAppConfigDir(false)) then
   begin
     //XMLConfig.FileName:=GetAppConfigFile(False); // exename.cfg
     {$ifdef windows}
-    XMLConfig.FileName:=GetAppConfigDir(false)+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
+    XMLConfig.FileName:=GetAppConfigDir(false)+configFile;
     {$else}
     XMLConfig.FileName:=GetAppConfigDir(false)+'.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
     {$endif}
   end else begin
     {$ifdef windows}
-    XMLConfig.FileName:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'.config');
+    XMLConfig.FileName:=ExtractFilePath(Application.ExeName)+configFile;
     {$else}
     XMLConfig.FileName:='.'+ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'') +'.config';
     {$endif}
@@ -542,7 +647,6 @@ begin
   // show-fullpath
   // show-filename
 
-
   // Parse other prameters.
   for I := 1 to ParamCount do
   begin
@@ -603,50 +707,14 @@ begin
       end;
     {$endif}
     end;
-
   end;
 
   // Search inside folder(s)
-  if FstDirectoryList.Count > 0 then
-  begin
-    // Create search mask
-    fileSearchMask:='';
-    for i:=0 to FstFileExtList.Count-1 do
-    begin
-      if trim(FstFileExtList[i]) <> '' then
-      begin
-         fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
-      end;
-    end;
-    // Loop directories and FindAllFiles.
-    for i:=0 to FstDirectoryList.Count -1 do
-    begin
-      try
-        // Recursively search files
-        folderfiles := FindAllFiles(FstDirectoryList[i], fileSearchMask, FOptIncludeSubFolders);
-        for j:=0 to folderfiles.Count - 1 do
-        begin
-          // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
-          if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
-          begin
-            f:= FileSize(folderfiles[j]);
-            // Check file size.
-            if f >= (FOptMinimulFileSizeKiloByte) then
-            begin
-              FstFileList.Add(folderfiles[j]);
-            end;
-          end;
-        end;
-      finally
-        folderfiles.Free;
-      end;
-    end;
-  end;
+  LoadDirectories(FstDirectoryList, FstFileList);
 
   //TODO: playlist
   // Only if no other files are specified,
   // open the ploylist and add its contents to the filelist.
-
 
   if ((FstFileList.Count < 1) and (FstrInitialSelectedImageFile = '')) then
   begin
@@ -695,7 +763,6 @@ begin
 
     //TODO: playlist
     // open ploylist files and add them to the filelist.
-
   end;
 
   // If only one image was selected, add all siblings automatically.
@@ -703,50 +770,7 @@ begin
   //if FstFileList.Count = 1 then
   if ((FstFileList.Count = 1) and (FstrInitialSelectedImageFile <> '')) then
   begin
-    fileFolder:=ReplaceStr(FstFileList[0],ExtractFileName(FstFileList[0]),'');
-    //fileFolder:=ReplaceStr(FstrInitialSelectedImageFile,ExtractFileName(FstrInitialSelectedImageFile),'');
-
-    // sets init dir for next time.
-    FstrInitialDir := ExtractFilePath(FstFileList[0]);
-
-    // Create search mask
-    fileSearchMask:='';
-    for i:=0 to FstFileExtList.Count-1 do
-    begin
-      if trim(FstFileExtList[i]) <> '' then
-      begin
-         fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
-      end;
-    end;
-
-    try
-      // Find siblings.
-      folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
-      for j:=0 to folderfiles.Count - 1 do
-      begin
-        // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
-        if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
-        begin
-          // Ignore first selected image.
-          if (folderfiles[j] <> FstFileList[0]) then
-          begin
-            f:= FileSize(folderfiles[j]);
-            // Check file size.
-            if f >= (FOptMinimulFileSizeKiloByte) then
-            begin
-              FstFileList.Add(folderfiles[j]);
-            end;
-          end else
-          begin
-            // remove firest selected and add to list so that file order is right.
-            FstFileList.Delete(0);
-            FstFileList.Add(folderfiles[j]);
-          end;
-        end;
-      end;
-    finally
-      folderfiles.Free;
-    end;
+    LoadSiblings(FstFileList[0], FstFileList);
 
     //if (FstFileList.count = 0) then
     //   FstFileList.Add(FstrInitialSelectedImageFile);
@@ -820,14 +844,12 @@ begin
       FiCurrentFileIndex:=0;
     end;
 
-
     // Show.
     FisStartNormal := true;
     self.Show;
     self.BringToFront;
     SetForegroundWindow(self.Handle);
   end;
-
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -964,6 +986,90 @@ begin
   FstFileList.Free;
   FstDirectoryList.Free;
   FstPlaylistList.Free;
+end;
+
+procedure TfrmMain.FormDropFiles(Sender: TObject;
+  const FileNames: array of string);
+var
+  i,f:integer;
+  FName, strInitialSelectedImageFile:string;
+  TmpFileList, TmpDirList, TmpPlayList:TStringList;
+  isSingleFSelected:boolean;
+begin
+  TmpFileList := TStringList.Create;
+  TmpDirList := TStringList.Create;
+  TmpPlayList := TStringList.Create;
+  strInitialSelectedImageFile := '';
+  isSingleFSelected:=false;
+
+  for I := Low(FileNames) to High(FileNames) do
+  begin
+    FName := FileNames[I];
+    if (FileExists(FName)) then
+    begin
+      // Found a file
+      {$ifdef windows}
+      {$else}
+      // On UNIX, a directory is also a file.
+      if (DirectoryExists(FName)) then
+        Continue;
+      {$endif}
+      if (FstFileExtList.IndexOf(LowerCase(ExtractFileExt(FName))) >= 0) then
+      begin
+        // Is a picture file.
+        // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+        if not (AnsiStartsStr('.',ExtractFilename(FName))) then
+        begin
+          f:= FileSize(FName);
+          // Check file size.
+          if f >= (FOptMinimulFileSizeKiloByte) then
+          begin
+            TmpFileList.Add(FName);
+            //
+            strInitialSelectedImageFile := FName;
+          end;
+        end;
+      end else if (FstPlaylistExtList.IndexOf(LowerCase(ExtractFileExt(FName))) >= 0) then
+      begin
+        // Found a playlist
+        TmpPlayList.Add(FName);
+      end;
+    {$ifdef windows}
+    end else if (DirectoryExists(FName)) then
+    begin
+      // Found a folder.
+      // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+      if not (AnsiStartsStr('.',ExtractFilename(FName))) then
+      begin
+        TmpDirList.Add(FName);
+      end;
+    {$endif}
+    end;
+  end;
+
+  LoadDirectories(TmpDirList, TmpFileList);
+
+  if (TmpFileList.Count = 1) and (strInitialSelectedImageFile <> '') then
+  begin
+    LoadSiblings(TmpFileList[0], TmpFileList);
+    isSingleFSelected:=true;
+  end;
+
+  if TmpFileList.Count <> 0 then
+  begin
+    fisSingleFileSelected := isSingleFSelected;
+    fstrInitialSelectedImageFile := strInitialSelectedImageFile;
+    FstFileList.Assign(TmpFileList);
+    FstDirectoryList.Assign(TmpDirList);
+    FstPlaylistList.Assign(TmpPlayList);
+    LoadImage;
+    SetFocus;
+    BringToFront;
+  end;
+
+  TmpFileList.Free;
+  TmpDirList.Free;
+  TmpPlayList.Free;
 end;
 
 procedure TfrmMain.TimerEffectStartTimer(Sender: TObject);
