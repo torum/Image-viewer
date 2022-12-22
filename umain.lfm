@@ -3,6 +3,7 @@ object frmMain: TfrmMain
   Height = 241
   Top = 1067
   Width = 320
+  AllowDropFiles = True
   AlphaBlend = True
   AlphaBlendValue = 20
   Caption = 'Image Viewer Main'
@@ -13,13 +14,14 @@ object frmMain: TfrmMain
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnDropFiles = FormDropFiles
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
   OnResize = FormResize
   OnShow = FormShow
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '2.2.0.4'
   object Image1: TImage
     Left = 0
     Height = 241
@@ -9526,7 +9528,7 @@ object frmMain: TfrmMain
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Title = 'Open picture(s)'
-    Filter = 'Graphic (*.jpeg;*.jpg;*.jpe;*.png;*.gif)|*.jpeg;*.jpg;*.jpe;*.png;*.gif|Portable Network Graphic (*.png)|*.png|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Graphics Interchange Format (*.gif)|*.gif'
+    Filter = 'All (*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif)|*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Portable Network Graphics (*.png)|*.png|Graphics Interchange Format (*.gif)|*.gif'
     Options = [ofFileMustExist, ofNoTestFileCreate, ofEnableSizing, ofDontAddToRecent, ofAutoPreview]
     Left = 51
     Top = 19
