@@ -28,3 +28,5 @@ lib/i386-win32/umain.rsj
 po_files/ImageViewer.pot
 backup/ufullscreen.pas
 backup/ufullscreen.lfm
+ImageViewer.app/Contents/Info.plist
+ImageViewer.app/Contents/PkgInfo
