@@ -19,7 +19,7 @@ procedure TranslateLCL;
 var
   Lang,FallbackLang: String;
 begin
-  // TODO: in windows, you have to call GetUserDefaultUILanguage() API to get UI languages.
+  // TODO: On windows, you have to call GetUserDefaultUILanguage() API to get UI languages.
   // http://sygh.hatenadiary.jp/entry/2014/05/24/181319
   {
   GetSystemDefaultLangID()
@@ -33,18 +33,6 @@ begin
   Lang:='';
   FallbackLang:='';
   LazGetLanguageIDs(Lang,FallbackLang);
-
-  //LazGetLanguageIDs(Lang,FallbackLang);
-  //OutputDebugString(PChar(TrimRight( 'Lang is '+ Lang + ', FallbackLang is '+ FallbackLang )));
-  //Debug Output: 'Lang is jp_JP FallbackLang is jp'
-  // What??? It supporsed to be "ja_JP"!!
-
-  //Lang := FallbackLang+'_'+Country;
-
-  //LazGetShortLanguageID(Lang);
-  //OutputDebugString(PChar(TrimRight( 'Lang is '+ Lang )));
-  //Debug Output: 'Lang is jp'
-  // What? not ja?
 
   if (Lang = 'en') or (Lang = 'en_US') or (Lang = 'us')
   or (FallbackLang = 'us') or (FallbackLang = 'US') or (FallbackLang = 'en') then

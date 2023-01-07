@@ -33,9 +33,7 @@ TODO:
  preLoading image for slideshow.
  load playlist.
  more Command line options.
- file drop handling(win).
- OS's power-save event aware.
- Modal dialog with options and playlist edit tab (drag & drop files).
+ Modal dialog with options and playlist edit tab.
 }
 
 interface
@@ -355,7 +353,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.0';
+  FstrAppVer:='1.3.2';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -392,7 +390,7 @@ begin
   // Be carefull when settings this. If the size is too large, the list will be empty.
   FOptMinimulFileSizeKiloByte:=1;
 
-  // Non user editable options. (TODO: should remove "Opt" from name.)
+  // Non user editable flags.
   FisSlideshowAutoStart:=true;
   FisStretch:=false;
   FisInFrame:=false;
@@ -1057,6 +1055,7 @@ begin
 
   if TmpFileList.Count <> 0 then
   begin
+    FiCurrentFileIndex:=0;
     fisSingleFileSelected := isSingleFSelected;
     fstrInitialSelectedImageFile := strInitialSelectedImageFile;
     FstFileList.Assign(TmpFileList);
