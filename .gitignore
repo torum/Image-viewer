@@ -30,3 +30,5 @@ backup/ufullscreen.pas
 backup/ufullscreen.lfm
 ImageViewer.app/Contents/Info.plist
 ImageViewer.app/Contents/PkgInfo
+backup/
+

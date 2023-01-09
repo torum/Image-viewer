@@ -1,20 +1,19 @@
 object frmAbout: TfrmAbout
-  Left = 1157
-  Height = 293
-  Top = 606
-  Width = 400
+  Left = 1707
+  Height = 234
+  Top = 849
+  Width = 320
   BorderStyle = bsToolWindow
-  ClientHeight = 293
-  ClientWidth = 400
-  DesignTimePPI = 120
+  ClientHeight = 234
+  ClientWidth = 320
   OnClose = FormClose
   Position = poOwnerFormCenter
-  LCLVersion = '1.8.4.0'
+  LCLVersion = '2.2.2.0'
   object Image1: TImage
-    Left = 24
-    Height = 113
-    Top = 24
-    Width = 113
+    Left = 19
+    Height = 90
+    Top = 19
+    Width = 90
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869637A39000089504E47
       0D0A1A0A0000000D49484452000001F4000001F40806000000CBD6DF8A000000
@@ -481,28 +480,28 @@ object frmAbout: TfrmAbout
     Proportional = True
   end
   object StaticTextAppsVer: TStaticText
-    Left = 168
-    Height = 21
-    Top = 72
-    Width = 121
+    Left = 134
+    Height = 16
+    Top = 58
+    Width = 95
     AutoSize = True
     Caption = 'StaticTextAppsVer'
     TabOrder = 0
   end
   object StaticTextWho: TStaticText
-    Left = 256
-    Height = 21
-    Top = 104
-    Width = 96
+    Left = 205
+    Height = 16
+    Top = 83
+    Width = 76
     AutoSize = True
     Caption = 'StaticTextWho'
     TabOrder = 1
   end
   object StaticTextWebSite: TStaticText
-    Left = 32
-    Height = 21
-    Top = 180
-    Width = 351
+    Left = 26
+    Height = 17
+    Top = 144
+    Width = 281
     Caption = 'https://torum.github.io/Image-viewer/'
     OnClick = StaticTextWebSiteClick
     OnMouseEnter = StaticTextWebSiteMouseEnter
@@ -510,18 +509,18 @@ object frmAbout: TfrmAbout
     TabOrder = 2
   end
   object LabelWebsite: TLabel
-    Left = 32
-    Height = 20
-    Top = 152
-    Width = 56
+    Left = 26
+    Height = 15
+    Top = 122
+    Width = 45
     Caption = 'Website:'
     ParentColor = False
   end
   object ButtonClose: TButton
-    Left = 280
-    Height = 31
-    Top = 240
-    Width = 94
+    Left = 224
+    Height = 25
+    Top = 192
+    Width = 75
     Caption = 'Close'
     Default = True
     ModalResult = 1
@@ -529,9 +528,9 @@ object frmAbout: TfrmAbout
     TabOrder = 3
   end
   object Bevel1: TBevel
-    Left = 24
-    Height = 7
-    Top = 216
-    Width = 351
+    Left = 19
+    Height = 6
+    Top = 173
+    Width = 281
   end
 end

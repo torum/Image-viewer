@@ -5,7 +5,6 @@ object frmMain: TfrmMain
   Width = 320
   AllowDropFiles = True
   AlphaBlend = True
-  AlphaBlendValue = 20
   Caption = 'Image Viewer Main'
   ClientHeight = 241
   ClientWidth = 320

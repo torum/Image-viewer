@@ -1,6 +1,7 @@
 unit UMain;
 
-{$mode objfpc}{$H+}
+{$mode delphi}
+// {$mode objfpc}{$H+}
 
 {
 Source:
@@ -41,7 +42,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
-  strutils, Types, FileCtrl, XMLConf{$ifdef windows}, windirs, Windows{$endif};
+  strutils, Types, FileCtrl, XMLConf{$ifdef windows}, windirs, Windows, DWMApi{$endif};
 
 type
 
@@ -170,6 +171,10 @@ type
     procedure DrawImage;
     procedure LoadDirectories(const Dirs: TStringList; FList: TStringList);
     procedure LoadSiblings(const FName: string; FList: TStringList);
+    {$ifdef windows}
+    procedure EnableBlur;
+    //procedure AeroGlass;
+    {$endif}
   public
     property FileList: TStringList read FstFileList;
     // User options. Read/Write.
@@ -198,8 +203,28 @@ type
     procedure SetCaption(strCaption:string);
   end;
 
+  {$ifdef windows}
+  AccentPolicy = packed record
+    AccentState: Integer;
+    AccentFlags: Integer;
+    GradientColor: Integer;
+    AnimationId: Integer;
+  end;
+
+  TWinCompAttrData = packed record
+    attribute: THandle;
+    pData: Pointer;
+    dataSize: ULONG;
+  end;
+  {$endif}
+
 var
   frmMain: TfrmMain;
+
+{$ifdef windows}
+var
+  SetWindowCompositionAttribute: function (Wnd: HWND; const AttrData: TWinCompAttrData): BOOL; stdcall = Nil;
+{$endif}
 
 resourcestring
   resstrStretch = 'Stretch';
@@ -353,7 +378,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.2';
+  FstrAppVer:='1.3.3';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -1492,6 +1517,7 @@ procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
 {$ifdef windows}
 var
   titlebarheight:integer;
+  //rgn:Cardinal;
 {$else}
 var
   Form: TForm;
@@ -1523,6 +1549,15 @@ begin
     self.left := self.left + GetSystemMetrics(SM_CYFRAME); // added in v1.2.18
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     self.height := self.height + titlebarheight;
+
+    // Rounded corner window on per with Windows11.
+    //rgn:=CreateRoundRectRgn(0,0,self.width,self.height,16,16);
+    //SetWindowRgn(Handle,Rgn,True);
+
+    // Could be better?
+    DoubleBuffered := True;
+    EnableBlur;
+
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
       FOrigBounds:= BoundsRect;
@@ -1575,7 +1610,6 @@ begin
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
-
   if (self.top < 0) then self.top := 0;
   if (self.left < -100) then self.left := 0;
 
@@ -1997,6 +2031,7 @@ begin
     // Don't do this at runtime on linux!
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     BorderStyle:= bsNone;
+
     {$endif}
 
     {$ifdef darwin}
@@ -2077,6 +2112,12 @@ begin
       BoundsRect:= CurrentMonitor.BoundsRect;
     end;
 
+    {$ifdef windows}
+    // Not really good?
+    //DoubleBuffered := True;
+    //EnableBlur;
+    {$endif}
+
     // ShowWindow(Handle, SW_SHOWFULLSCREEN);
   end else
   begin
@@ -2145,7 +2186,81 @@ begin
 
 end;
 
+{$ifdef windows}
+// https://wiki.lazarus.freepascal.org/Aero_Glass
+procedure TfrmMain.EnableBlur;
+const
+  WCA_ACCENT_POLICY = 19;
+  ACCENT_ENABLE_BLURBEHIND = 3;
+  ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
+  DrawLeftBorder = $20;
+  DrawTopBorder = $40;
+  DrawRightBorder = $80;
+  DrawBottomBorder = $100;
+var
+  dwm10: THandle;
+  data : TWinCompAttrData;
+  accent: AccentPolicy;
+begin
 
+  dwm10 := LoadLibrary('user32.dll');
+  try
+    @SetWindowCompositionAttribute := GetProcAddress(dwm10, 'SetWindowCompositionAttribute');
+    if @SetWindowCompositionAttribute <> nil then
+    begin
+      accent.AccentState := ACCENT_ENABLE_BLURBEHIND;
+      //accent.AccentState := ACCENT_ENABLE_ACRYLICBLURBEHIND;
+      //accent.GradientColor := (100 SHL 24) or ($00E3E0DE);
+      accent.GradientColor := ($000000FF);
+
+      accent.AccentFlags := DrawLeftBorder or DrawTopBorder or DrawRightBorder or DrawBottomBorder;
+
+      data.Attribute := WCA_ACCENT_POLICY;
+      data.dataSize := SizeOf(accent);
+      data.pData := @accent;
+      SetWindowCompositionAttribute(self.Handle, data);
+
+    end
+    else
+    begin
+      //ShowMessage('Not found Windows 10 blur API');
+    end;
+  finally
+    FreeLibrary(dwm10);
+  end;
+
+end;
+(*
+procedure TfrmMain.AeroGlass;
+var
+  Aero: BOOL;
+  Area: TRect;
+  hDWM: THandle;
+begin
+  hDWM:=LoadLibrary('dwmapi.dll');
+  try
+    @DwmIsCompositionEnabled:=GetProcAddress(hDWM,'DwmIsCompositionEnabled');
+    if @DwmIsCompositionEnabled<>nil then
+        DwmIsCompositionEnabled(Aero);
+    if Aero then
+    begin
+      Area:=Rect(-1,-1,-1,-1);
+      Color:=clBlack;
+      @DwmExtendFrameIntoClientArea:=GetProcAddress(hDWM,'DwmExtendFrameIntoClientArea');
+      if @DwmExtendFrameIntoClientArea<>nil then
+          DwmExtendFrameIntoClientArea(Handle,@Area);
+
+    end
+    else ShowMessage('Aero is Disabled');
+  finally
+    FreeLibrary(hDWM);
+  end;
+end;
+*)
+
+initialization
+  SetWindowCompositionAttribute := GetProcAddress(GetModuleHandle(user32), 'SetWindowCompositionAttribute');
+{$endif}
 end.
 
 
