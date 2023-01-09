@@ -388,7 +388,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.3.2';
+  FstrAppVer:='1.3.4';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
