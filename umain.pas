@@ -388,7 +388,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.3';
+  FstrAppVer:='1.3.3.2';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -1038,7 +1038,7 @@ end;
 procedure TfrmMain.FormDropFiles(Sender: TObject;
   const FileNames: array of string);
 var
-  i,f:integer;
+  i,f,newCurrentIndex:integer;
   FName, strInitialSelectedImageFile:string;
   TmpFileList, TmpDirList, TmpPlayList:TStringList;
   isSingleFSelected:boolean;
@@ -1105,11 +1105,25 @@ begin
   if TmpFileList.Count <> 0 then
   begin
     FiCurrentFileIndex:=0;
+
     fisSingleFileSelected := isSingleFSelected;
     fstrInitialSelectedImageFile := strInitialSelectedImageFile;
     FstFileList.Assign(TmpFileList);
     FstDirectoryList.Assign(TmpDirList);
     FstPlaylistList.Assign(TmpPlayList);
+
+    if (fstrInitialSelectedImageFile <> '') then
+    begin
+      newCurrentIndex:=FstFileList.indexOf(FstrInitialSelectedImageFile);
+      if (newCurrentIndex > -1) then
+      begin
+        FiCurrentFileIndex:=newCurrentIndex;
+      end else
+      begin
+        FiCurrentFileIndex:=0;
+      end;
+    end;
+
     LoadImage;
     SetFocus;
     BringToFront;
