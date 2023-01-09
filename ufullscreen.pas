@@ -725,6 +725,11 @@ end;
 procedure TfrmFullscreen.ResizeImage();
 var
   curWidth,curHeight:integer;
+  {$ifdef windows}
+  rgn:Cardinal;
+  param1,param2,param3,param4:integer;
+  MyRect : TRect;
+  {$endif}
 begin
   if FisInFrame then
   begin
@@ -756,6 +761,57 @@ begin
       Image1.Stretch:=true;
     end;
   end;
+
+  {$ifdef windows}
+  if FisInFrame then
+  begin
+    param1:= round((curWidth-Image1.Picture.width) div 2);
+    param2:= round((curHeight-Image1.Picture.height) div 2);
+    param3:= round(Image1.Picture.width + ((curWidth-Image1.Picture.width) div 2));
+    param4:= round(Image1.Picture.height + ((curHeight-Image1.Picture.height) div 2));
+
+    if Image1.Stretch then
+    begin
+      if Image1.Width*Image1.Picture.Height > Image1.Picture.Width*Image1.Height then
+      begin
+        // Height is restricting
+        MyRect.Top :=0;
+        MyRect.Bottom := Image1.Height;
+        MyRect.Left := (Image1.Width -
+                       Round((Image1.Picture.Width / Image1.Picture.Height) *
+                             Image1.Height)) div 2;
+        MyRect.Right := (Image1.Width +
+                       Round((Image1.Picture.Width / Image1.Picture.Height) *
+                             Image1.Height)) div 2;
+        param1:= MyRect.Left + 1;
+        param2:= MyRect.Top;
+        param3:= MyRect.Right;
+        param4:= MyRect.Bottom;
+      end else begin
+          // Width is restricting
+        MyRect.Left := 0;
+        MyRect.Right := Image1.Width;
+        MyRect.Top := (Image1.Height -
+                       Round((Image1.Picture.Height / Image1.Picture.Width) *
+                             Image1.Width)) div 2;
+        MyRect.Bottom := (Image1.Height +
+                          Round((Image1.Picture.Height / Image1.Picture.Width) *
+                                Image1.Width)) div 2;
+        param1:= MyRect.Left;
+        param2:= MyRect.Top + 1;
+        param3:= MyRect.Right;
+        param4:= MyRect.Bottom;
+      end;
+    end;
+
+    // TODO
+    // 1) can't do anything at cripped region when fullscreen because it's a modal window.
+    rgn:=CreateRoundRectRgn(param1,param2,param3,param4,2,2);
+    SetWindowRgn(Handle,Rgn,True);
+  end;
+
+
+  {$endif}
 end;
 
 function TfrmFullscreen.DisplayImage(id:integer):integer;
@@ -1088,6 +1144,7 @@ begin
     end else begin
       frmMain.OptStayOnTopInframe:=true;
     end;
+    ResizeImage;
   end;
 end;
 
@@ -1102,7 +1159,8 @@ begin
 
   if not Assigned(Image1.Picture) then exit;
   Image1.Stretch:=FExpand;
-  Image1.Refresh;
+  Image1.Refresh; 
+  ResizeImage;
 end;
 
 procedure TfrmFullscreen.MenuItemFitClick(Sender: TObject);
@@ -1117,7 +1175,8 @@ begin
   end;
 
   if not Assigned(Image1.Picture) then exit;
-  Image1.Refresh;
+  Image1.Refresh; 
+  ResizeImage;
 end;
 
 procedure TfrmFullscreen.MenuItemStretchBothClick(Sender: TObject);
@@ -1133,6 +1192,7 @@ begin
   end;
   Image1.Stretch:=FStretch;
   Image1.Refresh;
+  ResizeImage;
 end;
 
 procedure TfrmFullscreen.PopupMenu1Close(Sender: TObject);

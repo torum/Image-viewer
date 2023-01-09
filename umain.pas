@@ -84,10 +84,20 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
+    procedure FormDblClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormDropFiles(Sender: TObject; const FileNames: array of string);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
+    procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
+      MousePos: TPoint; var Handled: Boolean);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
@@ -875,6 +885,20 @@ begin
   end;
 end;
 
+procedure TfrmMain.FormDblClick(Sender: TObject);
+begin
+  if Fisfullscreen or FisInFrame then
+    begin
+      if Assigned(frmFullscreen) then
+      begin
+        // Redirect when form is cripped and received in frmMain.
+        if frmFullscreen.Visible then begin
+           frmFullscreen.Image1DblClick(Sender);
+        end;
+      end;
+    end;
+end;
+
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
   if Application.Terminated then exit;
@@ -1291,19 +1315,20 @@ end;
 
 procedure TfrmMain.Image1DblClick(Sender: TObject);
 begin
-  if FisInFrame then
-  begin
-    // This shuldn't be happening.
-  end else
-  begin
-    if not FisFullscreen then
+    if Fisfullscreen or FisInFrame then
     begin
-      MenuItemSlideshowClick(nil);
+      if Assigned(frmFullscreen) then
+      begin
+        // Redirect when form is cripped and received in frmMain.... but not working here because Image1 is hidden.
+        if frmFullscreen.Visible then begin
+           frmFullscreen.Image1DblClick(Sender);
+        end;
+      end;
     end else
     begin
-      // This shuldn't be happening.
+      //
+      MenuItemSlideshowClick(nil);
     end;
-  end;
 end;
 
 procedure TfrmMain.MenuItemSlideshowClick(Sender: TObject);
@@ -1871,6 +1896,81 @@ begin
     // picture zoom
     ScrollBox1.Visible := false;
     FintZoomingScaleFactor := 1;
+  end;
+end;
+
+procedure TfrmMain.FormMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and receive inputs while slideshow.
+      if frmFullscreen.Visible then begin
+         frmFullscreen.Image1MouseDown(Sender,Button,Shift,X,Y);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  if FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and receive inputs while slideshow.
+      if frmFullscreen.Visible then begin
+         frmFullscreen.Image1MouseMove(Sender,Shift,X,Y);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  if FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and receive inputs while slideshow.
+      if frmFullscreen.Visible then begin
+         frmFullscreen.Image1MouseUp(Sender,Button,Shift,X,Y);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+  if Fisfullscreen or FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and receive inputs while slideshow.
+      if frmFullscreen.Visible then begin
+         frmFullscreen.FormMouseWheelDown(Sender,Shift,MousePos,Handled);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
+  MousePos: TPoint; var Handled: Boolean);
+begin
+  if Fisfullscreen or FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and receive inputs while slideshow.
+      if frmFullscreen.Visible then begin
+         frmFullscreen.FormMouseWheelUp(Sender,Shift,MousePos,Handled);
+      end;
+    end;
   end;
 end;
 
