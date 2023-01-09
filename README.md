@@ -9,6 +9,7 @@ Windows version is [available at the Microsoft Store](https://www.microsoft.com/
 * Full keyboard and mouse playback control. 
 * Configurable options with command line parameters and popup menus. 
 * Supports multiple moniters.
+* File and folder drop support.
 
 ### Usage:  
 Image Viewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files or folders and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder) or (3) command-line.
