@@ -40,8 +40,8 @@ Normal View (on Ubuntu)
 Normal View (on macOS)  
 ![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/Mac%202018-02-20%2018.34.57.png?raw=true)
 
-Windowless View (with slideshow) on Windows 10  
-![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3.png?raw=true)
+Windowless View (with slideshow) on Windows 11  
+![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-n.png?raw=true)
 
 Windowless View (with slideshow) on macOS  
 ![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/macOS-inFrameScreenshot-2018-02-20%2023.56.00.png?raw=true)
