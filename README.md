@@ -67,7 +67,7 @@ Image Viewer can be launched via command-line, and applications or scripts can a
 #### Command-line Useage example:    
 ` $ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\` 
 
-#### Build instruction:   
+### Build instruction:   
 
 You can download the Lazarus IDE and FPC(compiler) from here.
 https://www.lazarus-ide.org/index.php?page=downloads
@@ -77,7 +77,7 @@ Or `sudo apt install lazarus` on Ubuntu.
 Once you download and install the IDE, just open the project file "ImageViewer.lpr".
 When the project is opened, just hit F9 and run.
  
-#### Compiled and tested on:   
+### Compiled and tested on:   
 
 * Windows 11: Lazarus 2.2.2 FPC 3.2.2 x86_64-win64-win32/win64
 * Windows 10: Lazarus 1.8.0 FPC 3.0.4 x86_64-win64-win32/win64
@@ -87,6 +87,6 @@ When the project is opened, just hit F9 and run.
 * macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
 * macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
-#### Contributers
-Russian translation (Nemo08)
-https://github.com/Nemo08
+### Contributers
+* @Nemo08 Russian translation.
+* @quadroid File/folder drop and portable mode.
