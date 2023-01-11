@@ -1,17 +1,16 @@
 unit UMain;
 
-
 // {$mode objfpc}{$H+}
 // EnableBlur procedure requires delphi mode.
 {$mode delphi}
 
 {
-Source:
+### Source:
  https://github.com/torum/Image-viewer
 
-No extra components required.
+* No extra components required.
 
-Compiled and tested on
+### Compiled and tested on
  Windows 11: Lazarus 2.2.2 FPC 3.2.2 x86_64-win64-win32/win64
  Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
  Ubuntu 22.04.1 LTS: Lazarus 2.2.0 FPC 3.2.2 x86_64-linux-gtk2
@@ -20,8 +19,8 @@ Compiled and tested on
  macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
  macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
-Known issues and bugs:
- On Windows, inFrame "window" does not have shaddow.
+### Known issues and bugs:
+ On Windows, inFrame "window" does not have shaddow.  < Fixed by EnableBlur.
  On Windows, PNG (depth 24) antialising isn't working when stretch.
   https://forum.lazarus.freepascal.org/index.php?topic=24408.0
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
@@ -32,11 +31,15 @@ Known issues and bugs:
  On macOS, awaking from sleep >blank screen?
  Cocoa based 64bit apps for macOS may not be ready some time soon...
 
-TODO:
- preLoading image for slideshow.
- load playlist.
- more Command line options.
- Modal dialog with options and playlist edit tab.
+### TODO:
+* Blur effect on/off option. Need to find a way to enable on fullscreen with a modal window first...
+* WebP support.
+* Better zooming.
+
+### Backlog:
+* preLoading image for slideshow.
+* load playlist.
+* more Command line options.
 }
 
 interface
@@ -390,7 +393,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.4.1';
+  FstrAppVer:='1.3.5.0';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -992,7 +995,6 @@ begin
 
   //if (self.top < 0) then self.top := 0;
   //if (self.left < -100) then self.left := 0;
-
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
@@ -1021,9 +1023,7 @@ begin
     XMLConfig.SetValue('/Opts/FileExts',widestring(FOptFileExts));
     XMLConfig.SetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts));
     XMLConfig.SetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
-
     XMLConfig.SetValue('/InitDir/Path',widestring(FstrInitialDir));
-
   end;
 end;
 
@@ -1166,8 +1166,6 @@ begin
     // Show full screen.
     frmFullscreen.ShowModal;
 
-    //if (self.top < 0) then self.top := 0;
-    //if (self.left < -100) then self.left := 0;
 
     // Returned from fullscreen
     if FisStartNormal then
@@ -1244,11 +1242,9 @@ begin
 
     if (FileList.Count = 1) then
     begin
-      //Self.Caption:=FileList[FiCurrentFileIndex];
       Self.Caption:=strPath;
     end else
     begin
-      //Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + FileList[FiCurrentFileIndex];
       Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
     end;
 
@@ -1479,7 +1475,6 @@ procedure TfrmMain.DrawImage;
 var
   ImageRect: TRect;
 begin
-  //ImageRect := Rect(0,0,(Image1.Picture.Width * FintZoomingScaleFactor),(Image1.Picture.Height * FintZoomingScaleFactor));
   SetRect(ImageRect,0,0,(Image1.Picture.Width * FintZoomingScaleFactor),(Image1.Picture.Height * FintZoomingScaleFactor));
 
   PaintBox1.Width := ImageRect.Right;
@@ -1549,9 +1544,6 @@ begin
     end;
     Screen.Cursor:=crDefault; //again
   end;
-
-  //if (self.top < 0) then self.top := 0;
-  //if (self.left < -100) then self.left := 0;
 end;
 
 procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
@@ -1591,11 +1583,11 @@ begin
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     self.height := self.height + titlebarheight;
 
-    // Rounded corner window on per with Windows11.
+    // Rounded corner window on per with Windows11. < not good enough...
     //rgn:=CreateRoundRectRgn(0,0,self.width,self.height,16,16);
     //SetWindowRgn(Handle,Rgn,True);
 
-    // Could be better?
+    // Background blur when background color is set to clBlack.
     DoubleBuffered := True;
     EnableBlur;
 
@@ -1651,8 +1643,6 @@ begin
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
-  //if (self.top < 0) then self.top := 0;
-  //if (self.left < -100) then self.left := 0;
 
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
@@ -1687,8 +1677,6 @@ begin
   Image1.Refresh;
   Image1.BringToFront;
   screen.Cursor:=crDefault;
-  //if (self.top < 0) then self.top := 0;
-  //if (self.left < -100) then self.left := 0;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
@@ -1705,9 +1693,7 @@ begin
   begin
     if FileList.Count > 0 then
     begin
-
       strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
-
       if (FileList.Count = 1) then
       begin
         Self.Caption:=strPath;
@@ -1715,7 +1701,6 @@ begin
       begin
         Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
       end;
-
     end;
   end;
 end;
@@ -1770,7 +1755,6 @@ begin
 
   //Application.Terminate;
   //Halt(1);
-
 end;
 
 procedure TfrmMain.FormKeyDown(Sender: TObject; var Key: Word;
@@ -2251,7 +2235,7 @@ begin
     end;
 
     {$ifdef windows}
-    // Not really good?
+    // Not really good....
     //DoubleBuffered := True;
     //EnableBlur;
     {$endif}
@@ -2272,7 +2256,6 @@ procedure TfrmMain.RestoreFormState;
 var
   LastWindowState: TWindowState;
 begin
-
   with XMLConfig do
   begin
     LastWindowState := TWindowState(GetValue('WindowState', Integer(WindowState)));
@@ -2294,17 +2277,12 @@ begin
         GetValue('NormalTop', Top),
         GetValue('NormalWidth', Width),
         GetValue('NormalHeight', Height));
-
-        //if (self.top < 0) then self.top := 0;
-        //if (self.left < -100) then self.left := 0;
     end;
   end;
-
 end;
 
 procedure TfrmMain.StoreFormState;
 begin
-
   // Save form state.
   with XMLConfig do
   begin
@@ -2312,16 +2290,12 @@ begin
     SetValue('NormalTop', Top);
     SetValue('NormalWidth', Width);
     SetValue('NormalHeight', Height);
-
     SetValue('RestoredLeft', RestoredLeft);
     SetValue('RestoredTop', RestoredTop);
     SetValue('RestoredWidth', RestoredWidth);
     SetValue('RestoredHeight', RestoredHeight);
-
     SetValue('WindowState', Integer(WindowState));
   end;
-
-
 end;
 
 {$ifdef windows}

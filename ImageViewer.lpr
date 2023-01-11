@@ -19,16 +19,8 @@ procedure TranslateLCL;
 var
   Lang,FallbackLang: String;
 begin
-  // TODO: On windows, you have to call GetUserDefaultUILanguage() API to get UI languages.
-  // http://sygh.hatenadiary.jp/entry/2014/05/24/181319
-  {
-  GetSystemDefaultLangID()
-  GetUserDefaultLangID()
-  GetSystemDefaultUILanguage()
-  GetUserDefaultUILanguage() // We need to call this. But GetLanguageIDs calls GetUserDefaultLCID.
-  GetSystemDefaultLCID()
-  GetUserDefaultLCID()
-  }
+  // On windows, you have to call GetUserDefaultUILanguage() API to get UI languages.
+  // But GetLanguageIDs calls GetUserDefaultLCID.
 
   Lang:='';
   FallbackLang:='';

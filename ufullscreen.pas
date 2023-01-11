@@ -763,6 +763,7 @@ begin
   end;
 
   {$ifdef windows}
+  // to see the background blue effect, we need to crip the image.
   if FisInFrame then
   begin
     param1:= round((curWidth-Image1.Picture.width) div 2);
@@ -809,8 +810,6 @@ begin
     rgn:=CreateRoundRectRgn(param1,param2,param3,param4,2,2);
     SetWindowRgn(Handle,Rgn,True);
   end;
-
-
   {$endif}
 end;
 
@@ -1246,7 +1245,6 @@ begin
   if FRandom then
   begin
     FRandom:=false;
-
     // Clear and reload the list.
     FFileList.Clear;
     FFileList.Assign(frmMain.FileList);
@@ -1656,9 +1654,6 @@ begin
   begin
     self.BoundsRect := self.Parent.ClientRect;
   end;
-
-  //if (self.top < 0) then self.top := 0;
-  //if (self.left < 0) then self.left := 0;
 end;
 
 procedure TfrmFullscreen.ShowFullScreen(blnOn: boolean);
