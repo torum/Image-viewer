@@ -941,14 +941,14 @@ begin
 
   if self.AlphaBlendValue < 255 then
   begin
-    if (self.AlphaBlendValue < 100 ) then begin
+    if (self.AlphaBlendValue < 120 ) then begin
        self.AlphaBlendValue := self.AlphaBlendValue + 10;
     end else
     begin
-      if (self.AlphaBlendValue +5 >= 255) then begin
+      if (self.AlphaBlendValue + 10 >= 255) then begin
         self.AlphaBlendValue := 255;
       end else begin
-        self.AlphaBlendValue := self.AlphaBlendValue + 4;
+        self.AlphaBlendValue := self.AlphaBlendValue + 10;
       end;
     end;
   end else begin
@@ -1144,7 +1144,9 @@ begin
     end else begin
       frmMain.OptStayOnTopInframe:=true;
     end;
-    ResizeImage;
+
+    ResizeImage;     
+
   end;
 end;
 
@@ -1655,8 +1657,8 @@ begin
     self.BoundsRect := self.Parent.ClientRect;
   end;
 
-  if (self.top < 0) then self.top := 0;
-  if (self.left < 0) then self.left := 0;
+  //if (self.top < 0) then self.top := 0;
+  //if (self.left < 0) then self.left := 0;
 end;
 
 procedure TfrmFullscreen.ShowFullScreen(blnOn: boolean);

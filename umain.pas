@@ -1,7 +1,9 @@
 unit UMain;
 
-{$mode delphi}
+
 // {$mode objfpc}{$H+}
+// EnableBlur procedure requires delphi mode.
+{$mode delphi}
 
 {
 Source:
@@ -388,7 +390,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.4';
+  FstrAppVer:='1.3.4.1';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -988,8 +990,8 @@ begin
     end;
   end;
 
-  if (self.top < 0) then self.top := 0;
-  if (self.left < -100) then self.left := 0;
+  //if (self.top < 0) then self.top := 0;
+  //if (self.left < -100) then self.left := 0;
 
 end;
 
@@ -1145,14 +1147,14 @@ begin
 
   if self.AlphaBlendValue < 255 then
   begin
-    if (self.AlphaBlendValue < 100 ) then begin
+    if (self.AlphaBlendValue < 150 ) then begin
        self.AlphaBlendValue := self.AlphaBlendValue + 10;
     end else
     begin
-      if (self.AlphaBlendValue +5 >= 255) then begin
+      if (self.AlphaBlendValue + 15 >= 255) then begin
         self.AlphaBlendValue := 255;
       end else begin
-        self.AlphaBlendValue := self.AlphaBlendValue + 5;
+        self.AlphaBlendValue := self.AlphaBlendValue + 15;
       end;
     end;
   end else begin
@@ -1164,8 +1166,8 @@ begin
     // Show full screen.
     frmFullscreen.ShowModal;
 
-    if (self.top < 0) then self.top := 0;
-    if (self.left < -100) then self.left := 0;
+    //if (self.top < 0) then self.top := 0;
+    //if (self.left < -100) then self.left := 0;
 
     // Returned from fullscreen
     if FisStartNormal then
@@ -1385,8 +1387,8 @@ begin
       Image1.Visible:=true;
       ShowFullScreen(false);
       Screen.Cursor:=crDefault;
-      if (self.top < 0) then self.top := 0;
-      if (self.left < -100) then self.left := 0;
+      //if (self.top < 0) then self.top := 0;
+      //if (self.left < -100) then self.left := 0;
     end;
 
   end;
@@ -1548,8 +1550,8 @@ begin
     Screen.Cursor:=crDefault; //again
   end;
 
-  if (self.top < 0) then self.top := 0;
-  if (self.left < -100) then self.left := 0;
+  //if (self.top < 0) then self.top := 0;
+  //if (self.left < -100) then self.left := 0;
 end;
 
 procedure TfrmMain.MenuItemSlideshowInFrameClick(Sender: TObject);
@@ -1649,8 +1651,8 @@ begin
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
   BoundsRect:=FOrigBounds;
-  if (self.top < 0) then self.top := 0;
-  if (self.left < -100) then self.left := 0;
+  //if (self.top < 0) then self.top := 0;
+  //if (self.left < -100) then self.left := 0;
 
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
@@ -1685,8 +1687,8 @@ begin
   Image1.Refresh;
   Image1.BringToFront;
   screen.Cursor:=crDefault;
-  if (self.top < 0) then self.top := 0;
-  if (self.left < -100) then self.left := 0;
+  //if (self.top < 0) then self.top := 0;
+  //if (self.left < -100) then self.left := 0;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
@@ -1724,6 +1726,8 @@ begin
 end;
 
 procedure TfrmMain.SetStayOnTop(bln:Boolean);
+var
+  BeforeBounds : TRect;
 begin
   if bln then
   begin
@@ -1731,8 +1735,28 @@ begin
     MenuItemStayOnTop.Checked:=true;
   end else
   begin
+    {$ifdef windows}
+    if FisInFrame then
+    begin
+      // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
+      BeforeBounds:= BoundsRect;
+    end;
+    {$endif}
+
     self.FormStyle:=fsNormal;
     MenuItemStayOnTop.Checked:=false;
+
+    {$ifdef windows}
+    if FisInFrame then
+    begin
+      self.BorderStyle:=bsNone;
+      // Blur again
+      DoubleBuffered := True;
+      EnableBlur;
+      // re-set position.
+      BoundsRect := BeforeBounds;
+    end;
+    {$endif}
   end;
   self.FoptStayOnTop:=bln;
 end;
@@ -2271,8 +2295,8 @@ begin
         GetValue('NormalWidth', Width),
         GetValue('NormalHeight', Height));
 
-        if (self.top < 0) then self.top := 0;
-        if (self.left < -100) then self.left := 0;
+        //if (self.top < 0) then self.top := 0;
+        //if (self.left < -100) then self.left := 0;
     end;
   end;
 
@@ -2301,6 +2325,7 @@ begin
 end;
 
 {$ifdef windows}
+// requires delphi mode.
 // https://wiki.lazarus.freepascal.org/Aero_Glass
 procedure TfrmMain.EnableBlur;
 const
