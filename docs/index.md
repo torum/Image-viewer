@@ -31,17 +31,17 @@ Image Viewer can be launched by (1) double clicking the executable and selecting
 
 
 ### Screenshots:
-Normal View (on Windows)  
-![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot1.png?raw=true)
+Windowless View (with slideshow) on Windows 11  
+![Windowless View (with slideshow) on Windows 11](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-n.png?raw=true)
 
-Normal View (on Ubuntu)  
-![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/Screenshot%20from%202018-02-20%2021-19-26.jpg?raw=true)
+Normal View on Windows 11
+![Normal View on Windows 11](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-Windows.png?raw=true)
+
+Normal View on Linux
+![Normal View on Linux](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-Ubuntu.png?raw=true)
 
 Normal View (on macOS)  
 ![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/Mac%202018-02-20%2018.34.57.png?raw=true)
-
-Windowless View (with slideshow) on Windows 11  
-![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-n.png?raw=true)
 
 Windowless View (with slideshow) on macOS  
 ![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/macOS-inFrameScreenshot-2018-02-20%2023.56.00.png?raw=true)
