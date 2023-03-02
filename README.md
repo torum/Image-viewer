@@ -12,8 +12,14 @@ Windows version is [available at the Microsoft Store](https://apps.microsoft.com
 * File and folder drop support.
 
 ### Screenshot:  
+Windowless View (with slideshow) on Windows 11  
 ![Windowless View (with slideshow) on Windows 11](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-n.png?raw=true)
 
+Normal View on Windows 11
+![Normal View on Windows 11](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-Windows.png?raw=true)
+
+Normal View on Linux
+![Normal View on Linux](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-Ubuntu.png?raw=true)
 
 ### Usage:  
 Image Viewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files or folders and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder) or (3) command-line.
