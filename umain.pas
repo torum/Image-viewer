@@ -47,7 +47,9 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
-  strutils, Types, FileCtrl, XMLConf{$ifdef windows}, windirs, Windows, DWMApi{$endif};
+  strutils, Types, FileCtrl, XMLConf
+  {$ifdef windows}, windirs, Windows, DWMApi, win32titlestyler{$endif}
+  ;
 
 type
 
@@ -393,7 +395,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.5.0';
+  FstrAppVer:='1.3.6.0';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -908,6 +910,12 @@ procedure TfrmMain.FormShow(Sender: TObject);
 begin
   if Application.Terminated then exit;
 
+  {$ifdef windows}
+    // Apply dark themed title bar.
+    // https://forum.lazarus.freepascal.org/index.php/topic,59172.msg441116.html
+    ApplyFormDarkTitle(self, FoptBackgroundBlack, true);
+  {$endif}
+
   if (FOptFullscreen and (not FisFullscreen) and (not FisStartNormal)) then
   begin
     self.PopupMenu:= nil;
@@ -1307,22 +1315,28 @@ end;
 
 procedure TfrmMain.MenuItemBackgroundBlackClick(Sender: TObject);
 begin
-
   FoptBackgroundBlack:=true;
   self.Color:=clBlack;
   MenuItemBackgroundBlack.Checked:=true;
   MenuItemBackgroundWhite.Checked:=false;
-
+  {$ifdef windows}
+    // Apply dark themed title bar.
+    // https://forum.lazarus.freepascal.org/index.php/topic,59172.msg441116.html
+    ApplyFormDarkTitle(self, FoptBackgroundBlack, true);
+  {$endif}
 end;
 
 procedure TfrmMain.MenuItemBackgroundWhiteClick(Sender: TObject);
 begin
-                                        
   FoptBackgroundBlack:=false;
   self.Color:=clWhite;
   MenuItemBackgroundBlack.Checked:=false;
   MenuItemBackgroundWhite.Checked:=true;
-
+  {$ifdef windows}
+    // Apply dark themed title bar.
+    // https://forum.lazarus.freepascal.org/index.php/topic,59172.msg441116.html
+    ApplyFormDarkTitle(self, FoptBackgroundBlack, true);
+  {$endif}
 end;
 
 procedure TfrmMain.Image1DblClick(Sender: TObject);
@@ -1383,8 +1397,6 @@ begin
       Image1.Visible:=true;
       ShowFullScreen(false);
       Screen.Cursor:=crDefault;
-      //if (self.top < 0) then self.top := 0;
-      //if (self.left < -100) then self.left := 0;
     end;
 
   end;
@@ -1575,6 +1587,7 @@ begin
     self.PopupMenu:= nil;
 
     {$ifdef windows}
+    FOrigWndState:=WindowState;
     FOrigBounds:= BoundsRect;
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
@@ -1642,8 +1655,15 @@ begin
   {$ifdef windows}
   BoundsRect:= FOrigBounds;
   self.BorderStyle:=bsSizeable;
-  BoundsRect:=FOrigBounds;
-
+  //BoundsRect:=FOrigBounds;
+  if (FOrigWndState = wsNormal) then
+  begin
+       BoundsRect:= FOrigBounds;
+  end else
+  if (FOrigWndState = wsMaximized) then
+  begin
+       WindowState:= FOrigWndState;
+  end;
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     self.BorderStyle:=bsSizeable;
@@ -1718,32 +1738,42 @@ begin
   begin
     self.FormStyle:=fsSystemStayOnTop;
     MenuItemStayOnTop.Checked:=true;
+    self.FoptStayOnTop:=true;
   end else
   begin
-    {$ifdef windows}
-    if FisInFrame then
+    if (self.FormStyle = fsSystemStayOnTop) then
     begin
-      // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
-      BeforeBounds:= BoundsRect;
-    end;
-    {$endif}
 
-    self.FormStyle:=fsNormal;
-    MenuItemStayOnTop.Checked:=false;
+      {$ifdef windows}
+      if FisInFrame then
+      begin
+        // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
+        BeforeBounds:= BoundsRect;
+      end;
+      {$endif}
 
-    {$ifdef windows}
-    if FisInFrame then
-    begin
-      self.BorderStyle:=bsNone;
-      // Blur again
-      DoubleBuffered := True;
-      EnableBlur;
-      // re-set position.
-      BoundsRect := BeforeBounds;
+      // TODO: This isn't working... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
+      self.FormStyle:=fsNormal;
+
+      MenuItemStayOnTop.Checked:=false;
+      self.FoptStayOnTop:=false;
+
+      {$ifdef windows}
+      if FisInFrame then
+      begin
+        self.BorderStyle:=bsNone;
+        // Blur again
+        DoubleBuffered := True;
+        EnableBlur;
+        // re-set position.
+        BoundsRect := BeforeBounds;
+      end;
+      {$endif}
+
     end;
-    {$endif}
   end;
-  self.FoptStayOnTop:=bln;
+  //self.FoptStayOnTop:=bln;
+  //MenuItemStayOnTop.Checked:=bln;
 end;
 
 procedure TfrmMain.ApplicationProperties1Exception(Sender: TObject; E: Exception);
@@ -1998,9 +2028,12 @@ end;
 
 procedure TfrmMain.MenuItemStayOnTopClick(Sender: TObject);
 begin
-  if (self.FormStyle = fsSystemStayOnTop) then
+  //if (self.FormStyle = fsSystemStayOnTop) then
+  if (self.FoptStayOnTop) then
   begin
     SetStayOnTop(false);
+    // TODO: somehow, this works.
+    if (self.FormStyle = fsSystemStayOnTop) then SetStayOnTop(false);
   end else
   begin
     SetStayOnTop(true);
@@ -2244,11 +2277,18 @@ begin
   end else
   begin
     WindowState:= FOrigWndState;
-    BoundsRect:= FOrigBounds;
+    if (FOrigWndState = wsNormal) then
+    begin
+         BoundsRect:= FOrigBounds;
+    end;
     BorderStyle:= bsSizeable;
 
     // ShowWindow(Handle, SW_SHOWNORMAL);
-    BoundsRect:= FOrigBounds;
+    WindowState:= FOrigWndState;
+    if (FOrigWndState = wsNormal) then
+    begin
+         BoundsRect:= FOrigBounds;
+    end;
   end;
 end;
 

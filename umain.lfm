@@ -26,7 +26,7 @@ object frmMain: TfrmMain
   OnShow = FormShow
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '2.2.4.0'
   object Image1: TImage
     Left = 0
     Height = 241

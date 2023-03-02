@@ -32,3 +32,5 @@ ImageViewer.app/Contents/Info.plist
 ImageViewer.app/Contents/PkgInfo
 backup/
 
+*.o
+*.ppu
