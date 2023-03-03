@@ -1592,8 +1592,9 @@ begin
     self.BorderStyle:=bsNone;
     BoundsRect := FOrigBounds;
 
-    self.left := self.left + GetSystemMetrics(SM_CYFRAME); // added in v1.2.18
+    self.left := self.left + GetSystemMetrics(SM_CYFRAME);
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
+    // This will keep the window size, but ... also create unwanted space above and below.
     self.height := self.height + titlebarheight;
 
     // Rounded corner window on per with Windows11. < not good enough...
@@ -1676,7 +1677,15 @@ begin
     //  Form.Free;
     //end;
 
-    BoundsRect:= FOrigBounds;
+    //BoundsRect:= FOrigBounds;
+    if (FOrigWndState = wsNormal) then
+    begin
+         BoundsRect:= FOrigBounds;
+    end else
+    if (FOrigWndState = wsMaximized) then
+    begin
+         WindowState:= FOrigWndState;
+    end;
   {$endif}
 
   Image1.BringToFront;
@@ -1731,8 +1740,10 @@ begin
 end;
 
 procedure TfrmMain.SetStayOnTop(bln:Boolean);
+{$ifdef windows}
 var
   BeforeBounds : TRect;
+{$endif}
 begin
   if bln then
   begin
@@ -1752,7 +1763,7 @@ begin
       end;
       {$endif}
 
-      // TODO: This isn't working... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
+      // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
       self.FormStyle:=fsNormal;
 
       MenuItemStayOnTop.Checked:=false;
@@ -2032,8 +2043,10 @@ begin
   if (self.FoptStayOnTop) then
   begin
     SetStayOnTop(false);
-    // TODO: somehow, this works.
+    {$ifdef windows}
+    // somehow, this works.
     if (self.FormStyle = fsSystemStayOnTop) then SetStayOnTop(false);
+    {$endif}
   end else
   begin
     SetStayOnTop(true);
@@ -2242,7 +2255,12 @@ begin
     {$else}
     ShowWindow(Handle, SW_SHOWNORMAL);
     {$endif}
-    BoundsRect:= FOrigBounds;
+    //BoundsRect:= FOrigBounds;
+    WindowState:= FOrigWndState;
+    if (FOrigWndState = wsNormal) then
+    begin
+         BoundsRect:= FOrigBounds;
+    end;
   end;
 end;
 
