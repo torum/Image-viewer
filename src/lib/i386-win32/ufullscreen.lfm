@@ -1,0 +1,165 @@
+object frmFullscreen: TfrmFullscreen
+  Left = 2246
+  Height = 241
+  Top = 1437
+  Width = 320
+  Align = alClient
+  AlphaBlend = True
+  BorderIcons = []
+  BorderStyle = bsNone
+  Caption = 'Fullscreen'
+  ClientHeight = 241
+  ClientWidth = 320
+  Color = clBlack
+  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  OnMouseMove = FormMouseMove
+  OnMouseWheelDown = FormMouseWheelDown
+  OnMouseWheelUp = FormMouseWheelUp
+  OnResize = FormResize
+  OnShow = FormShow
+  PopupMenu = PopupMenu1
+  Position = poOwnerFormCenter
+  LCLVersion = '2.2.4.0'
+  object Image1: TImage
+    Left = 0
+    Height = 241
+    Top = 0
+    Width = 320
+    AntialiasingMode = amOn
+    Align = alClient
+    AutoSize = True
+    Center = True
+    OnDblClick = Image1DblClick
+    OnMouseDown = Image1MouseDown
+    OnMouseMove = Image1MouseMove
+    OnMouseUp = Image1MouseUp
+    PopupMenu = PopupMenu1
+    Proportional = True
+    StretchOutEnabled = False
+    StretchInEnabled = False
+  end
+  object TimerFadeOut: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = TimerFadeOutTimer
+    Left = 269
+    Top = 13
+  end
+  object TimerFadeIn: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = TimerFadeInTimer
+    Left = 224
+    Top = 13
+  end
+  object PopupMenu1: TPopupMenu
+    OnPopup = PopupMenu1Popup
+    OnClose = PopupMenu1Close
+    Left = 141
+    Top = 109
+    object MenuItemPlayback: TMenuItem
+      Caption = '&Playback'
+      object MenuItemStart: TMenuItem
+        Caption = 'Start'
+        Visible = False
+        OnClick = MenuItemStartClick
+      end
+      object MenuItemPause: TMenuItem
+        Caption = 'Pau&se'
+        ShortCut = 32
+        OnClick = MenuItemPauseClick
+      end
+      object MenuItemNext: TMenuItem
+        Caption = '&Next'
+        ShortCut = 39
+        OnClick = MenuItemNextClick
+      end
+      object MenuItemBack: TMenuItem
+        Caption = '&Back'
+        ShortCut = 37
+        OnClick = MenuItemBackClick
+      end
+    end
+    object MenuItemInterval: TMenuItem
+      Caption = '&Interval'
+    end
+    object MenuItemStretch: TMenuItem
+      Caption = '&Stretch'
+      object MenuItemFit: TMenuItem
+        Caption = 'In (big->screen)'
+        ShortCut = 73
+        OnClick = MenuItemFitClick
+      end
+      object MenuItemExpand: TMenuItem
+        Caption = 'Out (small->screen)'
+        ShortCut = 79
+        OnClick = MenuItemExpandClick
+      end
+      object MenuItemStretchBoth: TMenuItem
+        Caption = 'In&&Out (fit to screen)'
+        Visible = False
+        OnClick = MenuItemStretchBothClick
+      end
+    end
+    object MenuItemFilter: TMenuItem
+      Caption = '&Filter'
+      object MenuItemFilterFileSize: TMenuItem
+        Caption = 'File size'
+      end
+    end
+    object MenuItemMoniters: TMenuItem
+      Caption = '&Moniters'
+    end
+    object Separator1: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemRandom: TMenuItem
+      Caption = 'Ran&dom'
+      ShortCut = 78
+      OnClick = MenuItemRandomClick
+    end
+    object MenuItemRepeat: TMenuItem
+      Caption = 'Repe&at'
+      ShortCut = 82
+      OnClick = MenuItemRepeatClick
+    end
+    object MenuItemEffect: TMenuItem
+      Caption = '&Effect'
+      ShortCut = 69
+      OnClick = MenuItemEffectClick
+    end
+    object MenuItemBorderForSOT: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemStayOnTop: TMenuItem
+      Caption = 'Stay on top'
+      OnClick = MenuItemStayOnTopClick
+    end
+    object MenuItem5: TMenuItem
+      Caption = '-'
+    end
+    object MenuItemQuit: TMenuItem
+      Caption = '&Quit'
+      ShortCut = 27
+      OnClick = MenuItemQuitClick
+    end
+  end
+  object TimerInterval: TTimer
+    Enabled = False
+    Interval = 3000
+    OnTimer = TimerIntervalTimer
+    Left = 13
+    Top = 13
+  end
+  object IdleTimerMouseHide: TIdleTimer
+    AutoEnabled = True
+    Interval = 1500
+    OnTimer = IdleTimerMouseHideTimer
+    Left = 18
+    Top = 204
+  end
+end
