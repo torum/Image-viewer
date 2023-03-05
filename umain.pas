@@ -1595,13 +1595,14 @@ begin
     self.left := self.left + GetSystemMetrics(SM_CYFRAME);
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     // This will keep the window size, but ... also create unwanted space above and below.
-    self.height := self.height + titlebarheight;
+    //self.height := self.height + titlebarheight;
 
     // Rounded corner window on per with Windows11. < not good enough...
     //rgn:=CreateRoundRectRgn(0,0,self.width,self.height,16,16);
     //SetWindowRgn(Handle,Rgn,True);
 
     // Background blur when background color is set to clBlack.
+    self.color := clBlack;  // Temp set to black
     DoubleBuffered := True;
     EnableBlur;
 
@@ -1664,6 +1665,15 @@ begin
   if (FOrigWndState = wsMaximized) then
   begin
        WindowState:= FOrigWndState;
+  end;
+
+  // Restore Temp set to black for EnableBlur
+  if (FoptBackgroundBlack) then
+  begin
+     self.color := clBlack;
+  end else
+  begin
+     self.color := clWhite;
   end;
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
@@ -2363,7 +2373,7 @@ procedure TfrmMain.EnableBlur;
 const
   WCA_ACCENT_POLICY = 19;
   ACCENT_ENABLE_BLURBEHIND = 3;
-  ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
+  //ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
   DrawLeftBorder = $20;
   DrawTopBorder = $40;
   DrawRightBorder = $80;
@@ -2373,6 +2383,8 @@ var
   data : TWinCompAttrData;
   accent: AccentPolicy;
 begin
+  //require Windows 10
+  if Win32MajorVersion<10 then exit;
 
   dwm10 := LoadLibrary('user32.dll');
   try
@@ -2381,8 +2393,10 @@ begin
     begin
       accent.AccentState := ACCENT_ENABLE_BLURBEHIND;
       //accent.AccentState := ACCENT_ENABLE_ACRYLICBLURBEHIND;
-      //accent.GradientColor := (100 SHL 24) or ($00E3E0DE);
-      accent.GradientColor := ($000000FF);
+
+      //accent.GradientColor := (100 SHL 24) or ($FFE3E0DE);
+      //accent.GradientColor := (100 SHL 24) or ($000000FF);
+      accent.GradientColor := (100 SHL 24) or ($11880000);
 
       accent.AccentFlags := DrawLeftBorder or DrawTopBorder or DrawRightBorder or DrawBottomBorder;
 
