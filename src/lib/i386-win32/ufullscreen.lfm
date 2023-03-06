@@ -33,6 +33,7 @@ object frmFullscreen: TfrmFullscreen
     Align = alClient
     AutoSize = True
     Center = True
+    OnClick = Image1Click
     OnDblClick = Image1DblClick
     OnMouseDown = Image1MouseDown
     OnMouseMove = Image1MouseMove

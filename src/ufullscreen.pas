@@ -60,6 +60,7 @@ type
     procedure FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
     procedure IdleTimerMouseHideTimer(Sender: TObject);
+    procedure Image1Click(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -107,6 +108,7 @@ type
     FisStartNormal:boolean;
     FXPos, FYPos: Integer;
     FisMoving: Boolean;
+    FisMouseDown: Boolean;
     FisPopupMenuShowing:boolean;
 
     procedure ShowFullScreen(blnOn: boolean);
@@ -1048,7 +1050,6 @@ begin
     if (id <= 0) then
     begin
       // Beginning of the list. There is no PREVIOUS.
-
       if FRepeat then
       begin
         result:=FFileList.Count-1;
@@ -1069,10 +1070,35 @@ begin
   end;
 end;
 
+procedure TfrmFullscreen.Image1Click(Sender: TObject);
+var a,b:TPoint;
+begin
+  // not good. 'Cause dblClick and click event occurs at the same time.
+  exit;
+
+  if (FisMoving) then exit;
+
+  a.X:=Mouse.CursorPos.X;
+  a.Y:=Mouse.CursorPos.Y;
+  b:=ScreenToClient(a);
+
+  if (b.X > (Image1.Width div 2)) then
+  begin
+    // go next image
+    PlaybackNext();
+  end else
+  begin
+    // go previous image
+    PlaybackBack();
+  end;
+
+end;
+
 procedure TfrmFullscreen.Image1DblClick(Sender: TObject);
 begin
   //ShowFullScreen(false);
-  FisMoving:=false; // finally.. figured out why frmMain Window go negative pos.
+  FisMoving:=false; // finally.. figured out why frmMain Window go negative pos. 
+  FisMouseDown:=false;
   close;
 end;
 
@@ -1083,7 +1109,8 @@ begin
   begin
     FXPos:=X;
     FYPos:=Y;
-    FisMoving:=True;
+    //FisMoving:=True;
+    FisMouseDown:=true;
   end;
 end;
 
@@ -1106,8 +1133,10 @@ begin
 
   if FisInFrame then
   begin
-    If FisMoving then
+    //If FisMoving then
+    if (FisMouseDown) then
     begin
+      FisMoving:=true;
       frmMain.Left:=frmMain.Left+X-FXPos;
       frmMain.Top:=frmMain.Top+Y-FYPos;
     end;
@@ -1119,6 +1148,7 @@ procedure TfrmFullscreen.Image1MouseUp(Sender: TObject; Button: TMouseButton;
 begin
   if (Button = mbLeft) and FisInFrame then
   begin
+    FisMouseDown:=false;
     FisMoving:=False;
   end;
   if (Button = mbRight) then

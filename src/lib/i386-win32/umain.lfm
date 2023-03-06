@@ -10,6 +10,7 @@ object frmMain: TfrmMain
   ClientWidth = 320
   Color = clSilver
   OnActivate = FormActivate
+  OnClick = FormClick
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDblClick = FormDblClick
@@ -35,6 +36,7 @@ object frmMain: TfrmMain
     Align = alClient
     AutoSize = True
     Center = True
+    OnClick = Image1Click
     OnDblClick = Image1DblClick
     OnMouseWheelDown = Image1MouseWheelDown
     OnMouseWheelUp = Image1MouseWheelUp

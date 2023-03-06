@@ -89,6 +89,7 @@ type
     XMLConfig: TXMLConfig;
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
     procedure FormActivate(Sender: TObject);
+    procedure FormClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDblClick(Sender: TObject);
@@ -107,6 +108,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Image1Click(Sender: TObject);
     procedure Image1DblClick(Sender: TObject);
     procedure Image1MouseWheelDown(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
@@ -395,7 +397,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.6.0';
+  FstrAppVer:='1.3.7.0';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -895,15 +897,29 @@ end;
 procedure TfrmMain.FormDblClick(Sender: TObject);
 begin
   if Fisfullscreen or FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
     begin
-      if Assigned(frmFullscreen) then
-      begin
-        // Redirect when form is cripped and received in frmMain.
-        if frmFullscreen.Visible then begin
-           frmFullscreen.Image1DblClick(Sender);
-        end;
+      // Redirect when form is cripped and received in frmMain.
+      if frmFullscreen.Visible then begin
+        frmFullscreen.Image1DblClick(Sender);
       end;
     end;
+  end;
+end;
+
+procedure TfrmMain.FormClick(Sender: TObject);
+begin
+  if Fisfullscreen or FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and received in frmMain.
+      if frmFullscreen.Visible then begin
+        frmFullscreen.Image1Click(Sender);
+      end;
+    end;
+  end;
 end;
 
 procedure TfrmMain.FormShow(Sender: TObject);
@@ -1357,6 +1373,46 @@ begin
     end;
 end;
 
+procedure TfrmMain.Image1Click(Sender: TObject);
+var a,b:TPoint;strPath:string;
+begin
+  // not good. 'Cause dblClick and click event occurs at the same time.
+  exit;
+
+  a.X:=Mouse.CursorPos.X;
+  a.Y:=Mouse.CursorPos.Y;
+  b:=ScreenToClient(a);
+
+  if (b.X > (Image1.Width div 2)) then
+  begin
+    // go next image
+    if FiCurrentFileIndex < FileList.Count -1 then
+    begin
+     screen.Cursor:=crHourGlass;
+     DispayImage(FileList[FiCurrentFileIndex+1]);
+     FiCurrentFileIndex:=FiCurrentFileIndex+1;
+
+     strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+     Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
+     screen.Cursor:=crDefault;
+    end;
+  end else
+  begin
+    // go previous image
+    if FiCurrentFileIndex > 0 then
+    begin
+      screen.Cursor:=crHourGlass;
+      DispayImage(FileList[FiCurrentFileIndex-1]);
+      FiCurrentFileIndex:=FiCurrentFileIndex-1;
+
+      strPath := MinimizeName(FileList[FiCurrentFileIndex],Self.Canvas, self.width - 300);
+      Self.Caption:='['+intToStr(FiCurrentFileIndex+1)+'/'+ intToStr(FileList.Count) +'] ' + strPath;
+      screen.Cursor:=crDefault;
+    end;
+  end;
+
+end;
+
 procedure TfrmMain.MenuItemSlideshowClick(Sender: TObject);
 begin
   // Start fullscreen
@@ -1405,7 +1461,7 @@ end;
 procedure TfrmMain.Image1MouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 var
-    currentShiftState: TShiftState;
+  currentShiftState: TShiftState;
   strPath:string;
 begin
   if (not FisFullscreen) and (not FisInFrame) then
@@ -1449,7 +1505,7 @@ begin
 
     end else
     begin
-      // go previouse image
+      // go previous image
       if FiCurrentFileIndex > 0 then
       begin
         screen.Cursor:=crHourGlass;
@@ -1596,6 +1652,7 @@ begin
     titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
     // This will keep the window size, but ... also create unwanted space above and below.
     //self.height := self.height + titlebarheight;
+    self.Top := self.Top + titlebarheight;
 
     // Rounded corner window on per with Windows11. < not good enough...
     //rgn:=CreateRoundRectRgn(0,0,self.width,self.height,16,16);
