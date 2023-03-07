@@ -42,7 +42,6 @@ object frmFullscreen: TfrmFullscreen
     Proportional = True
     StretchOutEnabled = False
     StretchInEnabled = False
-    Transparent = True
   end
   object TimerFadeOut: TTimer
     Enabled = False
