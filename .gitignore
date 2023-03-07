@@ -10,6 +10,7 @@ backup/ImageViewer.lpi
 backup/ImageViewer.lpr
 backup/umain.lfm
 backup/umain.pas
+lib/i386-win32/
 lib/i386-win32/ImageViewer.compiled
 lib/i386-win32/ImageViewer.o
 lib/i386-win32/ImageViewer.or
@@ -31,16 +32,8 @@ backup/ufullscreen.lfm
 ImageViewer.app/Contents/Info.plist
 ImageViewer.app/Contents/PkgInfo
 backup/
-
 *.o
 *.ppu
-src/lib/i386-win32/libimpufullscreen.a
 *.or
 *.a
-src/lib/i386-win32/ImageViewer.or
-src/lib/i386-win32/libimpufullscreen.a
-*.or
-*.a
-src/lib/i386-win32/ImageViewer.or
-src/lib/i386-win32/ImageViewer.or
-src/ImageViewer.log
+*.log
