@@ -1,13 +1,13 @@
 object frmMain: TfrmMain
   Left = 1683
-  Height = 241
+  Height = 354
   Top = 1067
-  Width = 320
+  Width = 426
   AllowDropFiles = True
   AlphaBlend = True
   Caption = 'Image Viewer Main'
-  ClientHeight = 241
-  ClientWidth = 320
+  ClientHeight = 354
+  ClientWidth = 426
   Color = clSilver
   OnActivate = FormActivate
   OnClick = FormClick
@@ -30,9 +30,9 @@ object frmMain: TfrmMain
   LCLVersion = '2.2.4.0'
   object Image1: TImage
     Left = 0
-    Height = 241
+    Height = 354
     Top = 0
-    Width = 320
+    Width = 426
     Align = alClient
     AutoSize = True
     Center = True
@@ -47,17 +47,17 @@ object frmMain: TfrmMain
   end
   object ScrollBox1: TScrollBox
     Left = 0
-    Height = 241
+    Height = 354
     Top = 0
-    Width = 320
+    Width = 426
     HorzScrollBar.Page = 320
     HorzScrollBar.Tracking = True
     VertScrollBar.Page = 241
     VertScrollBar.Tracking = True
     Align = alClient
     BorderStyle = bsNone
-    ClientHeight = 241
-    ClientWidth = 320
+    ClientHeight = 354
+    ClientWidth = 426
     TabOrder = 0
     Visible = False
     OnMouseWheelDown = ScrollBox1MouseWheelDown
@@ -69,13 +69,6 @@ object frmMain: TfrmMain
       Width = 320
       OnPaint = PaintBox1Paint
     end
-  end
-  object TimerEffectStart: TTimer
-    Enabled = False
-    Interval = 1
-    OnTimer = TimerEffectStartTimer
-    Left = 141
-    Top = 102
   end
   object TrayIcon1: TTrayIcon
     PopUpMenu = PopupMenuSystem
@@ -9562,5 +9555,19 @@ object frmMain: TfrmMain
       Caption = 'Quit'
       OnClick = MenuItemSysQuitClick
     end
+  end
+  object TimerDelayStart: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = TimerDelayStartTimer
+    Left = 141
+    Top = 102
+  end
+  object TimerEffectStart: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = TimerEffectStartTimer
+    Left = 84
+    Top = 102
   end
 end

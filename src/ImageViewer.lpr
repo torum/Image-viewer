@@ -59,10 +59,10 @@ begin
 
   if (ShowHelp) then
   begin
-      // This creates a NEW console window.
-      // In order to write to original cosole is to compile as a console application
-      // using ($APPTYPE CONSOLE) or -WG compile/linking option.
-      // However, if you do, you get a console window WITH a normal form window ...
+      // This creates a NEW console window to show help(-h option).
+      // In order to write to original cosole, it needs to be compiled as a console application.
+      // That means we need to use ($APPTYPE CONSOLE) or -WG compile/linking option.
+      // However, if you do that, you get a console window WITH a normal form window ...
       {$ifdef windows}
       AllocConsole;      // in Windows unit
       {$endif}
@@ -76,6 +76,8 @@ begin
       WriteLn('');
       WriteLn('Options and Values:');
       WriteLn('  --fullscreen, -f (on/off)    Start fullscreen at startup (default off)');
+      WriteLn('  --inFrame, -s (on/off)    Start inFrame mode at startup (default off)'); 
+      WriteLn('  --slideshowAutoStart, -a (on/off)    Start(force) slideshow for fullscreen and inFrame mode at startup (default off)');
       WriteLn('  --interval, -i (#)    Slideshow interval in seconds (default 4 seconds)');
       WriteLn('  --random, -r (on/off)    Slideshow random (default on)');
       WriteLn('  --repeat, -e (on/off)    Slideshow repeat (default on)');
@@ -89,6 +91,8 @@ begin
       WriteLn('');
       WriteLn('Useage example:');
       WriteLn('  $ ImageViewer -f on -i 2 -o on -e off C:\Users\<USER>\Pictures\Wallpapers\');
+      WriteLn('');
+      WriteLn('(ctrl+c to exit)');
 
       Application.Initialize;
       Application.ShowMainForm := False;

@@ -2,16 +2,14 @@ unit UFullscreen;
 
 {$mode objfpc}{$H+}
 
-{
-Debug:
- DEFINE MyDebug
-}
+//Debug:
+{$DEFINE MyDebug}
 
 interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  LclType, LclProc, LclIntf, Menus
+  LclType, LclProc, LclIntf, Menus, math
   {$ifdef MyDebug}, strutils{$endif}{$ifdef windows}, Windows{$endif};
 
 type
@@ -340,7 +338,6 @@ begin
     // Sets fullscreen and show.
     if FisInFrame then
     begin
-      self.BoundsRect := frmMain.ClientRect;
       StartSlideshow(FiStartWith);
     end else
     begin
@@ -416,13 +413,22 @@ begin
   FIsSlideshowPlaying:=true;
 
   if FRandom then begin
-    if startIndex > -1 then
+    if ((startIndex > -1) and (FFileList.Count > startIndex)) then
     begin
-      FstrCurr:= FFileList[startIndex];
-      // Randomize the file list.
-      Shuffle(FFileList);
-      // Specify index for display.
-      TimerInterval.tag:= FFileList.IndexOf(FstrCurr);
+
+      if (frmMain.IsSingleFileSelected) then
+      begin
+        FstrCurr:= FFileList[startIndex];
+        // Randomize the file list.
+        Shuffle(FFileList);
+        // Specify index for display.
+        TimerInterval.tag:= FFileList.IndexOf(FstrCurr);
+      end else
+      begin
+        Shuffle(FFileList);
+        TimerInterval.tag:= RandomRange(0,FFileList.Count-1);
+      end;
+
     end else
     begin
       TimerInterval.tag:=0;
@@ -433,12 +439,14 @@ begin
     TimerInterval.tag:=startIndex;
   end;
 
-  if (not frmMain.OptSlideshowAutoStart) or frmMain.IsSingleFileSelected then
+  if frmMain.IsSingleFileSelected then
   begin
     // Did not add files manually. started as single file. So,
     FManualTransition:=true;
-  end else
+  end;
+  if (frmMain.OptSlideshowAutoStart) then
   begin
+    // Force auto start.
     FManualTransition:=false;
   end;
 
@@ -733,15 +741,20 @@ var
   MyRect : TRect;
   {$endif}
 begin
+  if not Assigned(Image1.Picture) then exit;
+
   if FisInFrame then
   begin
-    curWidth := self.Parent.ClientWidth;
-    curHeight:= self.Parent.ClientHeight;
+    curWidth := Width;//self.Parent.ClientWidth;
+    curHeight:= Height;//self.Parent.ClientHeight;
   end else
   begin
     curWidth := screen.Monitors[FOptIntMoniter].Width;
     curHeight:= screen.Monitors[FOptIntMoniter].Height;
   end;
+  {$ifdef Mydebug}
+  OutputDebugString(PChar(TrimRight( 'curWidth: ->' + intToStr(curWidth))));
+  {$endif}
 
   if FStretch then begin
      Image1.Stretch:=true;
@@ -791,7 +804,7 @@ begin
         param3:= MyRect.Right;
         param4:= MyRect.Bottom;
       end else begin
-          // Width is restricting
+        // Width is restricting
         MyRect.Left := 0;
         MyRect.Right := Image1.Width;
         MyRect.Top := (Image1.Height -
@@ -805,12 +818,20 @@ begin
         param3:= MyRect.Right;
         param4:= MyRect.Bottom;
       end;
+    end else begin
+      {$ifdef Mydebug}
+      //OutputDebugString(PChar(TrimRight( 'Image1.Stretch == false' )));
+      {$endif}
     end;
 
     // TODO
     // 1) can't do anything at cripped region when fullscreen because it's a modal window.
     rgn:=CreateRoundRectRgn(param1,param2,param3,param4,2,2);
-    SetWindowRgn(Handle,Rgn,True);
+    if SetWindowRgn(self.Handle,Rgn,True) = 0 then
+    begin
+      DeleteObject(rgn);
+    end;
+    self.Repaint;
   end;
   {$endif}
 end;
@@ -829,15 +850,18 @@ begin
 
     try
       Image1.Picture.LoadFromFile(FFileList[id]);
-
+      {$ifdef Mydebug}
+      //OutputDebugString(PChar(TrimRight( 'Image1.Picture.LoadFromFile( '+ FFileList[id]) ));
+      {$endif}
       ResizeImage();
 
+      Image1.Update;
       Image1.Refresh;
       result:=id;
     except
       On E :Exception do begin
         Image1.Picture.Clear;
-        DisplayError(id,'DisplayImage@LoadFromFile - '+E.ClassName+' - '+E.Message);
+        DisplayError(id,'DisplayImage@LoadFromFile: '+E.ClassName+' - '+E.Message);
 
         // On error, stop.
         //result:=-1;
@@ -1173,9 +1197,7 @@ begin
     end else begin
       frmMain.OptStayOnTopInframe:=true;
     end;
-
-    ResizeImage;     
-
+    ResizeImage;
   end;
 end;
 

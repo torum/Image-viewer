@@ -85,6 +85,7 @@ type
     PopupMenuMain: TPopupMenu;
     ScrollBox1: TScrollBox;
     TimerEffectStart: TTimer;
+    TimerDelayStart: TTimer;
     TrayIcon1: TTrayIcon;
     XMLConfig: TXMLConfig;
     procedure ApplicationProperties1Exception(Sender: TObject; E: Exception);
@@ -135,6 +136,7 @@ type
       MousePos: TPoint; var Handled: Boolean);
     procedure ScrollBox1MouseWheelUp(Sender: TObject; Shift: TShiftState;
       MousePos: TPoint; var Handled: Boolean);
+    procedure TimerDelayStartTimer(Sender: TObject);
     procedure TimerEffectStartTimer(Sender: TObject);
     procedure TrayIcon1DblClick(Sender: TObject);
 
@@ -146,7 +148,8 @@ type
     FstFileExtList:TStringList;
     FstPlaylistExtList:TStringList;
     // User Opts.
-    FOptFullscreen:boolean;
+    FOptStartFullscreen:boolean; // commandline only option
+    FOptStartInFrame:boolean; // commandline only option
     FOptTransitEffect:boolean;
     FOptFit:boolean;
     FOptExpand:boolean;
@@ -296,108 +299,13 @@ uses UFullscreen, UAbout;
 
 { TfrmMain }
 
-procedure TfrmMain.LoadDirectories(const Dirs: TStringList; FList: TStringList);
-var
-  i,j,f:integer;
-  fileSearchMask:string;
-  folderfiles:TStringlist;
-begin
-  if Dirs.Count > 0 then
-  begin
-    // Create search mask
-    fileSearchMask:='';
-    for i:=0 to FstFileExtList.Count-1 do
-    begin
-      if trim(FstFileExtList[i]) <> '' then
-      begin
-         fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
-      end;
-    end;
-    // Loop directories and FindAllFiles.
-    for i:=0 to Dirs.Count -1 do
-    begin
-      try
-        // Recursively search files
-        folderfiles := FindAllFiles(Dirs[i], fileSearchMask, FOptIncludeSubFolders);
-        for j:=0 to folderfiles.Count - 1 do
-        begin
-          // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
-          if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
-          begin
-            f:= FileSize(folderfiles[j]);
-            // Check file size.
-            if f >= (FOptMinimulFileSizeKiloByte) then
-            begin
-              FList.Add(folderfiles[j]);
-            end;
-          end;
-        end;
-      finally
-        folderfiles.Free;
-      end;
-    end;
-  end;
-end;
-
-procedure TfrmMain.LoadSiblings(const FName: string; FList: TStringList);
-var
-  i,j,f:integer;
-  fileSearchMask, fileFolder:string;
-  folderfiles:TStringlist;
-begin
-  fileFolder:=ReplaceStr(FName,ExtractFileName(FName),'');
-  //fileFolder:=ReplaceStr(FstrInitialSelectedImageFile,ExtractFileName(FstrInitialSelectedImageFile),'');
-
-  // sets init dir for next time.
-  FstrInitialDir := ExtractFilePath(FName);
-
-  // Create search mask
-  fileSearchMask:='';
-  for i:=0 to FstFileExtList.Count-1 do
-  begin
-    if trim(FstFileExtList[i]) <> '' then
-    begin
-       fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
-    end;
-  end;
-
-  try
-    // Find siblings.
-    folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
-    for j:=0 to folderfiles.Count - 1 do
-    begin
-      // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
-      if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
-      begin
-        // Ignore first selected image.
-        if (folderfiles[j] <> FName) then
-        begin
-          f:= FileSize(folderfiles[j]);
-          // Check file size.
-          if f >= (FOptMinimulFileSizeKiloByte) then
-          begin
-            FList.Add(folderfiles[j]);
-          end;
-        end else
-        begin
-          // remove firest selected and add to list so that file order is right.
-          FList.Delete(0);
-          FList.Add(folderfiles[j]);
-        end;
-      end;
-    end;
-  finally
-    folderfiles.Free;
-  end;
-end;
-
 procedure TfrmMain.FormCreate(Sender: TObject);
 var
   s:string;
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.7.0';
+  FstrAppVer:='1.3.8.0';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -405,7 +313,8 @@ begin
   self.AlphaBlend:=true;
   self.AlphaBlendValue:=255;
 
-  TimerEffectStart.Enabled:=false;
+  TimerEffectStart.Enabled:=false; 
+  TimerDelayStart.Enabled:=false;
 
   // Init main lists.
   FstFileList:=TStringList.create;
@@ -414,7 +323,8 @@ begin
 
   // Set defaults for user options.
   FoptBackgroundBlack:=true;
-  FOptFullscreen:=false;
+  FOptStartFullscreen:=false;
+  FOptStartInFrame:=false;
   FOptTransitEffect:=true;
   FOptExpand:=false;
   FOptFit:=true;
@@ -435,9 +345,10 @@ begin
   FOptMinimulFileSizeKiloByte:=1;
 
   // Non user editable flags.
-  FisSlideshowAutoStart:=true;
+  FisSlideshowAutoStart:=false;
   FisStretch:=false;
   FisInFrame:=false;
+  FisSingleFileSelected:=false;
 
   // Init other objects.
   FstFileExtList := TStringList.Create;
@@ -502,7 +413,8 @@ begin
 
   FOptRandom := XMLConfig.GetValue('/Opts/Random',FOptRandom);
   FOptRepeat := XMLConfig.GetValue('/Opts/Repeat',FOptRepeat);
-  //FOptFullscreen := XMLConfig.GetValue('/Opts/Fullscreen',FOptFullscreen);
+  //FOptStartFullscreen := XMLConfig.GetValue('/Opts/StartFullscreen',FOptStartFullscreen); 
+  //FOptStartInFrame := XMLConfig.GetValue('/Opts/StartInFrame',FOptStartInFrame);
   FOptTransitEffect := XMLConfig.GetValue('/Opts/TransitEffect',FOptTransitEffect);
   FOptFit := XMLConfig.GetValue('/Opts/Fit',FOptFit);
   FOptExpand := XMLConfig.GetValue('/Opts/Expand',FOptExpand);
@@ -567,10 +479,42 @@ begin
   begin
     if (LowerCase(Application.GetOptionValue('f', 'fullscreen')) = 'on') then
     begin
-      FOptFullscreen:=true;
+      FOptStartFullscreen:=true;
     end else if (LowerCase(Application.GetOptionValue('f', 'fullscreen')) = 'off') then
     begin
-      FOptFullscreen:=false;
+      FOptStartFullscreen:=false;
+    end;
+  end;
+  if Application.HasOption('s', 'inFrame') then
+  begin
+    if (LowerCase(Application.GetOptionValue('s', 'inFrame')) = 'on') then
+    begin
+      FOptStartInFrame:=true;
+      // Just in case. Can't be both true.
+      FOptStartFullscreen:=false;
+    end else if (LowerCase(Application.GetOptionValue('s', 'inFrame')) = 'off') then
+    begin
+      FOptStartInFrame:=false;
+    end;
+  end;
+  if Application.HasOption('a', 'slideshowAutoStart') then
+  begin
+    if (LowerCase(Application.GetOptionValue('a', 'slideshowAutoStart')) = 'on') then
+    begin
+      FisSlideshowAutoStart:=true;
+    end else if (LowerCase(Application.GetOptionValue('a', 'slideshowAutoStart')) = 'off') then
+    begin
+      FisSlideshowAutoStart:=false;
+    end;
+  end;
+  if Application.HasOption('y', 'stayOnTop') then
+  begin
+    if (LowerCase(Application.GetOptionValue('y', 'stayOnTop')) = 'on') then
+    begin
+      FoptStayOnTop:=true;
+    end else if (LowerCase(Application.GetOptionValue('y', 'stayOnTop')) = 'off') then
+    begin
+      FoptStayOnTop:=false;
     end;
   end;
   if Application.HasOption('t', 'effect') then
@@ -649,26 +593,6 @@ begin
     end;
   end;
   }
-  if Application.HasOption('p', 'windowPosition') then
-  begin
-    //TODO:
-    //24,24
-  end;
-  if Application.HasOption('s', 'windowSize') then
-  begin
-    //TODO:
-    //240x380
-  end;
-  if Application.HasOption('y', 'stayOnTop') then
-  begin
-    if (LowerCase(Application.GetOptionValue('y', 'stayOnTop')) = 'on') then
-    begin
-      FoptStayOnTop:=true;
-    end else if (LowerCase(Application.GetOptionValue('y', 'stayOnTop')) = 'off') then
-    begin
-      FoptStayOnTop:=false;
-    end;
-  end;
   if Application.HasOption('x', 'fileExt') then
   begin
     //TODO:
@@ -850,7 +774,16 @@ begin
   TrayIcon1.Visible:=false;
   {$endif}
 
-  if FOptFullscreen then
+  if (FstFileList.indexOf(FstrInitialSelectedImageFile) > -1) then
+  begin
+    FiCurrentFileIndex:=FstFileList.indexof(FstrInitialSelectedImageFile);
+  end else
+  begin
+    // Start with 0
+    FiCurrentFileIndex:=0;
+  end;
+
+  if FOptStartFullscreen then
   begin
     // Fullscreen. Main form becomes just a background.
     self.ShowInTaskBar:=stNever;
@@ -861,6 +794,10 @@ begin
     self.Show;
     self.BringToFront;
   end else
+  //if (FOptStartInFrame) then
+  //begin
+    // Start inFrame.
+  //end else
   begin
     // Main form is the viewer.
     self.ShowInTaskBar:=stDefault;
@@ -877,47 +814,43 @@ begin
     self.AlphaBlendValue:=255;
     self.Image1.Visible:=true;
 
-    if (FstFileList.indexOf(FstrInitialSelectedImageFile) > -1) then
+    if (FOptStartInFrame) then
     begin
-      FiCurrentFileIndex:=FstFileList.indexof(FstrInitialSelectedImageFile);
+      // Start inFrame mode (invoked from cmdline).
+      FisStartNormal := false;
+      {$ifdef windows}
+      // a little hack. to workaround some issue in fullscreen and image cripping.
+      self.BorderStyle:=bsNone;
+      {$endif}
     end else
     begin
-      // Start with 0
-      FiCurrentFileIndex:=0;
+      // Start normal.
+      FisStartNormal := true;
     end;
 
-    // Show.
-    FisStartNormal := true;
-    self.Show;
+    // Show.     
     self.BringToFront;
+    self.Show;
     SetForegroundWindow(self.Handle);
   end;
 end;
 
-procedure TfrmMain.FormDblClick(Sender: TObject);
+procedure TfrmMain.FormActivate(Sender: TObject);
 begin
-  if Fisfullscreen or FisInFrame then
-  begin
-    if Assigned(frmFullscreen) then
-    begin
-      // Redirect when form is cripped and received in frmMain.
-      if frmFullscreen.Visible then begin
-        frmFullscreen.Image1DblClick(Sender);
-      end;
-    end;
-  end;
-end;
+  if Application.Terminated then exit;
 
-procedure TfrmMain.FormClick(Sender: TObject);
-begin
-  if Fisfullscreen or FisInFrame then
+  if (FOptStartFullscreen and (not FisStartNormal)) then
   begin
-    if Assigned(frmFullscreen) then
+    if not FOptTransitEffect then
     begin
-      // Redirect when form is cripped and received in frmMain.
-      if frmFullscreen.Visible then begin
-        frmFullscreen.Image1Click(Sender);
-      end;
+
+      frmFullscreen := TfrmFullscreen.create(self);
+      frmFullscreen.Color := self.color;
+      frmFullscreen.StartWith := FiCurrentFileIndex;
+      frmFullscreen.ShowModal;
+
+      // When returned (frmFullscreen is closed), self close.
+      close;
     end;
   end;
 end;
@@ -932,41 +865,53 @@ begin
     ApplyFormDarkTitle(self, FoptBackgroundBlack, true);
   {$endif}
 
-  if (FOptFullscreen and (not FisFullscreen) and (not FisStartNormal)) then
+  if (FOptStartFullscreen and (not FisFullscreen) and (not FisStartNormal)) then
   begin
+    // Start Fullscreen mode.
     self.PopupMenu:= nil;
-
     if FOptTransitEffect then
     begin
-      self.AlphaBlendValue:=1;
+      self.AlphaBlendValue:=10;
       ShowFullScreen(true);
-      // Start transition timer, and timer creates fullscreen
-      TimerEffectStart.Enabled:=true;
+      // Start transition timer, and timer creates fullscreen form.
+      TimerEffectStart.Enabled:=true; 
+      self.BringToFront;
     end else
     begin
-      // Create fullscreen form at "FormActivate" >why was that?
       self.AlphaBlendValue := 1;
       ShowFullScreen(true);
       self.AlphaBlendValue := 255;
       self.BringToFront;
-      // SetForegroundWindow(self.Handle);
+      // Create fullscreen form at "FormActivate" >why was that?
     end;
-  end else if FIsInFrame then
+  end else if (FOptStartInFrame and (not FisFullscreen) and (not FisStartNormal)) then
   begin
-    //?
-  end else
-  begin
-    // Normal Show for the first time.
+    // Start inFrame mode.
 
-    self.PopupMenu:= PopupMenuMain;
-
-    // It must be in "FormShow"
+    // This must be in "FormShow"
     if fileexists(XMLConfig.FileName) then
     begin
        RestoreFormState;
     end;
     if FoptStayOnTop then SetStayOnTop(true);
 
+    self.AlphaBlendValue:=1;
+    // Start transition timer, and timer creates inframe
+    // because of some issue in fullscreen and image cripping.
+    TimerDelayStart.Enabled:=true;
+
+  end else
+  begin
+    // Normal Show for the first time.
+
+    // This must be in "FormShow"
+    if fileexists(XMLConfig.FileName) then
+    begin
+       RestoreFormState;
+    end;
+    if FoptStayOnTop then SetStayOnTop(true);
+
+    self.PopupMenu:= PopupMenuMain;
     // Show image.
     LoadImage;
   end;
@@ -986,43 +931,9 @@ begin
   end;
 end;
 
-procedure TfrmMain.FormActivate(Sender: TObject);
-begin
-  if Application.Terminated then exit;
-
-  if (FOptFullscreen and (not FisStartNormal)) then
-  begin
-    if not FOptTransitEffect then
-    begin
-
-      frmFullscreen := TfrmFullscreen.create(self);
-      frmFullscreen.Color := self.color;
-      frmFullscreen.ShowModal;
-
-      // When returned (frmFullscreen is closed), self close.
-      close;
-    end;
-  end;
-
-  // Just in case
-  if FisFullscreen then
-  begin
-    if Assigned(frmFullscreen) then
-    begin
-      frmFullscreen.BringToFront;
-      SetForegroundWindow(frmFullscreen.Handle);
-    end else begin
-      // Something went wrong....
-      FisFullscreen:=false;
-    end;
-  end;
-
-  //if (self.top < 0) then self.top := 0;
-  //if (self.left < -100) then self.left := 0;
-end;
-
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: boolean);
-begin
+begin   
+
   {
   if not (FOptFullscreen and FisFullscreen) then
   begin
@@ -1030,25 +941,26 @@ begin
     StoreFormState;
   end;
   }
-  if FisStartNormal then begin
+  if FisStartNormal or FOptStartInFrame then begin
     StoreFormState;
-    // Save options.
-    XMLConfig.SetValue('/Opts/Random',FOptRandom);
-    XMLConfig.SetValue('/Opts/Repeat',FOptRepeat);
-    //XMLConfig.SetValue('/Opts/Fullscreen',FOptFullscreen);
-    XMLConfig.SetValue('/Opts/TransitEffect',FOptTransitEffect);
-    XMLConfig.SetValue('/Opts/Fit',FOptFit);
-    XMLConfig.SetValue('/Opts/Expand',FOptExpand);
-    XMLConfig.SetValue('/Opts/Moniter',FOptIntMoniter);
-    XMLConfig.SetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
-    XMLConfig.SetValue('/Opts/StayOnTop',FoptStayOnTop);
-    XMLConfig.SetValue('/Opts/BackgroundBlack',FoptBackgroundBlack);
-    XMLConfig.SetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
-    XMLConfig.SetValue('/Opts/FileExts',widestring(FOptFileExts));
-    XMLConfig.SetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts));
-    XMLConfig.SetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
-    XMLConfig.SetValue('/InitDir/Path',widestring(FstrInitialDir));
   end;
+
+  // Save options.
+  XMLConfig.SetValue('/Opts/Random',FOptRandom);
+  XMLConfig.SetValue('/Opts/Repeat',FOptRepeat);
+  XMLConfig.SetValue('/Opts/TransitEffect',FOptTransitEffect);
+  XMLConfig.SetValue('/Opts/Fit',FOptFit);
+  XMLConfig.SetValue('/Opts/Expand',FOptExpand);
+  XMLConfig.SetValue('/Opts/Moniter',FOptIntMoniter);
+  XMLConfig.SetValue('/Opts/MinimulFileSizeKiloByte',FOptMinimulFileSizeKiloByte);
+  XMLConfig.SetValue('/Opts/StayOnTop',FoptStayOnTop);
+  XMLConfig.SetValue('/Opts/BackgroundBlack',FoptBackgroundBlack);
+  XMLConfig.SetValue('/Opts/IncludeSubFolders',FOptIncludeSubFolders);
+  XMLConfig.SetValue('/Opts/FileExts',widestring(FOptFileExts));
+  XMLConfig.SetValue('/Opts/PlaylistExts',widestring(FOptPlaylistExts));
+  XMLConfig.SetValue('/Opts/IntervalSeconds',FOptIntervalIntSeconds);
+  XMLConfig.SetValue('/InitDir/Path',widestring(FstrInitialDir));
+
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -1059,6 +971,101 @@ begin
   FstFileList.Free;
   FstDirectoryList.Free;
   FstPlaylistList.Free;
+end;
+
+procedure TfrmMain.LoadDirectories(const Dirs: TStringList; FList: TStringList);
+var
+  i,j,f:integer;
+  fileSearchMask:string;
+  folderfiles:TStringlist;
+begin
+  if Dirs.Count > 0 then
+  begin
+    // Create search mask
+    fileSearchMask:='';
+    for i:=0 to FstFileExtList.Count-1 do
+    begin
+      if trim(FstFileExtList[i]) <> '' then
+      begin
+         fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
+      end;
+    end;
+    // Loop directories and FindAllFiles.
+    for i:=0 to Dirs.Count -1 do
+    begin
+      try
+        // Recursively search files
+        folderfiles := FindAllFiles(Dirs[i], fileSearchMask, FOptIncludeSubFolders);
+        for j:=0 to folderfiles.Count - 1 do
+        begin
+          // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+          if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
+          begin
+            f:= FileSize(folderfiles[j]);
+            // Check file size.
+            if f >= (FOptMinimulFileSizeKiloByte) then
+            begin
+              FList.Add(folderfiles[j]);
+            end;
+          end;
+        end;
+      finally
+        folderfiles.Free;
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.LoadSiblings(const FName: string; FList: TStringList);
+var
+  i,j,f:integer;
+  fileSearchMask, fileFolder:string;
+  folderfiles:TStringlist;
+begin
+  fileFolder:=ReplaceStr(FName,ExtractFileName(FName),'');
+  //fileFolder:=ReplaceStr(FstrInitialSelectedImageFile,ExtractFileName(FstrInitialSelectedImageFile),'');
+
+  // sets init dir for next time.
+  FstrInitialDir := ExtractFilePath(FName);
+
+  // Create search mask
+  fileSearchMask:='';
+  for i:=0 to FstFileExtList.Count-1 do
+  begin
+    if trim(FstFileExtList[i]) <> '' then
+    begin
+       fileSearchMask:= fileSearchMask+'*'+trim(FstFileExtList[i])+';';
+    end;
+  end;
+
+  try
+    // Find siblings.
+    folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
+    for j:=0 to folderfiles.Count - 1 do
+    begin
+      // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
+      if not (AnsiStartsStr('.',ExtractFilename(folderfiles[j]))) then
+      begin
+        // Ignore first selected image.
+        if (folderfiles[j] <> FName) then
+        begin
+          f:= FileSize(folderfiles[j]);
+          // Check file size.
+          if f >= (FOptMinimulFileSizeKiloByte) then
+          begin
+            FList.Add(folderfiles[j]);
+          end;
+        end else
+        begin
+          // remove firest selected and add to list so that file order is right.
+          FList.Delete(0);
+          FList.Add(folderfiles[j]);
+        end;
+      end;
+    end;
+  finally
+    folderfiles.Free;
+  end;
 end;
 
 procedure TfrmMain.FormDropFiles(Sender: TObject;
@@ -1190,7 +1197,6 @@ begin
     // Show full screen.
     frmFullscreen.ShowModal;
 
-
     // Returned from fullscreen
     if FisStartNormal then
     begin
@@ -1202,13 +1208,39 @@ begin
       Image1.Visible:=true;
       ShowFullScreen(false);
       // We are back normal;
-      FOptFullscreen:=false;
+      FOptStartFullscreen:=false;
     end else
     begin
       // We start with fullscreen, so close after fullscreen.
       close;
     end;
 
+  end;
+
+end;
+
+procedure TfrmMain.TimerDelayStartTimer(Sender: TObject);
+
+begin
+  // needs to this delay to work around some issue for inFrame start.
+  if self.AlphaBlendValue < 255 then
+  begin
+    if (self.AlphaBlendValue < 150 ) then begin
+       self.AlphaBlendValue := self.AlphaBlendValue + 10;
+    end else
+    begin
+      if (self.AlphaBlendValue + 15 >= 255) then begin
+        self.AlphaBlendValue := 255;
+      end else begin
+        self.AlphaBlendValue := self.AlphaBlendValue + 15;
+      end;
+    end;
+  end else begin
+      TimerDelayStart.Enabled:=false;
+      Application.ProcessMessages;
+      //
+      MenuItemSlideshowInFrameClick(Sender);
+      self.BringToFront;
   end;
 end;
 
@@ -1418,7 +1450,7 @@ begin
   // Start fullscreen
   if (not FisFullscreen) and (not FisInFrame) then
   begin
-    FOptFullscreen:=true;
+    FOptStartFullscreen:=true; // TODO:
     self.PopupMenu:= nil;
 
     // This is telling TimerEffectStart to go back to normal when done.
@@ -1637,31 +1669,46 @@ begin
         frmFullscreen.Close;
       end;
     end;
+    if not FIsStartNormal then
+    begin
+      // TODO:
+      //self.close;
+    end;
+
   end else
   begin
     // Disable main form popup.
-    self.PopupMenu:= nil;
+    self.PopupMenu:= nil;  
+    Image1.Visible:=false;
 
     {$ifdef windows}
+    self.AlphaBlendValue:=1;
     FOrigWndState:=WindowState;
     FOrigBounds:= BoundsRect;
-    self.BorderStyle:=bsNone;
+    // a little hack. to workaround some issue for inFrame start and image cripping.
+    if FisStartNormal then
+    begin
+      self.BorderStyle:=bsNone;
+    end;
     BoundsRect := FOrigBounds;
 
-    self.left := self.left + GetSystemMetrics(SM_CYFRAME);
-    titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
-    // This will keep the window size, but ... also create unwanted space above and below.
-    //self.height := self.height + titlebarheight;
-    self.Top := self.Top + titlebarheight;
-
-    // Rounded corner window on per with Windows11. < not good enough...
-    //rgn:=CreateRoundRectRgn(0,0,self.width,self.height,16,16);
-    //SetWindowRgn(Handle,Rgn,True);
+    if FisStartNormal then
+    begin
+      self.left := self.left + GetSystemMetrics(SM_CYFRAME);
+      titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
+      // This will keep the window size, but ... also create unwanted space above and below.
+      //self.height := self.height + titlebarheight;
+      self.Top := self.Top + titlebarheight;
+    end;
+    self.AlphaBlendValue:=255;
 
     // Background blur when background color is set to clBlack.
-    self.color := clBlack;  // Temp set to black
-    DoubleBuffered := True;
-    EnableBlur;
+    if (Win32MajorVersion>=10) then
+    begin
+      self.color := clBlack;  // Temp set to black
+      DoubleBuffered := True;
+      EnableBlur;
+    end;
 
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
@@ -1683,10 +1730,9 @@ begin
 
     FisInFrame:=true;
     self.Caption:='InFrame Slideshow';
-    Image1.Visible:=false;
     frmFullscreen := TfrmFullscreen.create(self);
     frmFullScreen.StartWith:=FiCurrentFileIndex;
-    frmFullscreen.Color := self.color;
+    frmFullscreen.Color := self.color;  ;
     frmFullscreen.Parent := self;
     // Set main form popup.
     self.PopupMenu:= frmFullscreen.PopupMenu;
@@ -1707,6 +1753,15 @@ var
   {$endif}
   i:integer;
 begin
+  // TODO:
+  // started inframe mode from commandline. so close app.
+  if not FIsStartNormal then
+  begin
+    // save options?
+    self.close;   
+    exit;
+  end;
+
   FisInFrame:=false;
   // Restore main form popup.
   self.PopupMenu:= PopupMenuMain;
@@ -1717,11 +1772,11 @@ begin
   //BoundsRect:=FOrigBounds;
   if (FOrigWndState = wsNormal) then
   begin
-       BoundsRect:= FOrigBounds;
+    BoundsRect:= FOrigBounds;
   end else
   if (FOrigWndState = wsMaximized) then
   begin
-       WindowState:= FOrigWndState;
+    WindowState:= FOrigWndState;
   end;
 
   // Restore Temp set to black for EnableBlur
@@ -1826,28 +1881,39 @@ begin
       if FisInFrame then
       begin
         // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
-        BeforeBounds:= BoundsRect;
-      end;
-      {$endif}
+        //BeforeBounds:= BoundsRect;
 
+        // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
+        //self.FormStyle:=fsNormal;
+
+        //MenuItemStayOnTop.Checked:=false;
+        //self.FoptStayOnTop:=false;
+
+        if FisStartNormal then
+        begin
+          //self.BorderStyle:=bsNone;
+        end;
+        // Blur again
+        //DoubleBuffered := True;
+        //EnableBlur;
+        // re-set position.
+        //BoundsRect := BeforeBounds;
+      end else
+      begin
+        // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
+        self.FormStyle:=fsNormal;
+
+        MenuItemStayOnTop.Checked:=false;
+        self.FoptStayOnTop:=false;
+      end;
+
+      {$else}
       // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
       self.FormStyle:=fsNormal;
 
       MenuItemStayOnTop.Checked:=false;
       self.FoptStayOnTop:=false;
-
-      {$ifdef windows}
-      if FisInFrame then
-      begin
-        self.BorderStyle:=bsNone;
-        // Blur again
-        DoubleBuffered := True;
-        EnableBlur;
-        // re-set position.
-        BoundsRect := BeforeBounds;
-      end;
       {$endif}
-
     end;
   end;
   //self.FoptStayOnTop:=bln;
@@ -1939,7 +2005,7 @@ begin
       end;
 
     end;
-  end else if FOptFullscreen and FisFullscreen then
+  end else if FOptStartFullscreen and FisFullscreen then
   begin
     if ((Key = VK_F11) or (Key = VK_ESCAPE)) then
     begin
@@ -2104,6 +2170,34 @@ begin
   end;
 end;
 
+procedure TfrmMain.FormDblClick(Sender: TObject);
+begin
+  if Fisfullscreen or FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and received in frmMain.
+      if frmFullscreen.Visible then begin
+        frmFullscreen.Image1DblClick(Sender);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.FormClick(Sender: TObject);
+begin
+  if Fisfullscreen or FisInFrame then
+  begin
+    if Assigned(frmFullscreen) then
+    begin
+      // Redirect when form is cripped and received in frmMain.
+      if frmFullscreen.Visible then begin
+        frmFullscreen.Image1Click(Sender);
+      end;
+    end;
+  end;
+end;
+
 procedure TfrmMain.MenuItemStayOnTopClick(Sender: TObject);
 begin
   //if (self.FormStyle = fsSystemStayOnTop) then
@@ -2201,7 +2295,7 @@ begin
   begin
     FOptIntMoniter:=intMoniter;
 
-    if FOptFullscreen and FisFullScreen and Assigned(frmFullscreen) then
+    if FOptStartFullscreen and FisFullScreen and Assigned(frmFullscreen) then
     begin
         ShowFullScreen(true);
     end else
@@ -2411,6 +2505,16 @@ begin
   // Save form state.
   with XMLConfig do
   begin
+    if (FisStartNormal) then
+    begin
+      SetValue('WindowState', Integer(WindowState));
+    end else begin
+      if (FOptStartInFrame) then
+      begin
+        //BoundsRect:= FOrigBounds;
+      end;
+    end;
+
     SetValue('NormalLeft', Left);
     SetValue('NormalTop', Top);
     SetValue('NormalWidth', Width);
@@ -2419,7 +2523,6 @@ begin
     SetValue('RestoredTop', RestoredTop);
     SetValue('RestoredWidth', RestoredWidth);
     SetValue('RestoredHeight', RestoredHeight);
-    SetValue('WindowState', Integer(WindowState));
   end;
 end;
 
@@ -2453,7 +2556,7 @@ begin
 
       //accent.GradientColor := (100 SHL 24) or ($FFE3E0DE);
       //accent.GradientColor := (100 SHL 24) or ($000000FF);
-      accent.GradientColor := (100 SHL 24) or ($11880000);
+      //accent.GradientColor := (100 SHL 24) or ($11880000);
 
       accent.AccentFlags := DrawLeftBorder or DrawTopBorder or DrawRightBorder or DrawBottomBorder;
 

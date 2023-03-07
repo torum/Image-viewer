@@ -42,3 +42,5 @@ src/lib/i386-win32/libimpufullscreen.a
 *.or
 *.a
 src/lib/i386-win32/ImageViewer.or
+src/lib/i386-win32/ImageViewer.or
+src/ImageViewer.log
