@@ -1,18 +1,18 @@
-# Image viewer/slideshow (Windows/Linux/Mac)
+# Image viewer with slideshow (Windows/Linux/Mac)
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by "feh" https://feh.finalrewind.org/
 
-### Download:
+## Download:
 Windows version is [available at the Microsoft Store](https://apps.microsoft.com/store/detail/simple-image-viewer/9NNZPQD4WJCK).　
 
-### Feature:  
-* Multiple viewing styles: 1. Normal window view, 2. "Windowless" view with slideshow, and 3. Fullscreen view with slideshow.   
+## Feature:  
+* Multiple viewing styles: 1. Normal window view, 2. "Windowless" inFrame view with slideshow, and 3. Fullscreen view with slideshow.   
 * Full keyboard and mouse playback control. 
 * Configurable options with command line parameters and popup menus. 
 * Supports multiple moniters.
-* File and folder drop support.
+* Files and folder drop support.
 
-### Screenshot:  
-Windowless View (with slideshow) on Windows 11  
+## Screenshot:  
+Windowless(inFrame) View (with slideshow) on Windows 11  
 ![Windowless View (with slideshow) on Windows 11](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-n.png?raw=true)
 
 Normal View on Windows 11
@@ -21,29 +21,36 @@ Normal View on Windows 11
 Normal View on Linux
 ![Normal View on Linux](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-Ubuntu.png?raw=true)
 
-### Usage:  
-Image Viewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files or folders and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder) or (3) command-line.
+## Usage:  
+ImageViewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files or folders and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder) or (3) command-line.
 
 ### Command-line options:  
-Image Viewer can be launched via command-line, and applications or scripts can also launch Image Viewer with following options.  
+ImageViewer can be launched via command-line, and applications or scripts can also launch Image Viewer with following options.  
    
-   
-- Slideshow interval in seconds (default 4 seconds):  
+- Start fullscreen mode at startup (default off):  
+`-f on`  or  `--fullscreen=on`   
+`-f off`  or  `--fullscreen=off`   
+
+- Start inFrame mode at startup (default off):  
+`-s on`  or  `--inFrame=on`   
+`-s off`  or  `--inFrame=off`  
+
+- Start/Force slideshow (default behavior: if single file is selected = off, if folder is selected = on):  
+`-a on`  or  `--slideshowAutoStart=on`   
+`-a off`  or  `--slideshowAutoStart=off`  
+
+- Set slideshow interval in seconds (default 4 seconds):  
 `-i 4`  or `--interval=4`   
   
-- Slideshow random (default on):  
+- Set slideshow random (default on):  
 `-r on`  or  `--random=on`   
 `-r off`  or  `--random=off`   
   
-- Slideshow repeat (default on):  
+- Set slideshow repeat (default on):  
 `-e on`  or  `--repeat=on`   
 `-e off`  or  `--repeat=off`   
-  
-- Slideshow start fullscreen (default off):  
-`-f on`  or  `--fullscreen=on`   
-`-f off`  or  `--fullscreen=off`   
-  
-- Slideshow transitional effect (default on):  
+
+- Set slideshow transitional effect (default on):  
 `-t on`  or  `--effect=on`   
 `-t off`  or  `--effect=off`   
   
@@ -66,22 +73,22 @@ Image Viewer can be launched via command-line, and applications or scripts can a
 `-y on`  or  `--stayOnTop=on`   
 `-y off`  or  `--stayOnTop=off`   
 
-- Help shows About dialog.  
+- Help shows command-line options.  
 `-h`  or  `--help`   
   
-   
-#### Command-line Useage example:    
+### Command-line Useage example:    
 ` $ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\` 
 
-### Build instruction:   
+##  Contributing 
+Feel free to open issues and send PRs. It is much appreciated. 
 
-You can download the Lazarus IDE and FPC(compiler) from here.
-https://www.lazarus-ide.org/index.php?page=downloads
+### Build instruction:   
+You can download the Lazarus IDE and FPC(compiler) from [here](https://www.lazarus-ide.org/index.php?page=downloads).  
+
 
 Or `sudo apt install lazarus` on Ubuntu.
 
-Once you download and install the IDE, just open the project file "ImageViewer.lpr".
-When the project is opened, just hit F9 and run.
+Just open the project file ("ImageViewer.lpr") with Lazarus IDE and hit F9 and run. That's it!
  
 ### Compiled and tested on:   
 
@@ -93,6 +100,6 @@ When the project is opened, just hit F9 and run.
 * macOS 10.13.3 (64bit) High Sierra: Lazarus 1.8.0 rexported FPC 3.0.4 i386-darwin-carbon
 * macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
-### Contributers
-* @Nemo08 Russian translation.
-* @quadroid File/folder drop and portable mode.
+## Contributers
+- @Nemo08 Russian translation.  
+- @quadroid File/folder drop and portable mode.  
