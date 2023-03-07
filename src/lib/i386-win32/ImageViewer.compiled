@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe" Date="1429738194"/>
-  <Params Value=" -Twin32 -Pi386 -MObjFPC -Scghi -O1 -WG -vewnhibq -FiC:\Users\torum\Source\Repos\Image-viewer\src\lib\i386-win32 -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\components\freetype\lib\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuC:\Users\torum\Source\Repos\Image-viewer\src\ -FUC:\Users\torum\Source\Repos\Image-viewer\src\lib\i386-win32\ -FEC:\Users\torum\Source\Repos\Image-viewer\src\ -oC:\Users\torum\Source\Repos\Image-viewer\src\ImageViewer.exe -dLCL -dLCLwin32 ImageViewer.lpr"/>
-</CONFIG>
