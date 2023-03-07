@@ -10,27 +10,21 @@ title: Simple Image Viewer
 * [Apps Privacy Policy page](https://torum.github.io/Image-viewer/app-privacy-policy/)  
 
 ---------------------------------------
-### Introduction  
+## Introduction  
+Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by "feh" https://feh.finalrewind.org/
 
+## Download:
+Windows version is [available at the Microsoft Store](https://apps.microsoft.com/store/detail/simple-image-viewer/9NNZPQD4WJCK).　
 
-
-# Image viewer/slideshow (Windows/Linux/Mac)
-Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by [feh](https://feh.finalrewind.org/).　　
-
-### Download:
-Windows version is [available at the Microsoft Store](https://apps.microsoft.com/store/detail/simple-image-viewer/9NNZPQD4WJCK).　　
-
-### Feature:  
-* Multiple viewing styles: 1. Normal window view, 2. "Windowless" view with slideshow, and 3. Fullscreen view with slideshow.   
+## Feature:  
+* Multiple viewing styles: 1. Normal window view, 2. "Windowless" inFrame view with slideshow, and 3. Fullscreen view with slideshow.   
 * Full keyboard and mouse playback control. 
-* Configurable options with command line parameters and popup menus.  
-* Supports multiple moniters.  
-
-### Usage:  
-Image Viewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files or folders in the explorer, and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder) or (3) command-line.
+* Configurable options with command line parameters and popup menus. 
+* Supports multiple moniters.
+* Files and folder drop support.　
 
 
-### Screenshots:
+## Screenshots:
 Windowless View (with slideshow) on Windows 11  
 ![Windowless View (with slideshow) on Windows 11](https://github.com/torum/Image-viewer/blob/master/files/bin/ImageViewerScreenshot3-n.png?raw=true)
 
@@ -47,26 +41,37 @@ Windowless View (with slideshow) on macOS
 ![alt text](https://github.com/torum/Image-viewer/blob/master/files/bin/macOS-inFrameScreenshot-2018-02-20%2023.56.00.png?raw=true)
 
 
+## Usage:  
+Image Viewer can be launched by (1) double clicking the executable and selecting image files or (2) selecting image files or folders in the explorer, and using "send to" feature in Windows explorer (create "shortcut" file and place it to "shell:sendto" folder) or (3) command-line.
+
 ### Command-line options:  
 Image Viewer can be also launched via command-line, meaning other applications or scripts can launch Image Viewer with following options.  
+ ImageViewer can be launched via command-line, and applications or scripts can also launch Image Viewer with following options.  
    
-   
-- Slideshow interval in seconds (default 4 seconds):  
+- Start fullscreen mode at startup (default off):  
+`-f on`  or  `--fullscreen=on`   
+`-f off`  or  `--fullscreen=off`   
+
+- Start inFrame mode at startup (default off):  
+`-s on`  or  `--inFrame=on`   
+`-s off`  or  `--inFrame=off`  
+
+- Start/Force slideshow (default behavior: if single file is selected = off, if folder is selected = on):  
+`-a on`  or  `--slideshowAutoStart=on`   
+`-a off`  or  `--slideshowAutoStart=off`  
+
+- Set slideshow interval in seconds (default 4 seconds):  
 `-i 4`  or `--interval=4`   
   
-- Slideshow random (default on):  
+- Set slideshow random (default on):  
 `-r on`  or  `--random=on`   
 `-r off`  or  `--random=off`   
   
-- Slideshow repeat (default on):  
+- Set slideshow repeat (default on):  
 `-e on`  or  `--repeat=on`   
 `-e off`  or  `--repeat=off`   
-  
-- Slideshow start fullscreen (default off):  
-`-f on`  or  `--fullscreen=on`   
-`-f off`  or  `--fullscreen=off`   
-  
-- Slideshow transitional effect (default on):  
+
+- Set slideshow transitional effect (default on):  
 `-t on`  or  `--effect=on`   
 `-t off`  or  `--effect=off`   
   
@@ -89,11 +94,11 @@ Image Viewer can be also launched via command-line, meaning other applications o
 `-y on`  or  `--stayOnTop=on`   
 `-y off`  or  `--stayOnTop=off`   
 
-- Help shows About dialog.  
+- Help shows command-line options.  
 `-h`  or  `--help`   
   
    
-#### Command-line Useage example:    
+### Command-line Useage example:    
 `$ ImageViewer -i 2 -f on -o on -e off C:\Users\<USER>\Pictures\Wallpapers\` 
 
  
