@@ -77,7 +77,7 @@ begin
       WriteLn('Options and Values:');
       WriteLn('  --fullscreen, -f (on/off)    Start fullscreen at startup (default off)');
       WriteLn('  --inFrame, -s (on/off)    Start inFrame mode at startup (default off)'); 
-      WriteLn('  --slideshowAutoStart, -a (on/off)    Start(force) slideshow for fullscreen and inFrame mode at startup (default off)');
+      WriteLn('  --slideshowAutoStart, -a (on/off)    Start/force slideshow for fullscreen and inFrame mode at startup (default behavior: if single file is selected = off, if folder is selected = on)');
       WriteLn('  --interval, -i (#)    Slideshow interval in seconds (default 4 seconds)');
       WriteLn('  --random, -r (on/off)    Slideshow random (default on)');
       WriteLn('  --repeat, -e (on/off)    Slideshow repeat (default on)');
