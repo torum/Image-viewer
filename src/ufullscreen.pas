@@ -2,8 +2,8 @@ unit UFullscreen;
 
 {$mode objfpc}{$H+}
 
-//Debug:
-{$DEFINE MyDebug}
+{Debug:
+$DEFINE MyDebug}
 
 interface
 

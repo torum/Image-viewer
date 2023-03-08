@@ -85,10 +85,11 @@ Feel free to open issues and send PRs. It is much appreciated.
 ### Build instruction:   
 You can download the Lazarus IDE and FPC(compiler) from [here](https://www.lazarus-ide.org/index.php?page=downloads).  
 
-
 Or `sudo apt install lazarus` on Ubuntu.
 
 Just open the project file ("ImageViewer.lpr") with Lazarus IDE and hit F9 and run. That's it!
+
+If you are on Linux, you may need to change target platform. Main menu > Project > Project Options and Compiler Options > Config and Target menu, and then pick Target platform > Target OS "Linux", Target CPU family "x86_64" according to your system.
  
 ### Compiled and tested on:   
 
