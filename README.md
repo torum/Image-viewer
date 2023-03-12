@@ -83,7 +83,7 @@ ImageViewer can be launched via command-line, and applications or scripts can al
 Feel free to open issues and send PRs. It is much appreciated. 
 
 ### Build instruction:   
-You can download the Lazarus IDE and FPC(compiler) from [here](https://www.lazarus-ide.org/index.php?page=downloads).  
+You can download [Lazarus IDE](https://www.lazarus-ide.org/), the Delphi compatible cross-platform IDE and FPC(compiler) from [here](https://www.lazarus-ide.org/index.php?page=downloads).  
 
 Or `sudo apt install lazarus` on Ubuntu.
 
