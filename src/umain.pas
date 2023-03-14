@@ -195,7 +195,6 @@ type
     procedure LoadSiblings(const FName: string; FList: TStringList);
     {$ifdef windows}
     procedure EnableBlur;
-    //procedure AeroGlass;
     {$endif}
   public
     property FileList: TStringList read FstFileList;
@@ -1220,7 +1219,6 @@ begin
 end;
 
 procedure TfrmMain.TimerDelayStartTimer(Sender: TObject);
-
 begin
   // needs to this delay to work around some issue for inFrame start.
   if self.AlphaBlendValue < 255 then
@@ -2265,7 +2263,7 @@ begin
     MenuItemSlideshowInFrame.Caption:=resstrInFrameView ;
     MenuItemSlideshow.Caption:=resstrFullscreenView;
 
-    MenuItemNext.enabled:=false; //visible or enabled:=false;
+    MenuItemNext.enabled:=false;
     MenuItemBack.enabled:=false;
   end;
 
@@ -2553,11 +2551,7 @@ begin
     begin
       accent.AccentState := ACCENT_ENABLE_BLURBEHIND;
       //accent.AccentState := ACCENT_ENABLE_ACRYLICBLURBEHIND;
-
-      //accent.GradientColor := (100 SHL 24) or ($FFE3E0DE);
-      //accent.GradientColor := (100 SHL 24) or ($000000FF);
-      //accent.GradientColor := (100 SHL 24) or ($11880000);
-
+      accent.GradientColor := (100 SHL 24) or ($FFE3E0DE);
       accent.AccentFlags := DrawLeftBorder or DrawTopBorder or DrawRightBorder or DrawBottomBorder;
 
       data.Attribute := WCA_ACCENT_POLICY;
@@ -2575,33 +2569,6 @@ begin
   end;
 
 end;
-(*
-procedure TfrmMain.AeroGlass;
-var
-  Aero: BOOL;
-  Area: TRect;
-  hDWM: THandle;
-begin
-  hDWM:=LoadLibrary('dwmapi.dll');
-  try
-    @DwmIsCompositionEnabled:=GetProcAddress(hDWM,'DwmIsCompositionEnabled');
-    if @DwmIsCompositionEnabled<>nil then
-        DwmIsCompositionEnabled(Aero);
-    if Aero then
-    begin
-      Area:=Rect(-1,-1,-1,-1);
-      Color:=clBlack;
-      @DwmExtendFrameIntoClientArea:=GetProcAddress(hDWM,'DwmExtendFrameIntoClientArea');
-      if @DwmExtendFrameIntoClientArea<>nil then
-          DwmExtendFrameIntoClientArea(Handle,@Area);
-
-    end
-    else ShowMessage('Aero is Disabled');
-  finally
-    FreeLibrary(hDWM);
-  end;
-end;
-*)
 
 initialization
   SetWindowCompositionAttribute := GetProcAddress(GetModuleHandle(user32), 'SetWindowCompositionAttribute');
