@@ -2,7 +2,7 @@
 Simple, minimum, yet configurable photo viewer/slideshow/digital signage software for Windows, Linux, and macOS. Inspired by "feh" https://feh.finalrewind.org/
 
 ## Download:
-Windows version is [available at the Microsoft Store](https://apps.microsoft.com/store/detail/simple-image-viewer/9NNZPQD4WJCK).　
+Windows version is [available at the Microsoft Store](https://apps.microsoft.com/store/detail/simple-image-viewer/9NNZPQD4WJCK). Alternatively, you can download executables directly from the [releases page](https://github.com/torum/Image-viewer/releases).　
 
 ## Feature:  
 * Multiple viewing styles: 1. Normal window view, 2. "Windowless" inFrame view with slideshow, and 3. Fullscreen view with slideshow.   
