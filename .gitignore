@@ -5,7 +5,7 @@ ImageViewer.lpr.old
 uabout.lrj
 ufullscreen.lrj
 umain.lrj
-ImageViewer.exe
+src/ImageViewer.exe
 lib/
 lib/i386-win32/
 po_files/ImageViewer.pot
