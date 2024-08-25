@@ -1,14 +1,14 @@
 object frmAbout: TfrmAbout
-  Left = 1707
+  Left = 515
   Height = 234
-  Top = 849
+  Top = 336
   Width = 320
   BorderStyle = bsToolWindow
   ClientHeight = 234
   ClientWidth = 320
   OnClose = FormClose
   Position = poOwnerFormCenter
-  LCLVersion = '2.2.2.0'
+  LCLVersion = '3.4.0.0'
   object Image1: TImage
     Left = 19
     Height = 90
@@ -503,10 +503,10 @@ object frmAbout: TfrmAbout
     Top = 144
     Width = 281
     Caption = 'https://torum.github.io/Image-viewer/'
+    TabOrder = 2
     OnClick = StaticTextWebSiteClick
     OnMouseEnter = StaticTextWebSiteMouseEnter
     OnMouseLeave = StaticTextWebSiteMouseLeave
-    TabOrder = 2
   end
   object LabelWebsite: TLabel
     Left = 26
@@ -524,8 +524,8 @@ object frmAbout: TfrmAbout
     Caption = 'Close'
     Default = True
     ModalResult = 1
-    OnClick = ButtonCloseClick
     TabOrder = 3
+    OnClick = ButtonCloseClick
   end
   object Bevel1: TBevel
     Left = 19

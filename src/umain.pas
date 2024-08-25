@@ -32,6 +32,7 @@ unit UMain;
  Cocoa based 64bit apps for macOS may not be ready some time soon...
 
 ### TODO:
+* StayOnTop on/off when inFrame mode.
 * Blur effect on/off option. Need to find a way to enable on fullscreen with a modal window first...
 * WebP support.
 * Better zooming.
@@ -304,7 +305,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.8.0';
+  FstrAppVer:='1.3.9.0';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -1703,9 +1704,9 @@ begin
     // Background blur when background color is set to clBlack.
     if (Win32MajorVersion>=10) then
     begin
-      self.color := clBlack;  // Temp set to black
+      self.color := clBlack; // Temp set to black
       DoubleBuffered := True;
-      EnableBlur;
+      EnableBlur; // TODO: make this an option.
     end;
 
     {$else}
@@ -1861,8 +1862,8 @@ end;
 
 procedure TfrmMain.SetStayOnTop(bln:Boolean);
 {$ifdef windows}
-var
-  BeforeBounds : TRect;
+//var
+  //BeforeBounds : TRect;
 {$endif}
 begin
   if bln then
@@ -1874,10 +1875,11 @@ begin
   begin
     if (self.FormStyle = fsSystemStayOnTop) then
     begin
-
       {$ifdef windows}
       if FisInFrame then
       begin
+        // TODO: This is not working...
+
         // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
         //BeforeBounds:= BoundsRect;
 
@@ -2432,7 +2434,7 @@ begin
       FOrigWndState:= WindowState;
       FOrigBounds:= BoundsRect;
       // Must be this order
-      WindowState:=wsFullScreen; //1
+      WindowState:= wsFullScreen; //1
       BorderStyle:= bsNone;      //2
     end;
 
@@ -2531,7 +2533,7 @@ procedure TfrmMain.EnableBlur;
 const
   WCA_ACCENT_POLICY = 19;
   ACCENT_ENABLE_BLURBEHIND = 3;
-  //ACCENT_ENABLE_ACRYLICBLURBEHIND = 4;
+  //ACCENT_ENABLE_ACRYLICBLURBEHIND = 4; // Windows 10 April 2018 Update
   DrawLeftBorder = $20;
   DrawTopBorder = $40;
   DrawRightBorder = $80;
@@ -2551,7 +2553,7 @@ begin
     begin
       accent.AccentState := ACCENT_ENABLE_BLURBEHIND;
       //accent.AccentState := ACCENT_ENABLE_ACRYLICBLURBEHIND;
-      accent.GradientColor := (100 SHL 24) or ($FFE3E0DE);
+      accent.GradientColor := (100 SHL 24)  or ($00E3E0DE);//or ($FFE3E0DE);
       accent.AccentFlags := DrawLeftBorder or DrawTopBorder or DrawRightBorder or DrawBottomBorder;
 
       data.Attribute := WCA_ACCENT_POLICY;

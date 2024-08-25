@@ -23,6 +23,13 @@
       <EnableI18N Value="True"/>
       <OutDir Value="po_files"/>
     </i18n>
+    <VersionInfo>
+      <UseVersionInfo Value="True"/>
+      <MajorVersionNr Value="1"/>
+      <MinorVersionNr Value="3"/>
+      <RevisionNr Value="9"/>
+      <StringTable FileDescription="Image Viewer" InternalName="ImageViewer" LegalCopyright="torum" OriginalFilename="ImageViewer.exe" ProductName="Simple Image Viewer"/>
+    </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>

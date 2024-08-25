@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, UMain, Ufullscreen, UAbout,
-  LCLTranslator, lazutf8{$ifdef windows}, Windows{$endif};
+  LCLTranslator, lazutf8, Translations{$ifdef windows}, Windows{$endif};
 
 {$R *.res}
 
@@ -18,13 +18,20 @@ var
 procedure TranslateLCL;
 var
   Lang,FallbackLang: String;
+  LangID: TLanguageID;
 begin
   // On windows, you have to call GetUserDefaultUILanguage() API to get UI languages.
-  // But GetLanguageIDs calls GetUserDefaultLCID.
+  // But GetLanguageIDs calls GetUserDefaultLCID...
 
-  Lang:='';
+  Lang:='en';
   FallbackLang:='';
-  LazGetLanguageIDs(Lang,FallbackLang);
+  //LazGetLanguageIDs(Lang,FallbackLang); // This is now deprecated.
+  LangID := GetLanguageID;
+  Lang := LangID.LanguageID;
+  FallbackLang:=LangID.LanguageCode;
+  // OutputDebugString(PChar(LangID.CountryCode)); // JP
+  // OutputDebugString(PChar(LangID.LanguageCode)); // ja
+  // OutputDebugString(PChar(LangID.LanguageID)); // ja_JP
 
   if (Lang = 'en') or (Lang = 'en_US') or (Lang = 'us')
   or (FallbackLang = 'us') or (FallbackLang = 'US') or (FallbackLang = 'en') then
@@ -32,11 +39,11 @@ begin
 
   if (Lang = 'ja') or (Lang = 'ja_jp') or (Lang = 'jp_JP') or (Lang = 'jp')
   or (FallbackLang = 'jp') or (FallbackLang = 'JP') or (FallbackLang = 'ja') then
-    Lang := 'ja_JP';
+    Lang := 'ja';//'ja_JP';
 
   if (Lang = 'ru') or (Lang = 'ru_RU') or (Lang = 'RU')
   or (FallbackLang = 'ru') or (FallbackLang = 'RU') then
-    Lang := 'ru_RU';
+    Lang := 'ru';//'ru_RU';
 
   SetDefaultLang(Lang,'','',false);
 
