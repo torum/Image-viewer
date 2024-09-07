@@ -1,9 +1,4 @@
 unit UMain;
-
-// {$mode objfpc}{$H+}
-// EnableBlur procedure requires delphi mode.
-{$mode delphi}
-
 {
 ### Source:
  https://github.com/torum/Image-viewer
@@ -42,6 +37,10 @@ unit UMain;
 * load playlist.
 * more Command line options.
 }
+
+// EnableBlur procedure requires delphi mode.
+//{$mode objfpc}{$H+}
+{$mode delphi}
 
 interface
 
@@ -305,7 +304,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.9.0';
+  FstrAppVer:='1.3.9.2';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -1214,9 +1213,7 @@ begin
       // We start with fullscreen, so close after fullscreen.
       close;
     end;
-
   end;
-
 end;
 
 procedure TfrmMain.TimerDelayStartTimer(Sender: TObject);
@@ -1712,9 +1709,9 @@ begin
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
       FOrigBounds:= BoundsRect;
-      Hide;
+      // Hide; // This started to cause an error since Ubuntu 24.04.
       self.BorderStyle:=bsNone;
-      Show;
+      // Show; // This started to cause an error since Ubuntu 24.04.
 
       Form := TForm.Create(nil);
       try
@@ -1862,8 +1859,8 @@ end;
 
 procedure TfrmMain.SetStayOnTop(bln:Boolean);
 {$ifdef windows}
-//var
-  //BeforeBounds : TRect;
+var
+  BeforeBounds : TRect;
 {$endif}
 begin
   if bln then
@@ -1878,29 +1875,31 @@ begin
       {$ifdef windows}
       if FisInFrame then
       begin
-        // TODO: This is not working...
-
         // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
-        //BeforeBounds:= BoundsRect;
+        BeforeBounds:= BoundsRect;
 
-        // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
-        //self.FormStyle:=fsNormal;
+        // This isn't working for windows... calling this(FormStyle:=fsNormal) twice seems to work but...
+        self.FormStyle:=fsNormal;
 
-        //MenuItemStayOnTop.Checked:=false;
-        //self.FoptStayOnTop:=false;
+        MenuItemStayOnTop.Checked:=false;
+        self.FoptStayOnTop:=false;
 
         if FisStartNormal then
         begin
-          //self.BorderStyle:=bsNone;
+          self.BorderStyle:=bsNone; // Forgot what this was for. Why did I put this here?
         end;
+
+        // Needed to this HERE again.... I don't know why.
+        self.FormStyle:=fsNormal;
+
         // Blur again
-        //DoubleBuffered := True;
-        //EnableBlur;
+        DoubleBuffered := True;
+        EnableBlur;
+
         // re-set position.
-        //BoundsRect := BeforeBounds;
+        BoundsRect := BeforeBounds;
       end else
       begin
-        // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
         self.FormStyle:=fsNormal;
 
         MenuItemStayOnTop.Checked:=false;
@@ -1908,7 +1907,6 @@ begin
       end;
 
       {$else}
-      // This isn't working for windows... calling this(SetStayOnTop) procedure twice from MenuItemStayOnTopClick works...
       self.FormStyle:=fsNormal;
 
       MenuItemStayOnTop.Checked:=false;

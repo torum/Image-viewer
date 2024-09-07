@@ -20,8 +20,6 @@ var
   Lang,FallbackLang: String;
   LangID: TLanguageID;
 begin
-  // On windows, you have to call GetUserDefaultUILanguage() API to get UI languages.
-  // But GetLanguageIDs calls GetUserDefaultLCID...
 
   Lang:='en';
   FallbackLang:='';
@@ -109,7 +107,7 @@ begin
   begin
 
     TranslateLCL;
-    Application.Scaled:=True;
+  Application.Scaled:=True;
     RequireDerivedFormResource:=True;
     Application.Initialize;
     Application.ShowMainForm := False;
