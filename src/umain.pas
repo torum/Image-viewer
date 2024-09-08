@@ -304,7 +304,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.9.2';
+  FstrAppVer:='1.3.9.3';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -827,9 +827,9 @@ begin
       FisStartNormal := true;
     end;
 
-    // Show.     
-    self.BringToFront;
+    // Show.        
     self.Show;
+    self.BringToFront;
     SetForegroundWindow(self.Handle);
   end;
 end;
@@ -1681,12 +1681,25 @@ begin
     self.AlphaBlendValue:=1;
     FOrigWndState:=WindowState;
     FOrigBounds:= BoundsRect;
+
+    Hide;
+
     // a little hack. to workaround some issue for inFrame start and image cripping.
     if FisStartNormal then
     begin
       self.BorderStyle:=bsNone;
     end;
     BoundsRect := FOrigBounds;
+
+    // Background blur when background color is set to clBlack.
+    if (Win32MajorVersion>=10) then
+    begin
+      self.color := clBlack; // Temp set to black
+      DoubleBuffered := True;
+      EnableBlur; // TODO: make this an option.
+    end;
+
+    Show;
 
     if FisStartNormal then
     begin
@@ -1698,20 +1711,12 @@ begin
     end;
     self.AlphaBlendValue:=255;
 
-    // Background blur when background color is set to clBlack.
-    if (Win32MajorVersion>=10) then
-    begin
-      self.color := clBlack; // Temp set to black
-      DoubleBuffered := True;
-      EnableBlur; // TODO: make this an option.
-    end;
-
     {$else}
       // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
       FOrigBounds:= BoundsRect;
-      // Hide; // This started to cause an error since Ubuntu 24.04.
+      Hide;
       self.BorderStyle:=bsNone;
-      // Show; // This started to cause an error since Ubuntu 24.04.
+      Show;
 
       Form := TForm.Create(nil);
       try
@@ -1735,6 +1740,8 @@ begin
     frmFullscreen.Visible:=true;
     frmFullscreen.Show;
 
+    self.BringToFront;
+
     // inFrame you have to
     // Call frmFullscreen.FormResize(self);  when resize.
     // Call DoneInFrame(); from frmFullscreen when close fullscreen.
@@ -1745,7 +1752,7 @@ procedure TfrmMain.DoneInFrame(strCurr :string);
 var
   {$ifdef windows}
   {$else}
-  //Form: TForm;
+  Form: TForm;
   {$endif}
   i:integer;
 begin
@@ -1785,15 +1792,18 @@ begin
   end;
   {$else}
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
+    Hide;
     self.BorderStyle:=bsSizeable;
 
-    //Form := TForm.Create(nil);
-    //try
-    //  Parent := Form;
-    //  Parent := nil;
-    //finally
-    //  Form.Free;
-    //end;
+    Form := TForm.Create(nil);
+    try
+      Parent := Form;
+      Parent := nil;
+    finally
+      Form.Free;
+    end;
+
+    Show;
 
     //BoundsRect:= FOrigBounds;
     if (FOrigWndState = wsNormal) then
@@ -1823,7 +1833,8 @@ begin
   Image1.Repaint;
   Image1.Refresh;
   Image1.BringToFront;
-  screen.Cursor:=crDefault;
+  screen.Cursor:=crDefault;  
+  self.BringToFront;
 end;
 
 procedure TfrmMain.FormResize(Sender: TObject);
