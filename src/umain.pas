@@ -6,7 +6,7 @@ unit UMain;
 * No extra components required.
 
 ### Compiled and tested on
- Windows 11: Lazarus 2.2.2 FPC 3.2.2 x86_64-win64-win32/win64
+ Windows 11: Lazarus 3.4 FPC 3.2.2 x86_64-win64-win32/win64
  Windows 10: Lazarus 1.8.0 r56594 FPC 3.0.4 x86_64-win64-win32/win64
  Ubuntu 22.04.1 LTS: Lazarus 2.2.0 FPC 3.2.2 x86_64-linux-gtk2
  Ubuntu 17.10 (64bit): Lazarus 1.8.0 rc4+dfsg-1 FPC 3.0.2 x86_64-linux-gtk2
@@ -15,11 +15,12 @@ unit UMain;
  macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
 ### Known issues and bugs:
- On Windows, inFrame "window" does not have shaddow.  < Fixed by EnableBlur.
+ On Windows, inFrame "window" does not have shaddow.  < Fixed with EnableBlur.
  On Windows, PNG (depth 24) antialising isn't working when stretch.
   https://forum.lazarus.freepascal.org/index.php?topic=24408.0
   http://forum.lazarus.freepascal.org/index.php?topic=19542.0
  On Ubuntu, inFrame transit effect doesn't seem to be working..
+ On Ubuntu 24.04, BorderStyle:=bsSizeable has some issues.
  On macOS, inFrame transit effect won't work?
  On macOS El Capitan, the top bar won't hide. It's fine on High Sierra.
  On macOS, trayicon won't show up correctly. Black filled.->disabled
@@ -27,9 +28,8 @@ unit UMain;
  Cocoa based 64bit apps for macOS may not be ready some time soon...
 
 ### TODO:
-* StayOnTop on/off when inFrame mode.
 * Blur effect on/off option. Need to find a way to enable on fullscreen with a modal window first...
-* WebP support.
+* WebP support. Preferably without Dlls or external components.
 * Better zooming.
 
 ### Backlog:
@@ -304,7 +304,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.3.9.3';
+  FstrAppVer:='1.4.0.1';
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -1682,8 +1682,6 @@ begin
     FOrigWndState:=WindowState;
     FOrigBounds:= BoundsRect;
 
-    Hide;
-
     // a little hack. to workaround some issue for inFrame start and image cripping.
     if FisStartNormal then
     begin
@@ -1698,8 +1696,6 @@ begin
       DoubleBuffered := True;
       EnableBlur; // TODO: make this an option.
     end;
-
-    Show;
 
     if FisStartNormal then
     begin
@@ -1733,7 +1729,7 @@ begin
     self.Caption:='InFrame Slideshow';
     frmFullscreen := TfrmFullscreen.create(self);
     frmFullScreen.StartWith:=FiCurrentFileIndex;
-    frmFullscreen.Color := self.color;  ;
+    frmFullscreen.Color := self.color;
     frmFullscreen.Parent := self;
     // Set main form popup.
     self.PopupMenu:= frmFullscreen.PopupMenu;
@@ -1794,15 +1790,6 @@ begin
     // https://forum.lazarus.freepascal.org/index.php?topic=38675.0
     Hide;
     self.BorderStyle:=bsSizeable;
-
-    Form := TForm.Create(nil);
-    try
-      Parent := Form;
-      Parent := nil;
-    finally
-      Form.Free;
-    end;
-
     Show;
 
     //BoundsRect:= FOrigBounds;
@@ -1886,29 +1873,33 @@ begin
       {$ifdef windows}
       if FisInFrame then
       begin
-        // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
-        BeforeBounds:= BoundsRect;
-
-        // This isn't working for windows... calling this(FormStyle:=fsNormal) twice seems to work but...
-        self.FormStyle:=fsNormal;
-
-        MenuItemStayOnTop.Checked:=false;
-        self.FoptStayOnTop:=false;
-
         if FisStartNormal then
         begin
-          self.BorderStyle:=bsNone; // Forgot what this was for. Why did I put this here?
+          // "FormStyle:=fsNormal" causes window pos to move to 0,0 so..
+          BeforeBounds:= BoundsRect;
+
+          // This isn't working for windows... calling this(FormStyle:=fsNormal) twice seems to work but...
+          self.FormStyle:=fsNormal;
+
+          MenuItemStayOnTop.Checked:=false;
+          self.FoptStayOnTop:=false;
+
+            //self.BorderStyle:=bsNone; // Forgot what this is for. Why did I put this here?
+
+          // Needed to this HERE again.... I don't know why.
+          self.FormStyle:=fsNormal;
+
+          // Blur again
+          DoubleBuffered := True;
+          EnableBlur;
+
+          // re-set position.
+          BoundsRect := BeforeBounds;
+        end else
+        begin
+          // (FOptStartInFrame) somehow setting it off causes app to close.
+
         end;
-
-        // Needed to this HERE again.... I don't know why.
-        self.FormStyle:=fsNormal;
-
-        // Blur again
-        DoubleBuffered := True;
-        EnableBlur;
-
-        // re-set position.
-        BoundsRect := BeforeBounds;
       end else
       begin
         self.FormStyle:=fsNormal;
@@ -1925,8 +1916,7 @@ begin
       {$endif}
     end;
   end;
-  //self.FoptStayOnTop:=bln;
-  //MenuItemStayOnTop.Checked:=bln;
+
 end;
 
 procedure TfrmMain.ApplicationProperties1Exception(Sender: TObject; E: Exception);

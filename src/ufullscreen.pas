@@ -302,6 +302,12 @@ begin
     MenuItemMoniters.Add(childItem);
   end;
 
+  // disable StayOnToo menu because somehow setting it off causes app close when start inFrame mode from command-line.
+  if (not FisStartNormal) then
+  begin
+    MenuItemStayOnTop.Enabled:=false;
+  end;
+
   self.Visible:=false; // Don't set to true.
   self.ShowInTaskBar:=stNever;
 
@@ -428,7 +434,6 @@ begin
         Shuffle(FFileList);
         TimerInterval.tag:= RandomRange(0,FFileList.Count-1);
       end;
-
     end else
     begin
       TimerInterval.tag:=0;
@@ -752,9 +757,6 @@ begin
     curWidth := screen.Monitors[FOptIntMoniter].Width;
     curHeight:= screen.Monitors[FOptIntMoniter].Height;
   end;
-  {$ifdef Mydebug}
-  OutputDebugString(PChar(TrimRight( 'curWidth: ->' + intToStr(curWidth))));
-  {$endif}
 
   if FStretch then begin
      Image1.Stretch:=true;
@@ -956,6 +958,9 @@ procedure TfrmFullscreen.TimerFadeInTimer(Sender: TObject);
 var
   iNext:integer;
 begin
+  {$ifdef Mydebug}
+    OutputDebugString(PChar(TrimRight( 'TimerFadeInTimer') ));
+  {$endif}
   if FFileList.Count = 0 then
   begin
     TimerInterval.Enabled:=false;
