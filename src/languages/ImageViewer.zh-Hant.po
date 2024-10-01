@@ -1,0 +1,183 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: umain.resstrabout
+msgctxt "umain.resstrabout"
+msgid "About"
+msgstr "關於"
+
+#: umain.resstrclose
+msgctxt "umain.resstrclose"
+msgid "&Close"
+msgstr "關閉(&C)"
+
+#: umain.resstreffect
+msgctxt "umain.resstreffect"
+msgid "&Effect"
+msgstr "效果(&E)"
+
+#: umain.resstrfilter
+msgctxt "umain.resstrfilter"
+msgid "&Filter"
+msgstr "過濾器(&F)"
+
+#: umain.resstrfilterfilesize
+msgctxt "umain.resstrfilterfilesize"
+msgid "File size"
+msgstr "文件大小"
+
+#: umain.resstrfullscreenslideshow
+msgctxt "umain.resstrfullscreenslideshow"
+msgid "Fullscreen Slideshow"
+msgstr "全屏幻燈片"
+
+#: umain.resstrfullscreenview
+msgid "&Fullscreen View"
+msgstr "全屏查看(&F)"
+
+#: umain.resstrinframeslideshow
+msgctxt "umain.resstrinframeslideshow"
+msgid "InFrame Slideshow"
+msgstr "框架內幻燈片"
+
+#: umain.resstrinframeview
+msgid "&InFrame View"
+msgstr "框架內查看(&I)"
+
+#: umain.resstrinterval
+msgctxt "umain.resstrinterval"
+msgid "&Interval"
+msgstr "間隔(&I)"
+
+#: umain.resstrleavefullscreen
+msgctxt "umain.resstrleavefullscreen"
+msgid "&Leave Fullscreen"
+msgstr "退出全屏(&L)"
+
+#: umain.resstrleaveinframe
+msgctxt "umain.resstrleaveinframe"
+msgid "&Leave InFrame"
+msgstr "退出框架(&L)"
+
+#: umain.resstrminute
+msgctxt "umain.resstrminute"
+msgid "minute"
+msgstr "分鐘"
+
+#: umain.resstrminutes
+msgctxt "umain.resstrminutes"
+msgid "minutes"
+msgstr "分鐘"
+
+#: umain.resstrmoniter
+msgctxt "umain.resstrmoniter"
+msgid "Moniter"
+msgstr "監視器"
+
+#: umain.resstrmoniters
+msgctxt "umain.resstrmoniters"
+msgid "&Moniters"
+msgstr "監視器(&M)"
+
+#: umain.resstrplayback
+msgctxt "umain.resstrplayback"
+msgid "&Playback"
+msgstr "播放(&P)"
+
+#: umain.resstrplaybacknext
+msgctxt "umain.resstrplaybacknext"
+msgid "&Next"
+msgstr "下一個(&N)"
+
+#: umain.resstrplaybackpause
+msgctxt "umain.resstrplaybackpause"
+msgid "Pau&se"
+msgstr "暫停(&S)"
+
+#: umain.resstrplaybackprevious
+msgctxt "umain.resstrplaybackprevious"
+msgid "&Back"
+msgstr "上一個(&B)"
+
+#: umain.resstrquit
+msgctxt "umain.resstrquit"
+msgid "&Quit"
+msgstr "退出(&Q)"
+
+#: umain.resstrrandom
+msgctxt "umain.resstrrandom"
+msgid "Ran&dom"
+msgstr "隨機(&D)"
+
+#: umain.resstrrepeat
+msgctxt "umain.resstrrepeat"
+msgid "Repe&at"
+msgstr "重複(&A)"
+
+#: umain.resstrsecond
+msgctxt "umain.resstrsecond"
+msgid "second"
+msgstr "秒"
+
+#: umain.resstrseconds
+msgctxt "umain.resstrseconds"
+msgid "seconds"
+msgstr "秒"
+
+#: umain.resstrstartfullscreenslideshow
+msgid "Start &Fullscreen Slideshow"
+msgstr "開始全屏幻燈片(&F)"
+
+#: umain.resstrstartinframeslideshow
+msgid "Start &InFrame Slideshow"
+msgstr "開始框架內幻燈片(&I)"
+
+#: umain.resstrstayontop
+msgctxt "umain.resstrstayontop"
+msgid "Stay on top"
+msgstr "置頂"
+
+#: umain.resstrbackground
+msgctxt "umain.background"
+msgid "Background Color"
+msgstr "背景顏色"
+
+#: umain.resstrbackgroundblack
+msgctxt "umain.backgroundblack"
+msgid "Black"
+msgstr "黑色"
+
+#: umain.resstrbackgroundwhite
+msgctxt "umain.backgroundwhite"
+msgid "White"
+msgstr "白色"
+
+#: umain.resstrstopfullscreenslideshow
+msgctxt "umain.resstrstopfullscreenslideshow"
+msgid "&Stop Fullscreen Slideshow"
+msgstr "停止全屏幻燈片(&S)"
+
+#: umain.resstrstopinframeslideshow
+msgctxt "umain.resstrstopinframeslideshow"
+msgid "&Stop InFrame Slideshow"
+msgstr "停止框架內幻燈片(&S)"
+
+#: umain.resstrstretch
+msgctxt "umain.resstrstretch"
+msgid "Stretch"
+msgstr "拉伸"
+
+#: umain.resstrstretchin
+msgctxt "umain.resstrstretchin"
+msgid "In (big->screen)"
+msgstr "拉伸入 (大->屏幕)"
+
+#: umain.resstrstretchout
+msgctxt "umain.resstrstretchout"
+msgid "Out (small->screen)"
+msgstr "拉伸出 (小->屏幕)"
+
+#: umain.resstropenpictures
+msgctxt "umain.resstropenpictures"
+msgid "Open picture(s)"
+msgstr "打開圖片"

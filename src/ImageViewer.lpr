@@ -17,33 +17,42 @@ var
 
 procedure TranslateLCL;
 var
-  Lang,FallbackLang: String;
+  strLang, strLanguageCode, strLanguageID: String;
   LangID: TLanguageID;
 begin
-
-  Lang:='en';
-  FallbackLang:='';
   //LazGetLanguageIDs(Lang,FallbackLang); // This is now deprecated.
   LangID := GetLanguageID;
-  Lang := LangID.LanguageID;
-  FallbackLang:=LangID.LanguageCode;
+
   // OutputDebugString(PChar(LangID.CountryCode)); // JP
   // OutputDebugString(PChar(LangID.LanguageCode)); // ja
   // OutputDebugString(PChar(LangID.LanguageID)); // ja_JP
+  
+  strLanguageCode:=LangID.LanguageCode;
+  strLanguageID := LangID.LanguageID;
 
-  if (Lang = 'en') or (Lang = 'en_US') or (Lang = 'us')
-  or (FallbackLang = 'us') or (FallbackLang = 'US') or (FallbackLang = 'en') then
-    Lang := 'en';
+  strLang:='en';
 
-  if (Lang = 'ja') or (Lang = 'ja_jp') or (Lang = 'jp_JP') or (Lang = 'jp')
-  or (FallbackLang = 'jp') or (FallbackLang = 'JP') or (FallbackLang = 'ja') then
-    Lang := 'ja';//'ja_JP';
+  if (strLanguageCode = 'en') or (strLanguageID = 'en_US') then
+    strLang := 'en';
 
-  if (Lang = 'ru') or (Lang = 'ru_RU') or (Lang = 'RU')
-  or (FallbackLang = 'ru') or (FallbackLang = 'RU') then
-    Lang := 'ru';//'ru_RU';
+  if (strLanguageCode = 'ja') or (strLanguageID = 'ja_jp') or (strLanguageID = 'jp_JP') then
+    strLang := 'ja';//'ja_JP';
 
-  SetDefaultLang(Lang,'','',false);
+  if (strLanguageCode = 'ru') or (strLanguageID = 'ru_RU') then
+    strLang := 'ru';//'ru_RU';
+
+  if (strLanguageCode = 'zh') then begin
+    if (strLanguageID = 'zh-Hant') then begin
+       strLang := 'zh-Hant';
+    end else
+    if (strLanguageID = 'zh-CN') then begin
+       strLang := 'zh-CN';
+    end else begin
+       //
+    end;
+  end;
+
+  SetDefaultLang(strLang,'','',false);
 
 end;
 
