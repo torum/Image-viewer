@@ -43,13 +43,13 @@ begin
 
   if (strLanguageCode = 'zh') then begin
     if (strLanguageID = 'zh_Hant') then begin
-       strLang := 'zh-Hant';
+       strLang := 'zh_Hant';
     end else
     if (strLanguageID = 'zh_CN') then begin
-       strLang := 'zh-CN';
+       strLang := 'zh_CN';
     end else begin
        // Defaults to traditional for now.
-       strLang := 'zh-Hant';
+       strLang := 'zh_Hant';
     end;
   end;
 
