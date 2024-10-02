@@ -102,8 +102,9 @@ If you are on Linux, you may need to change target platform. Main menu > Project
 * macOS 10.11.6 (64bit) El Capitan: Lazarus 1.9.0 carbon trunk, FPC 3.0.4
 
 ## Contributers
-- [@Nemo08](https://github.com/Nemo08) Russian translation.  
-- [@quadroid](https://github.com/quadroid) File/folder drop and portable mode.  
+- [@Nemo08](https://github.com/Nemo08) Russian translation.
+- [@quadroid](https://github.com/quadroid) File/folder drop and portable mode.
+- [@killtimer920](https://github.com/killtimer920) Chinese translations (simplified zh-CN and traditional zh-Hant).
 
 ## Third-party components
 [win32titlestyler.pas](https://github.com/Alexey-T/CudaText/blob/master/comp/win32titlestyler.pas) by [@Alexey-T](https://github.com/Alexey-T) 
