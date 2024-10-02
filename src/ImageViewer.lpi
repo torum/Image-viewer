@@ -28,7 +28,7 @@
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="4"/>
-      <BuildNr Value="2"/>
+      <RevisionNr Value="2"/>
       <StringTable FileDescription="Image Viewer" InternalName="ImageViewer" LegalCopyright="torum" OriginalFilename="ImageViewer.exe" ProductName="Simple Image Viewer"/>
     </VersionInfo>
     <BuildModes Count="1">

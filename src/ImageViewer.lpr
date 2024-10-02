@@ -35,20 +35,21 @@ begin
   if (strLanguageCode = 'en') or (strLanguageID = 'en_US') then
     strLang := 'en';
 
-  if (strLanguageCode = 'ja') or (strLanguageID = 'ja_jp') or (strLanguageID = 'jp_JP') then
+  if (strLanguageCode = 'ja') or (strLanguageID = 'jp_JP') then
     strLang := 'ja';//'ja_JP';
 
   if (strLanguageCode = 'ru') or (strLanguageID = 'ru_RU') then
     strLang := 'ru';//'ru_RU';
 
   if (strLanguageCode = 'zh') then begin
-    if (strLanguageID = 'zh-Hant') then begin
+    if (strLanguageID = 'zh_Hant') then begin
        strLang := 'zh-Hant';
     end else
-    if (strLanguageID = 'zh-CN') then begin
+    if (strLanguageID = 'zh_CN') then begin
        strLang := 'zh-CN';
     end else begin
-       //
+       // Defaults to traditional for now.
+       strLang := 'zh-Hant';
     end;
   end;
 
