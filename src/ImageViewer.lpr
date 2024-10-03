@@ -38,6 +38,9 @@ begin
   if (strLanguageCode = 'ja') or (strLanguageID = 'jp_JP') then
     strLang := 'ja';//'ja_JP';
 
+  if (strLanguageCode = 'ko') or (strLanguageID = 'ko_KR') then
+    strLang := 'ko';//'ko_KR';
+
   if (strLanguageCode = 'ru') or (strLanguageID = 'ru_RU') then
     strLang := 'ru';//'ru_RU';
 

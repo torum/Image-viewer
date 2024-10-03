@@ -1,0 +1,193 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Image Viewer - Korean\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: VenusGirl: https://venusgirls.tistory.com/\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
+
+#: umain.resstrabout
+msgctxt "umain.resstrabout"
+msgid "About"
+msgstr "정보"
+
+#: umain.resstrclose
+msgctxt "umain.resstrclose"
+msgid "&Close"
+msgstr "닫기(&C)"
+
+#: umain.resstreffect
+msgctxt "umain.resstreffect"
+msgid "&Effect"
+msgstr "효과(&E)"
+
+#: umain.resstrfilter
+msgctxt "umain.resstrfilter"
+msgid "&Filter"
+msgstr "필터(&F)"
+
+#: umain.resstrfilterfilesize
+msgctxt "umain.resstrfilterfilesize"
+msgid "File size"
+msgstr "파일 크기"
+
+#: umain.resstrfullscreenslideshow
+msgctxt "umain.resstrfullscreenslideshow"
+msgid "Fullscreen Slideshow"
+msgstr "전체 화면 슬라이드쇼"
+
+#: umain.resstrfullscreenview
+msgid "&Fullscreen View"
+msgstr "전체 화면 보기(&F)"
+
+#: umain.resstrinframeslideshow
+msgctxt "umain.resstrinframeslideshow"
+msgid "InFrame Slideshow"
+msgstr "프레임 슬라이드쇼"
+
+#: umain.resstrinframeview
+msgid "&InFrame View"
+msgstr "프레임 보기(&I)"
+
+#: umain.resstrinterval
+msgctxt "umain.resstrinterval"
+msgid "&Interval"
+msgstr "간격(&I)"
+
+#: umain.resstrleavefullscreen
+msgctxt "umain.resstrleavefullscreen"
+msgid "&Leave Fullscreen"
+msgstr "전체 화면 종료(&L)"
+
+#: umain.resstrleaveinframe
+msgctxt "umain.resstrleaveinframe"
+msgid "&Leave InFrame"
+msgstr "프레임 종료(&L)"
+
+#: umain.resstrminute
+msgctxt "umain.resstrminute"
+msgid "minute"
+msgstr "분"
+
+#: umain.resstrminutes
+msgctxt "umain.resstrminutes"
+msgid "minutes"
+msgstr "분"
+
+#: umain.resstrmoniter
+msgctxt "umain.resstrmoniter"
+msgid "Moniter"
+msgstr "모니터"
+
+#: umain.resstrmoniters
+msgctxt "umain.resstrmoniters"
+msgid "&Moniters"
+msgstr "모니터(&M)"
+
+#: umain.resstrplayback
+msgctxt "umain.resstrplayback"
+msgid "&Playback"
+msgstr "재생(&P)"
+
+#: umain.resstrplaybacknext
+msgctxt "umain.resstrplaybacknext"
+msgid "&Next"
+msgstr "다음(&N)"
+
+#: umain.resstrplaybackpause
+msgctxt "umain.resstrplaybackpause"
+msgid "Pau&se"
+msgstr "일시 중지(&S)"
+
+#: umain.resstrplaybackprevious
+msgctxt "umain.resstrplaybackprevious"
+msgid "&Back"
+msgstr "뒤로(&B)"
+
+#: umain.resstrquit
+msgctxt "umain.resstrquit"
+msgid "&Quit"
+msgstr "종료(&Q)"
+
+#: umain.resstrrandom
+msgctxt "umain.resstrrandom"
+msgid "Ran&dom"
+msgstr "무작위(&D)"
+
+#: umain.resstrrepeat
+msgctxt "umain.resstrrepeat"
+msgid "Repe&at"
+msgstr "반복(&A)"
+
+#: umain.resstrsecond
+msgctxt "umain.resstrsecond"
+msgid "second"
+msgstr "초"
+
+#: umain.resstrseconds
+msgctxt "umain.resstrseconds"
+msgid "seconds"
+msgstr "초"
+
+#: umain.resstrstartfullscreenslideshow
+msgid "Start &Fullscreen Slideshow"
+msgstr "전체 화면 슬라이드쇼 시작(&F)"
+
+#: umain.resstrstartinframeslideshow
+msgid "Start &InFrame Slideshow"
+msgstr "프레임 슬라이드쇼 시작(&I)"
+
+#: umain.resstrstayontop
+msgctxt "umain.resstrstayontop"
+msgid "Stay on top"
+msgstr "맨 위에 유지"
+
+#: umain.resstrbackground
+msgctxt "umain.background"
+msgid "Background Color"
+msgstr "배경 색상"
+
+#: umain.resstrbackgroundblack
+msgctxt "umain.backgroundblack"
+msgid "Black"
+msgstr "검정"
+
+#: umain.resstrbackgroundwhite
+msgctxt "umain.backgroundwhite"
+msgid "White"
+msgstr "흰색"
+
+#: umain.resstrstopfullscreenslideshow
+msgctxt "umain.resstrstopfullscreenslideshow"
+msgid "&Stop Fullscreen Slideshow"
+msgstr "전체 화면 슬라이드쇼 중지(&S)"
+
+#: umain.resstrstopinframeslideshow
+msgctxt "umain.resstrstopinframeslideshow"
+msgid "&Stop InFrame Slideshow"
+msgstr "프레임 슬라이드쇼 중지(&S)"
+
+#: umain.resstrstretch
+msgctxt "umain.resstrstretch"
+msgid "Stretch"
+msgstr "늘이기"
+
+#: umain.resstrstretchin
+msgctxt "umain.resstrstretchin"
+msgid "In (big->screen)"
+msgstr "큰 이미지를 화면 크기에 맞게 축소"
+
+#: umain.resstrstretchout
+msgctxt "umain.resstrstretchout"
+msgid "Out (small->screen)"
+msgstr "작은 이미지를 화면 크기에 맞게 확대"
+
+#: umain.resstropenpictures
+msgctxt "umain.resstropenpictures"
+msgid "Open picture(s)"
+msgstr "그림 열기"
