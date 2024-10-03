@@ -9,17 +9,17 @@ msgstr "關於"
 #: umain.resstrclose
 msgctxt "umain.resstrclose"
 msgid "&Close"
-msgstr "關閉(&C)"
+msgstr "關閉"
 
 #: umain.resstreffect
 msgctxt "umain.resstreffect"
 msgid "&Effect"
-msgstr "效果(&E)"
+msgstr "效果"
 
 #: umain.resstrfilter
 msgctxt "umain.resstrfilter"
 msgid "&Filter"
-msgstr "過濾器(&F)"
+msgstr "過濾器"
 
 #: umain.resstrfilterfilesize
 msgctxt "umain.resstrfilterfilesize"
@@ -33,31 +33,31 @@ msgstr "全屏幻燈片"
 
 #: umain.resstrfullscreenview
 msgid "&Fullscreen View"
-msgstr "全屏查看(&F)"
+msgstr "全屏查看"
 
 #: umain.resstrinframeslideshow
 msgctxt "umain.resstrinframeslideshow"
 msgid "InFrame Slideshow"
-msgstr "框架內幻燈片"
+msgstr "無窗幻燈片"
 
 #: umain.resstrinframeview
 msgid "&InFrame View"
-msgstr "框架內查看(&I)"
+msgstr "無窗模式"
 
 #: umain.resstrinterval
 msgctxt "umain.resstrinterval"
 msgid "&Interval"
-msgstr "間隔(&I)"
+msgstr "間隔"
 
 #: umain.resstrleavefullscreen
 msgctxt "umain.resstrleavefullscreen"
 msgid "&Leave Fullscreen"
-msgstr "退出全屏(&L)"
+msgstr "退出全屏"
 
 #: umain.resstrleaveinframe
 msgctxt "umain.resstrleaveinframe"
 msgid "&Leave InFrame"
-msgstr "退出框架(&L)"
+msgstr "退出無窗"
 
 #: umain.resstrminute
 msgctxt "umain.resstrminute"
@@ -77,42 +77,42 @@ msgstr "監視器"
 #: umain.resstrmoniters
 msgctxt "umain.resstrmoniters"
 msgid "&Moniters"
-msgstr "監視器(&M)"
+msgstr "監視器"
 
 #: umain.resstrplayback
 msgctxt "umain.resstrplayback"
 msgid "&Playback"
-msgstr "播放(&P)"
+msgstr "播放"
 
 #: umain.resstrplaybacknext
 msgctxt "umain.resstrplaybacknext"
 msgid "&Next"
-msgstr "下一個(&N)"
+msgstr "下一個"
 
 #: umain.resstrplaybackpause
 msgctxt "umain.resstrplaybackpause"
 msgid "Pau&se"
-msgstr "暫停(&S)"
+msgstr "暫停"
 
 #: umain.resstrplaybackprevious
 msgctxt "umain.resstrplaybackprevious"
 msgid "&Back"
-msgstr "上一個(&B)"
+msgstr "上一個"
 
 #: umain.resstrquit
 msgctxt "umain.resstrquit"
 msgid "&Quit"
-msgstr "退出(&Q)"
+msgstr "退出"
 
 #: umain.resstrrandom
 msgctxt "umain.resstrrandom"
 msgid "Ran&dom"
-msgstr "隨機(&D)"
+msgstr "隨機"
 
 #: umain.resstrrepeat
 msgctxt "umain.resstrrepeat"
 msgid "Repe&at"
-msgstr "重複(&A)"
+msgstr "重複"
 
 #: umain.resstrsecond
 msgctxt "umain.resstrsecond"
@@ -126,11 +126,11 @@ msgstr "秒"
 
 #: umain.resstrstartfullscreenslideshow
 msgid "Start &Fullscreen Slideshow"
-msgstr "開始全屏幻燈片(&F)"
+msgstr "開始全屏幻燈片"
 
 #: umain.resstrstartinframeslideshow
 msgid "Start &InFrame Slideshow"
-msgstr "開始框架內幻燈片(&I)"
+msgstr "開始無窗幻燈片"
 
 #: umain.resstrstayontop
 msgctxt "umain.resstrstayontop"
@@ -155,12 +155,12 @@ msgstr "白色"
 #: umain.resstrstopfullscreenslideshow
 msgctxt "umain.resstrstopfullscreenslideshow"
 msgid "&Stop Fullscreen Slideshow"
-msgstr "停止全屏幻燈片(&S)"
+msgstr "停止全屏幻燈片"
 
 #: umain.resstrstopinframeslideshow
 msgctxt "umain.resstrstopinframeslideshow"
 msgid "&Stop InFrame Slideshow"
-msgstr "停止框架內幻燈片(&S)"
+msgstr "停止無窗幻燈片"
 
 #: umain.resstrstretch
 msgctxt "umain.resstrstretch"
@@ -170,12 +170,12 @@ msgstr "拉伸"
 #: umain.resstrstretchin
 msgctxt "umain.resstrstretchin"
 msgid "In (big->screen)"
-msgstr "拉伸入 (大->屏幕)"
+msgstr "適應窗口"
 
 #: umain.resstrstretchout
 msgctxt "umain.resstrstretchout"
 msgid "Out (small->screen)"
-msgstr "拉伸出 (小->屏幕)"
+msgstr "拉伸放大"
 
 #: umain.resstropenpictures
 msgctxt "umain.resstropenpictures"
