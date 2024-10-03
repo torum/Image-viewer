@@ -105,6 +105,7 @@ If you are on Linux, you may need to change target platform. Main menu > Project
 - [@Nemo08](https://github.com/Nemo08) Russian translation.
 - [@quadroid](https://github.com/quadroid) File/folder drop and portable mode.
 - [@killtimer920](https://github.com/killtimer920) Chinese translations (simplified zh-CN and traditional zh-Hant).
+- [@VenusGirl](https://github.com/VenusGirl) Korean translation.
 
 ## Third-party components
 [win32titlestyler.pas](https://github.com/Alexey-T/CudaText/blob/master/comp/win32titlestyler.pas) by [@Alexey-T](https://github.com/Alexey-T) 
