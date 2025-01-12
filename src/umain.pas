@@ -2419,7 +2419,7 @@ begin
     WindowState:= FOrigWndState;
     if (FOrigWndState = wsNormal) then
     begin
-         BoundsRect:= FOrigBounds;
+      //BoundsRect:= FOrigBounds; // Not needed. Resized to a wrong size.
     end;
   end;
 end;
