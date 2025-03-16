@@ -1,14 +1,15 @@
 object frmMain: TfrmMain
   Left = 1683
-  Height = 354
+  Height = 531
   Top = 1067
-  Width = 426
+  Width = 639
   AllowDropFiles = True
   AlphaBlend = True
   Caption = 'Image Viewer Main'
-  ClientHeight = 354
-  ClientWidth = 426
+  ClientHeight = 531
+  ClientWidth = 639
   Color = clSilver
+  DesignTimePPI = 144
   OnActivate = FormActivate
   OnClick = FormClick
   OnCloseQuery = FormCloseQuery
@@ -27,12 +28,12 @@ object frmMain: TfrmMain
   OnShow = FormShow
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '3.4.0.0'
+  LCLVersion = '3.8.0.0'
   object Image1: TImage
     Left = 0
-    Height = 354
+    Height = 531
     Top = 0
-    Width = 426
+    Width = 639
     Align = alClient
     AutoSize = True
     Center = True
@@ -47,17 +48,17 @@ object frmMain: TfrmMain
   end
   object ScrollBox1: TScrollBox
     Left = 0
-    Height = 354
+    Height = 531
     Top = 0
-    Width = 426
-    HorzScrollBar.Page = 320
+    Width = 639
+    HorzScrollBar.Page = 480
     HorzScrollBar.Tracking = True
-    VertScrollBar.Page = 241
+    VertScrollBar.Page = 362
     VertScrollBar.Tracking = True
     Align = alClient
     BorderStyle = bsNone
-    ClientHeight = 354
-    ClientWidth = 426
+    ClientHeight = 531
+    ClientWidth = 639
     ParentBackground = False
     TabOrder = 0
     Visible = False
@@ -65,9 +66,9 @@ object frmMain: TfrmMain
     OnMouseWheelUp = ScrollBox1MouseWheelUp
     object PaintBox1: TPaintBox
       Left = 0
-      Height = 241
+      Height = 362
       Top = 0
-      Width = 320
+      Width = 480
       OnPaint = PaintBox1Paint
     end
   end
@@ -9440,13 +9441,13 @@ object frmMain: TfrmMain
       426082
     }
     OnDblClick = TrayIcon1DblClick
-    Left = 282
-    Top = 198
+    Left = 423
+    Top = 297
   end
   object PopupMenuMain: TPopupMenu
     OnPopup = PopupMenuMainPopup
-    Left = 198
-    Top = 102
+    Left = 297
+    Top = 153
     object MenuItemNext: TMenuItem
       Caption = 'Next'
       ShortCut = 39
@@ -9524,27 +9525,27 @@ object frmMain: TfrmMain
     ExceptionDialog = aedOkMessageBox
     ShowMainForm = False
     OnException = ApplicationProperties1Exception
-    Left = 282
-    Top = 13
+    Left = 423
+    Top = 20
   end
   object OpenPictureDialog1: TOpenPictureDialog
     Title = 'Open picture(s)'
     Filter = 'All (*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif)|*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Portable Network Graphics (*.png)|*.png|Graphics Interchange Format (*.gif)|*.gif'
     Options = [ofFileMustExist, ofNoTestFileCreate, ofEnableSizing, ofDontAddToRecent, ofAutoPreview]
-    Left = 51
-    Top = 19
+    Left = 77
+    Top = 29
   end
   object XMLConfig: TXMLConfig
     StartEmpty = False
     RootName = 'Application'
     ReadOnly = False
-    Left = 84
-    Top = 166
+    Left = 126
+    Top = 249
   end
   object PopupMenuSystem: TPopupMenu
     OnPopup = PopupMenuSystemPopup
-    Left = 230
-    Top = 198
+    Left = 345
+    Top = 297
     object MenuItemSysAbout: TMenuItem
       Caption = 'About'
       OnClick = MenuItemSysAboutClick
@@ -9561,14 +9562,14 @@ object frmMain: TfrmMain
     Enabled = False
     Interval = 1
     OnTimer = TimerDelayStartTimer
-    Left = 141
-    Top = 102
+    Left = 212
+    Top = 153
   end
   object TimerEffectStart: TTimer
     Enabled = False
     Interval = 1
     OnTimer = TimerEffectStartTimer
-    Left = 84
-    Top = 102
+    Left = 126
+    Top = 153
   end
 end

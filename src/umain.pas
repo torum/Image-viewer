@@ -674,6 +674,9 @@ begin
     end;
   end;
 
+  // sort
+  FstPlaylistList.Sort;
+
   // Search inside folder(s)
   LoadDirectories(FstDirectoryList, FstFileList);
 
@@ -995,6 +998,10 @@ begin
       try
         // Recursively search files
         folderfiles := FindAllFiles(Dirs[i], fileSearchMask, FOptIncludeSubFolders);
+
+        // sort
+        folderfiles.Sort;
+
         for j:=0 to folderfiles.Count - 1 do
         begin
           // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
@@ -1040,6 +1047,10 @@ begin
   try
     // Find siblings.
     folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
+
+    // sort
+    folderfiles.Sort;
+
     for j:=0 to folderfiles.Count - 1 do
     begin
       // MacOS has a bad habit of leaving garbages like this. So, skipping files start with ".".
