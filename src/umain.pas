@@ -675,7 +675,7 @@ begin
   end;
 
   // sort
-  FstPlaylistList.Sort;
+  FstFileList.Sort;
 
   // Search inside folder(s)
   LoadDirectories(FstDirectoryList, FstFileList);
@@ -727,6 +727,9 @@ begin
           FstPlaylistList.Add(OpenPictureDialog1.Files[i]);
         end;
       end;
+
+      // sort
+      FstFileList.Sort;
     end;
 
     //TODO: playlist
