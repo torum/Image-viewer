@@ -6,9 +6,12 @@ uses
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms, UMain, Ufullscreen, UAbout,
-  LCLTranslator, lazutf8, Translations{$ifdef windows}, Windows{$endif};
+  Interfaces, Forms,
+  {$ifdef windows}
+  libwebp, fpreadwebp, webpimage, Windows,
+  {$endif}
+  UMain, Ufullscreen, UAbout,
+  LCLTranslator, lazutf8, Translations;
 
 {$R *.res}
 

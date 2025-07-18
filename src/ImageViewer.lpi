@@ -51,7 +51,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="4">
+    <Units Count="6">
       <Unit0>
         <Filename Value="ImageViewer.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -80,6 +80,14 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UAbout"/>
       </Unit3>
+      <Unit4>
+        <Filename Value="libwebp\fpreadwebp.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="libwebp\libwebp.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -90,6 +98,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="libwebp"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <CodeGeneration>

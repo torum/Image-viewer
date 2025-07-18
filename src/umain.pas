@@ -29,7 +29,7 @@ unit UMain;
 
 ### TODO:
 * Blur effect on/off option. Need to find a way to enable on fullscreen with a modal window first...
-* WebP support. Preferably without Dlls or external components.
+* WebP support. Preferably without Dlls or external components. > with dll.
 * Better zooming.
 
 ### Backlog:
@@ -48,7 +48,11 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   LclType, LclProc, LclIntf, Menus, StdCtrls, ExtDlgs,
   strutils, Types, FileCtrl, XMLConf
-  {$ifdef windows}, windirs, Windows, DWMApi, win32titlestyler{$endif}
+  {$ifdef windows}, windirs, Windows, DWMApi, win32titlestyler,
+  libwebp,
+  fpreadwebp,
+  webpimage,
+  intfgraphics, graphtype{$endif}
   ;
 
 type
@@ -179,6 +183,7 @@ type
     FstrInitialSelectedImageFile:string;
     FstrInitialDir:string;
     FintZoomingScaleFactor:integer;
+    FisWebpEnabled: boolean;
     procedure ShowFullScreen(blnOn: boolean);
     procedure SetFullScreen_Universal(blnOn: boolean);
     procedure SetFullScreen_Win32(blnOn: boolean);
@@ -304,7 +309,13 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.4.3.0';
+  FstrAppVer:='1.4.4.0';
+
+  if (LoadLibwebp()) then begin
+     FisWebpEnabled:=true;
+  end else begin
+    FisWebpEnabled:=false;
+  end;
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -332,8 +343,16 @@ begin
   FOptRandom:=true;
   FOptRepeat:=true;
   {$ifdef windows}
-  FOptFileExts:='.jpg;.jpeg;.jpe;.jfif;.png;.gif;.bmp;.ico';
-  OpenPictureDialog1.Filter:='All (*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico)|*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Portable Network Graphics (*.png)|*.png|Graphics Interchange Format (*.gif)|*.gif|Bitmap (*.bmp)|*.bmp|Icon (*.ico)|*.ico';
+  if (FisWebpEnabled)then
+  begin
+    FOptFileExts:='.jpg;.jpeg;.jpe;.jpe;.jfif;.png;.gif;.bmp;.ico;.webp';
+
+    OpenPictureDialog1.Filter:='All (*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico;*.webp)|*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico;*.webp|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Portable Network Graphics (*.png)|*.png|Graphics Interchange Format (*.gif)|*.gif|Bitmap (*.bmp)|*.bmp|Icon (*.ico)|*.ico|WebP (*.webp)|*.webp';
+  end else
+  begin
+      FOptFileExts:='.jpg;.jpeg;.jpe;.jfif;.png;.gif;.bmp;.ico';
+      OpenPictureDialog1.Filter:='All (*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico)|*.jpeg;*.jpg;*.jpe;*.jfif;*.png;*.gif;*.bmp;*.ico|Joint Picture Expert Group (*.jpeg;*.jpg;*.jpe;*.jfif)|*.jpeg;*.jpg;*.jpe;*.jfif|Portable Network Graphics (*.png)|*.png|Graphics Interchange Format (*.gif)|*.gif|Bitmap (*.bmp)|*.bmp|Icon (*.ico)|*.ico';
+  end;
   {$else}
   FOptFileExts:='.jpg;.jpeg;.jpe;.png;.gif';
   {$endif}
@@ -976,6 +995,10 @@ begin
   FstFileList.Free;
   FstDirectoryList.Free;
   FstPlaylistList.Free;
+
+  if (FisWebpEnabled) then begin
+    UnloadLibwebp;
+  end;
 end;
 
 procedure TfrmMain.LoadDirectories(const Dirs: TStringList; FList: TStringList);
@@ -1715,9 +1738,14 @@ begin
     begin
       self.left := self.left + GetSystemMetrics(SM_CYFRAME);
       titlebarheight:=GetSystemMetrics(SM_CYCAPTION)+ GetSystemMetrics(SM_CYFRAME);
+
+      // This would keep the size and pos of window, but...
+      //self.Top := self.Top + titlebarheight;
+
       // This will keep the window size, but ... also create unwanted space above and below.
-      //self.height := self.height + titlebarheight;
-      self.Top := self.Top + titlebarheight;
+      self.height := self.height + titlebarheight;
+
+
     end;
     self.AlphaBlendValue:=255;
 
@@ -2584,7 +2612,9 @@ begin
   end;
 
 end;
+{$endif}
 
+{$ifdef windows}
 initialization
   SetWindowCompositionAttribute := GetProcAddress(GetModuleHandle(user32), 'SetWindowCompositionAttribute');
 {$endif}
