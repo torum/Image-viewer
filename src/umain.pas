@@ -311,11 +311,13 @@ var
 begin
   FstrAppVer:='1.4.4.0';
 
+  {$ifdef windows}
   if (LoadLibwebp()) then begin
      FisWebpEnabled:=true;
   end else begin
     FisWebpEnabled:=false;
   end;
+  {$endif}
 
   // Init Main form properties.
   self.Caption:=ReplaceStr(ExtractFileName(ParamStr(0)),ExtractFileExt(ParamStr(0)),'');
@@ -996,9 +998,11 @@ begin
   FstDirectoryList.Free;
   FstPlaylistList.Free;
 
+  {$ifdef windows}
   if (FisWebpEnabled) then begin
     UnloadLibwebp;
   end;
+  {$endif}
 end;
 
 procedure TfrmMain.LoadDirectories(const Dirs: TStringList; FList: TStringList);
