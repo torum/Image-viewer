@@ -12,7 +12,7 @@ object frmMain: TfrmMain
   DesignTimePPI = 144
   PopupMode = pmAuto
   Position = poScreenCenter
-  LCLVersion = '4.0.0.4'
+  LCLVersion = '4.2.0.0'
   OnActivate = FormActivate
   OnClick = FormClick
   OnCloseQuery = FormCloseQuery

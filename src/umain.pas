@@ -175,7 +175,7 @@ type
     FisSlideshowAutoStart:boolean;
     FisSingleFileSelected: boolean;
     FisManualTransition:boolean;
-    FCurrentMonitor:TMonitor;
+    //FCurrentMonitor:TMonitor;
     FOrigBounds: TRect;
     FOrigWndState: TWindowState;
     FiCurrentFileIndex:integer;
@@ -250,6 +250,7 @@ var
 {$ifdef windows}
 var
   SetWindowCompositionAttribute: function (Wnd: HWND; const AttrData: TWinCompAttrData): BOOL; stdcall = Nil;
+
 {$endif}
 
 resourcestring
@@ -309,7 +310,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.4.4.0';
+  FstrAppVer:='1.4.5.0';
 
   {$ifdef windows}
   if (LoadLibwebp()) then begin
@@ -696,7 +697,7 @@ begin
   end;
 
   // sort
-  FstFileList.Sort;
+  //FstFileList.Sort;
 
   // Search inside folder(s)
   LoadDirectories(FstDirectoryList, FstFileList);
@@ -750,7 +751,7 @@ begin
       end;
 
       // sort
-      FstFileList.Sort;
+      //FstFileList.Sort;
     end;
 
     //TODO: playlist
@@ -1030,7 +1031,7 @@ begin
         folderfiles := FindAllFiles(Dirs[i], fileSearchMask, FOptIncludeSubFolders);
 
         // sort
-        folderfiles.Sort;
+        //folderfiles.Sort;
 
         for j:=0 to folderfiles.Count - 1 do
         begin
@@ -1079,7 +1080,7 @@ begin
     folderfiles := FindAllFiles(fileFolder, fileSearchMask, false);
 
     // sort
-    folderfiles.Sort;
+    //folderfiles.Sort;
 
     for j:=0 to folderfiles.Count - 1 do
     begin
@@ -1496,7 +1497,7 @@ begin
     Image1.Visible:=false;
 
     // Sets current screen of the form.
-    FCurrentMonitor:=Screen.MonitorFromWindow(handle);
+    //FCurrentMonitor:=Screen.MonitorFromWindow(handle);
     FOptIntMoniter:=getCurrentMonitorIndex();
 
     if FOptTransitEffect then
@@ -2352,14 +2353,9 @@ end;
 
 function TfrmMain.GetCurrentMonitor():TMonitor;
 begin
-  if not Assigned(FCurrentMonitor) then
-  begin
-    FCurrentMonitor := Screen.MonitorFromWindow(Handle);
-    result:=FCurrentMonitor;
-  end else
-  begin
-    result:=FCurrentMonitor;
-  end;
+  //FCurrentMonitor := Screen.MonitorFromWindow(Handle);
+  //result:=FCurrentMonitor;
+  result := Screen.MonitorFromWindow(Handle);
 end;
 
 function TfrmMain.GetCurrentMonitorIndex():integer;
@@ -2571,7 +2567,11 @@ begin
   end;
 end;
 
+
+
+
 {$ifdef windows}
+
 // requires delphi mode.
 // https://wiki.lazarus.freepascal.org/Aero_Glass
 procedure TfrmMain.EnableBlur;
