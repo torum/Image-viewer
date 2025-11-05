@@ -310,7 +310,7 @@ var
   i,f:integer;
   configFile:string;
 begin
-  FstrAppVer:='1.4.5.0';
+  FstrAppVer:='1.4.6.0';
 
   {$ifdef windows}
   if (LoadLibwebp()) then begin

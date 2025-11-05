@@ -15,7 +15,6 @@
       <XPManifest>
         <DpiAware Value="True/PM_V2"/>
         <LongPathAware Value="True"/>
-        <AnsiUTF8 Value="True"/>
         <TextName Value="torum.ImageViewer.ImageViewer"/>
         <TextDesc Value="Image Viewer/Slideshow"/>
       </XPManifest>
@@ -29,7 +28,7 @@
       <UseVersionInfo Value="True"/>
       <MajorVersionNr Value="1"/>
       <MinorVersionNr Value="4"/>
-      <RevisionNr Value="5"/>
+      <RevisionNr Value="6"/>
       <StringTable FileDescription="Image Viewer" InternalName="ImageViewer" LegalCopyright="torum" OriginalFilename="ImageViewer.exe" ProductName="Simple Image Viewer"/>
     </VersionInfo>
     <BuildModes Count="1">
