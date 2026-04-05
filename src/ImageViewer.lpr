@@ -39,13 +39,16 @@ begin
     strLang := 'en';
 
   if (strLanguageCode = 'ja') or (strLanguageID = 'jp_JP') then
-    strLang := 'ja';//'ja_JP';
+    strLang := 'ja';
 
   if (strLanguageCode = 'ko') or (strLanguageID = 'ko_KR') then
-    strLang := 'ko';//'ko_KR';
+    strLang := 'ko';
 
   if (strLanguageCode = 'ru') or (strLanguageID = 'ru_RU') then
-    strLang := 'ru';//'ru_RU';
+    strLang := 'ru';
+
+  if (strLanguageCode = 'sl') or (strLanguageID = 'sl-SI') then
+    strLang := 'sl';
 
   if (strLanguageCode = 'zh') then begin
     if (strLanguageID = 'zh_Hant') then begin
