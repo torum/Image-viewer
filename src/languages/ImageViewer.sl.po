@@ -1,0 +1,183 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8"
+
+#: umain.resstrabout
+msgctxt "umain.resstrabout"
+msgid "About"
+msgstr "O programu"
+
+#: umain.resstrclose
+msgctxt "umain.resstrclose"
+msgid "&Close"
+msgstr "&Zapri"
+
+#: umain.resstreffect
+msgctxt "umain.resstreffect"
+msgid "&Effect"
+msgstr "&Učinek"
+
+#: umain.resstrfilter
+msgctxt "umain.resstrfilter"
+msgid "&Filter"
+msgstr "&Filter"
+
+#: umain.resstrfilterfilesize
+msgctxt "umain.resstrfilterfilesize"
+msgid "File size"
+msgstr "Velikost datoteke"
+
+#: umain.resstrfullscreenslideshow
+msgctxt "umain.resstrfullscreenslideshow"
+msgid "Fullscreen Slideshow"
+msgstr "Celozaslonska predstavitev"
+
+#: umain.resstrfullscreenview
+msgid "&Fullscreen View"
+msgstr "&Celozaslonski pogled"
+
+#: umain.resstrinframeslideshow
+msgctxt "umain.resstrinframeslideshow"
+msgid "InFrame Slideshow"
+msgstr "Predstavitev v okvirju"
+
+#: umain.resstrinframeview
+msgid "&InFrame View"
+msgstr "&Pogled v okvirju"
+
+#: umain.resstrinterval
+msgctxt "umain.resstrinterval"
+msgid "&Interval"
+msgstr "&Interval"
+
+#: umain.resstrleavefullscreen
+msgctxt "umain.resstrleavefullscreen"
+msgid "&Leave Fullscreen"
+msgstr "&Zapusti celozaslonski način"
+
+#: umain.resstrleaveinframe
+msgctxt "umain.resstrleaveinframe"
+msgid "&Leave InFrame"
+msgstr "&Zapusti okvir"
+
+#: umain.resstrminute
+msgctxt "umain.resstrminute"
+msgid "minute"
+msgstr "minuta"
+
+#: umain.resstrminutes
+msgctxt "umain.resstrminutes"
+msgid "minutes"
+msgstr "minute"
+
+#: umain.resstrmoniter
+msgctxt "umain.resstrmoniter"
+msgid "Moniter"
+msgstr "Monitor"
+
+#: umain.resstrmoniters
+msgctxt "umain.resstrmoniters"
+msgid "&Moniters"
+msgstr "&Monitorji"
+
+#: umain.resstrplayback
+msgctxt "umain.resstrplayback"
+msgid "&Playback"
+msgstr "&Predvajanje"
+
+#: umain.resstrplaybacknext
+msgctxt "umain.resstrplaybacknext"
+msgid "&Next"
+msgstr "&Naprej"
+
+#: umain.resstrplaybackpause
+msgctxt "umain.resstrplaybackpause"
+msgid "Pau&se"
+msgstr "&Premor"
+
+#: umain.resstrplaybackprevious
+msgctxt "umain.resstrplaybackprevious"
+msgid "&Back"
+msgstr "&Nazaj"
+
+#: umain.resstrquit
+msgctxt "umain.resstrquit"
+msgid "&Quit"
+msgstr "&Izhod"
+
+#: umain.resstrrandom
+msgctxt "umain.resstrrandom"
+msgid "Ran&dom"
+msgstr "&Naključno"
+
+#: umain.resstrrepeat
+msgctxt "umain.resstrrepeat"
+msgid "Repe&at"
+msgstr "&Ponovi"
+
+#: umain.resstrsecond
+msgctxt "umain.resstrsecond"
+msgid "second"
+msgstr "sekunda"
+
+#: umain.resstrseconds
+msgctxt "umain.resstrseconds"
+msgid "seconds"
+msgstr "sekunde"
+
+#: umain.resstrstartfullscreenslideshow
+msgid "Start &Fullscreen Slideshow"
+msgstr "Zaženi &celozaslonsko predstavitev"
+
+#: umain.resstrstartinframeslideshow
+msgid "Start &InFrame Slideshow"
+msgstr "Zaženi &predstavitev v okvirju"
+
+#: umain.resstrstayontop
+msgctxt "umain.resstrstayontop"
+msgid "Stay on top"
+msgstr "Vedno na vrhu"
+
+#: umain.resstrbackground
+msgctxt "umain.background"
+msgid "Background Color"
+msgstr "Barva ozadja"
+
+#: umain.resstrbackgroundblack
+msgctxt "umain.backgroundblack"
+msgid "Black"
+msgstr "Črna"
+
+#: umain.resstrbackgroundwhite
+msgctxt "umain.backgroundwhite"
+msgid "White"
+msgstr "Bela"
+
+#: umain.resstrstopfullscreenslideshow
+msgctxt "umain.resstrstopfullscreenslideshow"
+msgid "&Stop Fullscreen Slideshow"
+msgstr "&Ustavi celozaslonsko predstavitev"
+
+#: umain.resstrstopinframeslideshow
+msgctxt "umain.resstrstopinframeslideshow"
+msgid "&Stop InFrame Slideshow"
+msgstr "&Ustavi predstavitev v okvirju"
+
+#: umain.resstrstretch
+msgctxt "umain.resstrstretch"
+msgid "Stretch"
+msgstr "Raztegni"
+
+#: umain.resstrstretchin
+msgctxt "umain.resstrstretchin"
+msgid "In (big->screen)"
+msgstr "Navznoter (veliko->zaslon)"
+
+#: umain.resstrstretchout
+msgctxt "umain.resstrstretchout"
+msgid "Out (small->screen)"
+msgstr "Navzven (majhno->zaslon)"
+
+#: umain.resstropenpictures
+msgctxt "umain.resstropenpictures"
+msgid "Open picture(s)"
+msgstr "Odpri sliko(e)"
